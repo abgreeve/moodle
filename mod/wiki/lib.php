@@ -830,3 +830,29 @@ function mod_wiki_core_calendar_provide_event_action(calendar_event $event,
         true
     );
 }
+
+/**
+ * This standard function will check all instances of this module
+ * and make sure there are up-to-date events created for each of them.
+ * If courseid = 0, then every wiki event in the site is checked, else
+ * only wiki events belonging to the course specified are checked.
+ * This function is used, in its new format, by restore_refresh_events()
+ *
+ * @param int $courseid
+ * @return bool
+ */
+function wiki_refresh_events($courseid = 0) {
+
+    $courses = ($courseid == 0) ? get_courses() : array(get_course($courseid));
+    foreach ($courses as $course) {
+
+        $modinfo = get_fast_modinfo($course);
+        $cms = $modinfo->instances['wiki'];
+
+        foreach ($cms as $cm) {
+            \core_completion\api::update_completion_date_event($cm->id, 'wiki', $cm->instance, $cm->completionexpected);
+        }
+    }
+
+    return true;
+}

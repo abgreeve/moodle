@@ -166,6 +166,9 @@ function scorm_add_instance($scorm, $mform=null) {
 
     scorm_grade_item_update($record);
     scorm_update_calendar($record, $cmid);
+    if (!empty($scorm->completionexpected)) {
+        \core_completion\api::update_completion_date_event($cmid, 'scorm', $record, $scorm->completionexpected);
+    }
 
     return $record->id;
 }
@@ -244,6 +247,8 @@ function scorm_update_instance($scorm, $mform=null) {
     }
 
     $DB->update_record('scorm', $scorm);
+    // We need to find this out before we blow away the form data.
+    $completionexpected = (!empty($scorm->completionexpected)) ? $scorm->completionexpected : null;
 
     $scorm = $DB->get_record('scorm', array('id' => $scorm->id));
 
@@ -257,6 +262,7 @@ function scorm_update_instance($scorm, $mform=null) {
     scorm_grade_item_update($scorm);
     scorm_update_grades($scorm);
     scorm_update_calendar($scorm, $cmid);
+    \core_completion\api::update_completion_date_event($cmid, 'scorm', $scorm, $completionexpected);
 
     return true;
 }

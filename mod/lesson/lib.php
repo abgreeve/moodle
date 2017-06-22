@@ -55,6 +55,10 @@ function lesson_add_instance($data, $mform) {
 
     lesson_process_post_save($data);
 
+    if (!empty($data->completionexpected)) {
+        \core_completion\api::update_completion_date_event($cmid, 'lesson', $data->id, $data->completionexpected);
+    }
+
     lesson_grade_item_update($data);
 
     return $lessonid;
@@ -85,6 +89,9 @@ function lesson_update_instance($data, $mform) {
     lesson_update_media_file($data->id, $context, $draftitemid);
 
     lesson_process_post_save($data);
+
+    $completionexpected = (!empty($data->completionexpected)) ? $data->completionexpected : null;
+    \core_completion\api::update_completion_date_event($cmid, 'lesson', $data->id, $completionexpected);
 
     // update grade item definition
     lesson_grade_item_update($data);

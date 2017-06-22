@@ -982,6 +982,9 @@ function data_add_instance($data, $mform = null) {
 
     // Add calendar events if necessary.
     data_set_events($data);
+    if (!empty($data->completionexpected)) {
+        \core_completion\api::update_completion_date_event($data->coursemodule, 'data', $data->id, $data->completionexpected);
+    }
 
     data_grade_item_update($data);
 
@@ -1019,6 +1022,8 @@ function data_update_instance($data) {
 
     // Add calendar events if necessary.
     data_set_events($data);
+    $completionexpected = (!empty($data->completionexpected)) ? $data->completionexpected : null;
+    \core_completion\api::update_completion_date_event($data->coursemodule, 'data', $data->id, $completionexpected);
 
     data_grade_item_update($data);
 

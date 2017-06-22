@@ -100,6 +100,9 @@ function quiz_add_instance($quiz) {
 
     // Do the processing required after an add or an update.
     quiz_after_add_or_update($quiz);
+    if (!empty($quiz->completionexpected)) {
+        \core_completion\api::update_completion_date_event($cmid, 'quiz', $quiz->id, $quiz->completionexpected);
+    }
 
     return $quiz->id;
 }
@@ -136,6 +139,9 @@ function quiz_update_instance($quiz, $mform) {
 
     // Do the processing required after an add or an update.
     quiz_after_add_or_update($quiz);
+
+    $completionexpected = (!empty($quiz->completionexpected)) ? $quiz->completionexpected : null;
+    \core_completion\api::update_completion_date_event($quiz->coursemodule, 'quiz', $quiz->id, $completionexpected);
 
     if ($oldquiz->grademethod != $quiz->grademethod) {
         quiz_update_all_final_grades($quiz);

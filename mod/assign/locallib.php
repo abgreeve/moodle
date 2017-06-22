@@ -696,6 +696,11 @@ class assign {
 
         }
 
+        if (!empty($formdata->completionexpected)) {
+            \core_completion\api::update_completion_date_event($formdata->coursemodule, 'assign', $this->instance,
+                    $formdata->completionexpected);
+        }
+
         $update = new stdClass();
         $update->id = $this->get_instance()->id;
         $update->nosubmissions = (!$this->is_any_submission_plugin_enabled()) ? 1: 0;
@@ -1296,6 +1301,11 @@ class assign {
         }
 
         $this->update_calendar($this->get_course_module()->id);
+
+        $completionexpected = (!empty($formdata->completionexpected)) ? $formdata->completionexpected : null;
+        \core_completion\api::update_completion_date_event($this->get_course_module()->id, 'assign', $this->instance,
+                $completionexpected);
+
         $this->update_gradebook(false, $this->get_course_module()->id);
 
         $update = new stdClass();

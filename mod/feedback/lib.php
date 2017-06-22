@@ -102,6 +102,10 @@ function feedback_add_instance($feedback) {
 
     $feedback->id = $feedbackid;
 
+    if (!empty($feedback->completionexpected)) {
+        \core_completion\api::update_completion_date_event($feedback->coursemodule, 'feedback', $feedback->id,
+                $feedback->completionexpected);
+    }
     feedback_set_events($feedback);
 
     if (!isset($feedback->coursemodule)) {
@@ -147,6 +151,8 @@ function feedback_update_instance($feedback) {
     $DB->update_record("feedback", $feedback);
 
     //create or update the new events
+    $completionexpected = (!empty($feedback->completionexpected)) ? $feedback->completionexpected : null;
+    \core_completion\api::update_completion_date_event($feedback->coursemodule, 'feedback', $feedback->id, $completionexpected);
     feedback_set_events($feedback);
 
     $context = context_module::instance($feedback->coursemodule);

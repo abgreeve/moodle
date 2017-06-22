@@ -133,6 +133,11 @@ function chat_add_instance($chat) {
 
         calendar_event::create($event);
     }
+
+    if (!empty($chat->completionexpected)) {
+        \core_completion\api::update_completion_date_event($chat->coursemodule, 'chat', $returnid, $chat->completionexpected);
+    }
+
     return $returnid;
 }
 
@@ -191,6 +196,9 @@ function chat_update_instance($chat) {
             calendar_event::create($event);
         }
     }
+
+    $completionexpected = (!empty($chat->completionexpected)) ? $chat->completionexpected : null;
+    \core_completion\api::update_completion_date_event($chat->coursemodule, 'chat', $chat->id, $completionexpected);
 
     return true;
 }

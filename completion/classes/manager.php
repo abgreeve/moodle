@@ -319,6 +319,9 @@ class manager {
                     // If completion was changed we will need to reset it's state. Exception is when completion was and remains as manual.
                     $needreset[] = $cm->id;
                 }
+
+                $completionexpected = ($data['completionexpected']) ? $data['completionexpected']: null;
+                \core_completion\api::update_completion_date_event($cm->id, $cm->modname, $cm->instance, $completionexpected);
             }
         }
         if ($updated) {

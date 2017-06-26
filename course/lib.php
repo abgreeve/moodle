@@ -1110,6 +1110,9 @@ function set_coursemodule_name($id, $name) {
     grade_update_mod_grades($grademodule);
 
     // Update calendar events with the new name.
+    $completionexpected = (!empty($cm->completionexpected)) ? $cm->completionexpected : null;
+    \core_completion\api::update_completion_date_event($cm->id, $cm->modname, $grademodule, $completionexpected);
+
     $refresheventsfunction = $cm->modname . '_refresh_events';
     if (function_exists($refresheventsfunction)) {
         call_user_func($refresheventsfunction, $cm->course);

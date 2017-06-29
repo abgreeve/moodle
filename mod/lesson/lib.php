@@ -304,10 +304,28 @@ function lesson_get_group_override_priorities($lessonid) {
  * This function is used, in its new format, by restore_refresh_events()
  *
  * @param int $courseid
+ * @param int|stdClass $instance lesson module instance or ID.
+ * @param int|stdClass $cm Course module object or ID.
  * @return bool
  */
-function lesson_refresh_events($courseid = 0) {
+function lesson_refresh_events($courseid = 0, $instance = null, $cm = null) {
     global $DB;
+
+    // If we have instance information then we can just update the one event instead of updating all events.
+    if (isset($instance)) {
+        if (!is_object($instance)) {
+            $instance = $DB->get_record('lesson', array('id' => $instance), '*', MUST_EXIST);
+        }
+        if (isset($cm)) {
+            if (!is_object($cm)) {
+                $cm = get_coursemodule_from_instance('lesson', $instance->id, $instance->course);
+            }
+            lesson_update_events($instance);
+            $completionexpected = (!empty($cm->completionexpected)) ? $cm->completionexpected : null;
+            \core_completion\api::update_completion_date_event($cm->id, 'lesson', $instance, $completionexpected);
+            return true;
+        }
+    }
 
     if ($courseid == 0) {
         if (!$lessons = $DB->get_records('lesson')) {
@@ -320,7 +338,10 @@ function lesson_refresh_events($courseid = 0) {
     }
 
     foreach ($lessons as $lesson) {
+        $cm = get_coursemodule_from_instance('lesson', $lesson->id, $lesson->course);
         lesson_update_events($lesson);
+        $completionexpected = (!empty($cm->completionexpected)) ? $cm->completionexpected : null;
+        \core_completion\api::update_completion_date_event($cm->id, 'lesson', $lesson, $completionexpected);
     }
 
     return true;
@@ -979,6 +1000,8 @@ function lesson_process_pre_save(&$lesson) {
 function lesson_process_post_save(&$lesson) {
     // Update the events relating to this lesson.
     lesson_update_events($lesson);
+    $completionexpected = (!empty($lesson->completionexpected)) ? $lesson->completionexpected : null;
+    \core_completion\api::update_completion_date_event($lesson->coursemodule, 'lesson', $lesson, $completionexpected);
 }
 
 

@@ -141,6 +141,11 @@ function choice_add_instance($choice) {
     // Add calendar events if necessary.
     choice_set_events($choice);
 
+    if (!empty($choice->completionexpected)) {
+        \core_completion\api::update_completion_date_event($choice->coursemodule, 'choice', $choice->id,
+                $choice->completionexpected);
+    }
+
     return $choice->id;
 }
 
@@ -189,6 +194,8 @@ function choice_update_instance($choice) {
 
     // Add calendar events if necessary.
     choice_set_events($choice);
+    $completionexpected = (!empty($choice->completionexpected)) ? $choice->completionexpected : null;
+    \core_completion\api::update_completion_date_event($choice->coursemodule, 'choice', $choice->id, $completionexpected);
 
     return $DB->update_record('choice', $choice);
 
@@ -1124,11 +1131,29 @@ function choice_get_availability_status($choice) {
  * This function is used, in its new format, by restore_refresh_events()
  *
  * @param int $courseid
+ * @param int|stdClass $instance Choice module instance or ID.
+ * @param int|stdClass $cm Course module object or ID.
  * @return bool
  */
-function choice_refresh_events($courseid = 0) {
+function choice_refresh_events($courseid = 0, $instance = null, $cm = null) {
     global $DB, $CFG;
     require_once($CFG->dirroot.'/mod/choice/locallib.php');
+
+    // If we have instance information then we can just update the one event instead of updating all events.
+    if (isset($instance)) {
+        if (!is_object($instance)) {
+            $instance = $DB->get_record('choice', array('id' => $instance), '*', MUST_EXIST);
+        }
+        if (isset($cm)) {
+            if (!is_object($cm)) {
+                $cm = get_coursemodule_from_instance('choice', $instance->id, $instance->course);
+            }
+            $completionexpected = (!empty($cm->completionexpected)) ? $cm->completionexpected : null;
+            \core_completion\api::update_completion_date_event($cm->id, 'choice', $instance, $completionexpected);
+        }
+        choice_set_events($instance);
+        return true;
+    }
 
     if ($courseid) {
         if (! $choices = $DB->get_records("choice", array("course" => $courseid))) {
@@ -1141,7 +1166,10 @@ function choice_refresh_events($courseid = 0) {
     }
 
     foreach ($choices as $choice) {
+        $cm = get_coursemodule_from_instance('choice', $choice->id, $choice->course);
         choice_set_events($choice);
+        $completionexpected = (!empty($cm->completionexpected)) ? $cm->completionexpected : null;
+        \core_completion\api::update_completion_date_event($cm->id, 'choice', $choice, $completionexpected);
     }
     return true;
 }

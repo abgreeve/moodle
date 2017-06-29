@@ -1112,7 +1112,7 @@ function set_coursemodule_name($id, $name) {
     // Update calendar events with the new name.
     $refresheventsfunction = $cm->modname . '_refresh_events';
     if (function_exists($refresheventsfunction)) {
-        call_user_func($refresheventsfunction, $cm->course);
+        call_user_func($refresheventsfunction, $cm->course, $grademodule, $cm);
     }
 
     return true;

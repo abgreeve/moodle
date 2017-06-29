@@ -166,6 +166,9 @@ function scorm_add_instance($scorm, $mform=null) {
 
     scorm_grade_item_update($record);
     scorm_update_calendar($record, $cmid);
+    if (!empty($scorm->completionexpected)) {
+        \core_completion\api::update_completion_date_event($cmid, 'scorm', $record, $scorm->completionexpected);
+    }
 
     return $record->id;
 }
@@ -244,7 +247,8 @@ function scorm_update_instance($scorm, $mform=null) {
     }
 
     $DB->update_record('scorm', $scorm);
-
+    // We need to find this out before we blow away the form data.
+    $completionexpected = (!empty($scorm->completionexpected)) ? $scorm->completionexpected : null;
     $scorm = $DB->get_record('scorm', array('id' => $scorm->id));
 
     // Extra fields required in grade related functions.
@@ -257,6 +261,7 @@ function scorm_update_instance($scorm, $mform=null) {
     scorm_grade_item_update($scorm);
     scorm_update_grades($scorm);
     scorm_update_calendar($scorm, $cmid);
+    \core_completion\api::update_completion_date_event($cmid, 'scorm', $scorm, $completionexpected);
 
     return true;
 }
@@ -1585,13 +1590,31 @@ function mod_scorm_get_fontawesome_icon_map() {
  * If courseid = 0, then every scorm event in the site is checked, else
  * only scorm events belonging to the course specified are checked.
  *
- * @param int $courseid
+ * @param int $
+ * @param int|stdClass $instance scorm module instance or ID.
+ * @param int|stdClass $cm Course module object or ID.
  * @return bool
  */
-function scorm_refresh_events($courseid = 0) {
+function scorm_refresh_events($courseid = 0, $instance = null, $cm = null) {
     global $CFG, $DB;
 
     require_once($CFG->dirroot . '/mod/scorm/locallib.php');
+
+    // If we have instance information then we can just update the one event instead of updating all events.
+    if (isset($instance)) {
+        if (!is_object($instance)) {
+            $instance = $DB->get_record('scorm', array('id' => $instance), '*', MUST_EXIST);
+        }
+        if (isset($cm)) {
+            if (!is_object($cm)) {
+                $cm = get_coursemodule_from_instance('scorm', $instance->id, $instance->course);
+            }
+            $completionexpected = (!empty($cm->completionexpected)) ? $cm->completionexpected : null;
+            \core_completion\api::update_completion_date_event($cm->id, 'scorm', $instance, $completionexpected);
+            scorm_update_calendar($instance, $cm->id);
+            return true;
+        }
+    }
 
     if ($courseid) {
         // Make sure that the course id is numeric.
@@ -1610,6 +1633,8 @@ function scorm_refresh_events($courseid = 0) {
     foreach ($scorms as $scorm) {
         $cm = get_coursemodule_from_instance('scorm', $scorm->id);
         scorm_update_calendar($scorm, $cm->id);
+        $completionexpected = (!empty($cm->completionexpected)) ? $cm->completionexpected : null;
+        \core_completion\api::update_completion_date_event($cm->id, 'scorm', $scorm, $completionexpected);
     }
 
     return true;

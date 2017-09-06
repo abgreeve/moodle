@@ -135,43 +135,67 @@ class assign_grading_table extends table_sql implements renderable {
 
         $fields = user_picture::fields('u', $extrauserfields) . ', ';
         $fields .= 'u.id as userid, ';
-        $fields .= 's.status as status, ';
-        $fields .= 's.id as submissionid, ';
-        $fields .= 's.timecreated as firstsubmission, ';
-        $fields .= 's.timemodified as timesubmitted, ';
-        $fields .= 's.attemptnumber as attemptnumber, ';
-        $fields .= 'g.id as gradeid, ';
-        $fields .= 'g.grade as grade, ';
-        $fields .= 'g.timemodified as timemarked, ';
-        $fields .= 'g.timecreated as firstmarked, ';
+        if ($this->assignment->get_instance()->teamsubmission) {
+            $fields .= 'xxp.status as status, ';
+            $fields .= 'xxp.submissionid as submissionid, ';
+            $fields .= 'xxp.firstsubmission as firstsubmission, ';
+            $fields .= 'xxp.timesubmitted as timesubmitted, ';
+            $fields .= 'xxp.attemptnumber as attemptnumber, ';
+            $fields .= 'xxp.gradeid as gradeid, ';
+            $fields .= 'xxp.grade as grade, ';
+            $fields .= 'xxp.timemarked as timemarked, ';
+            $fields .= 'xxp.firstmarked as firstmarked, ';
+        } else {
+            $fields .= 's.status as status, ';
+            $fields .= 's.id as submissionid, ';
+            $fields .= 's.timecreated as firstsubmission, ';
+            $fields .= 's.timemodified as timesubmitted, ';
+            $fields .= 's.attemptnumber as attemptnumber, ';
+            $fields .= 'g.id as gradeid, ';
+            $fields .= 'g.grade as grade, ';
+            $fields .= 'g.timemodified as timemarked, ';
+            $fields .= 'g.timecreated as firstmarked, ';
+        }
         $fields .= 'uf.mailed as mailed, ';
         $fields .= 'uf.locked as locked, ';
         $fields .= 'uf.extensionduedate as extensionduedate, ';
         $fields .= 'uf.workflowstate as workflowstate, ';
         $fields .= 'uf.allocatedmarker as allocatedmarker';
 
-        $from = '{user} u
-                         LEFT JOIN {assign_submission} s
-                                ON u.id = s.userid
-                               AND s.assignment = :assignmentid1
-                               AND s.latest = 1
-                         LEFT JOIN {assign_grades} g
-                                ON u.id = g.userid
-                               AND g.assignment = :assignmentid2 ';
+        $from = '{user} u ';
 
-        // For group submissions we don't immediately create an entry in the assign_submission table for each user,
-        // instead the userid is set to 0. In this case we use a different query to retrieve the grade for the user.
+        // Group assignments need a different query to select the proper data. If changing this please pay particular
+        // attention to team submissions with multiple attempts.
         if ($this->assignment->get_instance()->teamsubmission) {
-            $params['assignmentid4'] = (int) $this->assignment->get_instance()->id;
-            $grademaxattempt = 'SELECT mxg.userid, MAX(mxg.attemptnumber) AS maxattempt
-                                  FROM {assign_grades} mxg
-                                 WHERE mxg.assignment = :assignmentid4
-                              GROUP BY mxg.userid';
-            $from .= 'LEFT JOIN (' . $grademaxattempt . ') gmx
-                             ON u.id = gmx.userid
-                            AND g.attemptnumber = gmx.maxattempt ';
+            $from .= 'LEFT JOIN ( -- Users with an assignment submission.
+                          SELECT s.userid AS userid, s.status AS status, s.id AS submissionid,
+                                 s.timecreated AS firstsubmission, s.timemodified AS timesubmitted,
+                                 s.attemptnumber AS attemptnumber, g.id AS gradeid, g.grade AS grade,
+                                 g.timemodified AS timemarked, g.timecreated AS firstmarked
+                            FROM {user} u
+                      INNER JOIN {assign_submission} s ON u.id = s.userid
+                          -- Filter results down to the most recent attempt.
+                      INNER JOIN (SELECT userid, max(attemptnumber) AS maxattempt
+                                    FROM {assign_submission}
+                                   WHERE assignment = :groupassignnumber1
+                                GROUP BY userid) gs ON gs.userid = s.userid
+                       LEFT JOIN {assign_grades} g ON g.attemptnumber = s.attemptnumber AND s.userid = g.userid
+                                    AND g.assignment = :groupassignnumber2
+                           WHERE s.assignment = :groupassignnumber3
+                             AND gs.maxattempt = s.attemptnumber) xxp ON xxp.userid = u.id ';
+
+            $params['groupassignnumber1'] = (int)$this->assignment->get_instance()->id;
+            $params['groupassignnumber2'] = (int)$this->assignment->get_instance()->id;
+            $params['groupassignnumber3'] = (int)$this->assignment->get_instance()->id;
         } else {
-            $from .= 'AND g.attemptnumber = s.attemptnumber ';
+            $from .= 'LEFT JOIN {assign_submission} s
+                             ON u.id = s.userid
+                            AND s.assignment = :assignmentid1
+                            AND s.latest = 1
+                      LEFT JOIN {assign_grades} g
+                             ON u.id = g.userid
+                            AND g.assignment = :assignmentid2
+                            AND g.attemptnumber = s.attemptnumber ';
         }
 
         $from .= 'LEFT JOIN {assign_user_flags} uf
@@ -264,21 +288,40 @@ class assign_grading_table extends table_sql implements renderable {
         // The filters do not make sense when there are no submissions, so do not apply them.
         if ($this->assignment->is_any_submission_plugin_enabled()) {
             if ($filter == ASSIGN_FILTER_SUBMITTED) {
-                $where .= ' AND (s.timemodified IS NOT NULL AND
-                                 s.status = :submitted) ';
+                if ($this->assignment->get_instance()->teamsubmission) {
+                    $where .= ' AND (xxp.timesubmitted IS NOT NULL AND
+                                   xxp.status = :submitted) ';
+                } else {
+                    $where .= ' AND (s.timemodified IS NOT NULL AND
+                                   s.status = :submitted) ';
+                }
                 $params['submitted'] = ASSIGN_SUBMISSION_STATUS_SUBMITTED;
 
             } else if ($filter == ASSIGN_FILTER_NOT_SUBMITTED) {
-                $where .= ' AND (s.timemodified IS NULL OR s.status != :submitted) ';
+                if ($this->assignment->get_instance()->teamsubmission) {
+                    $where .= ' AND (xxp.timesubmitted IS NULL OR xxp.status != :submitted) ';
+                } else {
+                    $where .= ' AND (s.timemodified IS NULL OR s.status != :submitted) ';
+                }
                 $params['submitted'] = ASSIGN_SUBMISSION_STATUS_SUBMITTED;
             } else if ($filter == ASSIGN_FILTER_REQUIRE_GRADING) {
-                $where .= ' AND (s.timemodified IS NOT NULL AND
-                                 s.status = :submitted AND
-                                 (s.timemodified >= g.timemodified OR g.timemodified IS NULL OR g.grade IS NULL';
+                if ($this->assignment->get_instance()->teamsubmission) {
+                    $where .= ' AND (xxp.timesubmitted IS NOT NULL AND
+                                     xxp.status = :submitted AND
+                                     (xxp.timesubmitted >= xxp.timemarked OR xxp.timemarked IS NULL OR xxp.grade IS NULL';
+                } else {
+                    $where .= ' AND (s.timemodified IS NOT NULL AND
+                                     s.status = :submitted AND
+                                     (s.timemodified >= g.timemodified OR g.timemodified IS NULL OR g.grade IS NULL';
+                }
 
                 if ($this->assignment->get_grade_item()->gradetype == GRADE_TYPE_SCALE) {
                     // Scale grades are set to -1 when not graded.
-                    $where .= ' OR g.grade = -1';
+                    if ($this->assignment->get_instance()->teamsubmission) {
+                        $where .= ' OR xxp.grade = -1';
+                    } else {
+                        $where .= ' OR g.grade = -1';
+                    }
                 }
 
                 $where .= '))';

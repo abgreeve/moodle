@@ -1343,11 +1343,12 @@ class flexible_table {
      * @return string HTML fragment.
      */
     protected function sort_link($text, $column, $isprimary, $order) {
-        return html_writer::link($this->baseurl->out(false,
-                array($this->request[TABLE_VAR_SORT] => $column)),
-                $text . get_accesshide(get_string('sortby') . ' ' .
-                $text . ' ' . $this->sort_order_name($isprimary, $order))) . ' ' .
-                $this->sort_icon($isprimary, $order);
+        $a = new stdClass();
+        $a->text = $text;
+        $a->order = $this->sort_order_name($isprimary, $order);
+        $sortby = get_string('sortbydir', '', $a);
+        return html_writer::link( $this->baseurl->out(false, [$this->request[TABLE_VAR_SORT] => $column]),
+            $text . get_accesshide($sortby), ['title' => $sortby]) . ' ' . $this->sort_icon($isprimary, $order);
     }
 
     /**

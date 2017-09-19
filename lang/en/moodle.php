@@ -1829,6 +1829,7 @@ $string['someallowguest'] = 'Some courses may allow guest access';
 $string['someerrorswerefound'] = 'Some information was missing or incorrect. Look below for details.';
 $string['sort'] = 'Sort';
 $string['sortby'] = 'Sort by';
+$string['sortbydir'] = 'Sort by {$a->text} ({$a->order})';
 $string['sortbyx'] = 'Sort by {$a} ascending';
 $string['sortbyxreverse'] = 'Sort by {$a} descending';
 $string['sorting'] = 'Sorting';

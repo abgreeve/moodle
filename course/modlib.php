@@ -73,6 +73,7 @@ function add_moduleinfo($moduleinfo, $course, $mform = null) {
     if ($completion->is_enabled()) {
         $newcm->completion                = $moduleinfo->completion;
         $newcm->completiongradeitemnumber = $moduleinfo->completiongradeitemnumber;
+        $newcm->passinggradeitemnumber    = $moduleinfo->passinggradeitemnumber;
         $newcm->completionview            = $moduleinfo->completionview;
         $newcm->completionexpected        = $moduleinfo->completionexpected;
     }
@@ -404,6 +405,13 @@ function set_moduleinfo_defaults($moduleinfo) {
         $moduleinfo->completiongradeitemnumber = null;
     }
 
+    // Convert the 'pass grade' checkbox into a grade-item number: 0 if checked, null if not.
+    if (isset($moduleinfo->passinggrade) && $moduleinfo->passinggrade) {
+        $moduleinfo->passinggradeitemnumber = 0;
+    } else {
+        $moduleinfo->passinggradeitemnumber = null;
+    }
+
     if (!isset($moduleinfo->conditiongradegroup)) {
         $moduleinfo->conditiongradegroup = array();
     }
@@ -511,6 +519,7 @@ function update_moduleinfo($cm, $moduleinfo, $course, $mform = null) {
         if (!empty($moduleinfo->completionunlocked)) {
             $cm->completion = $moduleinfo->completion;
             $cm->completiongradeitemnumber = $moduleinfo->completiongradeitemnumber;
+            $cm->passinggradeitemnumber = $moduleinfo->passinggradeitemnumber;
             $cm->completionview = $moduleinfo->completionview;
         }
         // The expected date does not affect users who have completed the activity,
@@ -670,6 +679,7 @@ function get_moduleinfo_data($cm, $course) {
     $data->completionview     = $cm->completionview;
     $data->completionexpected = $cm->completionexpected;
     $data->completionusegrade = is_null($cm->completiongradeitemnumber) ? 0 : 1;
+    $data->passinggrade       = is_null($cm->passinggradeitemnumber) ? 0 : 1;
     $data->showdescription    = $cm->showdescription;
     $data->tags               = core_tag_tag::get_item_tags_array('core', 'course_modules', $cm->id);
     if (!empty($CFG->enableavailability)) {

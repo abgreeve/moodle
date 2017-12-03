@@ -226,7 +226,8 @@ abstract class moodleform_mod extends moodleform {
                 }
 
                 $hasgradeitems = false;
-                $items = grade_item::fetch_all(array('itemtype'=>'mod', 'itemmodule'=>$modulename,'iteminstance'=>$instance, 'courseid'=>$COURSE->id));
+                $items = grade_item::fetch_all(array('itemtype' => 'mod', 'itemmodule' => $modulename,
+                    'iteminstance' => $instance, 'courseid' => $COURSE->id));
                 //will be no items if, for example, this activity supports ratings but rating aggregate type == no ratings
                 if (!empty($items)) {
                     foreach ($items as $item) {
@@ -338,10 +339,13 @@ abstract class moodleform_mod extends moodleform {
             if ($freeze) {
                 $mform->freeze('completion');
                 if ($mform->elementExists('completionview')) {
-                    $mform->freeze('completionview'); // don't use hardFreeze or checkbox value gets lost
+                    $mform->freeze('completionview'); // Don't use hardFreeze or checkbox value gets lost.
                 }
                 if ($mform->elementExists('completionusegrade')) {
                     $mform->freeze('completionusegrade');
+                }
+                if ($mform->elementExists('passinggrade')) {
+                    $mform->freeze('passinggrade');
                 }
                 $mform->freeze($this->_customcompletionelements);
             }
@@ -422,7 +426,7 @@ abstract class moodleform_mod extends moodleform {
                 $data['completion'] == COMPLETION_TRACKING_AUTOMATIC &&
                 !empty($data['completionunlocked'])) {
             if (empty($data['completionview']) && empty($data['completionusegrade']) &&
-                !$this->completion_rule_enabled($data)) {
+                !$this->completion_rule_enabled($data) && empty($data['passinggrade'])) {
                 $errors['completion'] = get_string('badautocompletion', 'completion');
             }
         }
@@ -687,11 +691,24 @@ abstract class moodleform_mod extends moodleform {
                     get_string('completionusegrade_desc', 'completion'));
                 $mform->disabledIf('completionusegrade', 'completion', 'ne', COMPLETION_TRACKING_AUTOMATIC);
                 $mform->addHelpButton('completionusegrade', 'completionusegrade', 'completion');
+
+                // Designed to add another checkbox for "passing grade".
+                if (plugin_supports('mod', $this->_modname, FEATURE_COMPLETION_PASSING_GRADE, false)) {
+                    $mform->addElement('checkbox', 'passinggrade', get_string('passinggrade', 'completion'),
+                        get_string('passinggrade_desc', 'completion'));
+                    $mform->addHelpButton('passinggrade', 'completionusegrade', 'completion');
+                    $mform->disabledIf('passinggrade', 'completionusegrade');
+                    $mform->disabledIf('passinggrade', 'gradepass', 'eq', '');
+                    $mform->disabledIf('passinggrade', 'gradepass', 'eq', ' ');
+                }
                 $gotcompletionoptions = true;
 
                 // If using the rating system, there is no grade unless ratings are enabled.
                 if ($this->_features->rating) {
                     $mform->disabledIf('completionusegrade', 'assessed', 'eq', 0);
+                    if (plugin_supports('mod', $this->_modname, FEATURE_COMPLETION_PASSING_GRADE, false)) {
+                        $mform->disabledIf('passinggrade', 'assessed', 'eq', 0);
+                    }
                 }
             }
 

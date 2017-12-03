@@ -4062,9 +4062,10 @@ class restore_module_structure_step extends restore_structure_step {
         if (!grade_verify_idnumber($data->idnumber, $this->get_courseid())) {        // idnumber uniqueness
             $data->idnumber = '';
         }
-        if (empty($CFG->enablecompletion)) { // completion
+        if (empty($CFG->enablecompletion)) { // Completion.
             $data->completion = 0;
             $data->completiongradeitemnumber = null;
+            $data->passinggradeitemnumber = null;
             $data->completionview = 0;
             $data->completionexpected = 0;
         } else {

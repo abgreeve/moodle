@@ -112,6 +112,7 @@ class core_course_modlib_testcase extends advanced_testcase {
         $expecteddata->completionview     = $assigncm->completionview;
         $expecteddata->completionexpected = $assigncm->completionexpected;
         $expecteddata->completionusegrade = is_null($assigncm->completiongradeitemnumber) ? 0 : 1;
+        $expecteddata->passinggrade       = is_null($assigncm->passinggradeitemnumber) ? 0 : 1;
         $expecteddata->showdescription    = $assigncm->showdescription;
         $expecteddata->tags               = core_tag_tag::get_item_tags_array('core', 'course_modules', $assigncm->id);
         $expecteddata->availabilityconditionsjson = null;

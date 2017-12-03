@@ -286,6 +286,11 @@ class completion_criteria_activity extends completion_criteria {
             if (!is_null($cm->completiongradeitemnumber)) {
                 $details['requirement'][] = get_string('achievinggrade', 'completion');
             }
+
+            if (!is_null($cm->passinggradeitemnumber)) {
+                $details['requirement'][] = get_string('passinggrade', 'completion');
+            }
+
         }
 
         $details['requirement'] = implode($details['requirement'], ', ');

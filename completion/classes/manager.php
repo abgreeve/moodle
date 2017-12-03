@@ -179,6 +179,11 @@ class manager {
                 $activeruledescriptions[] = get_string('completionusegrade_desc', 'completion');
             }
 
+            if ($moduledata instanceof cm_info && !is_null($moduledata->passinggradeitemnumber) ||
+                ($moduledata instanceof stdClass && !empty($moduledata->passinggrade))) {
+                $activeruledescriptions[] = get_string('passinggrade_desc', 'completion');
+            }
+
             // Now, ask the module to provide descriptions for its custom conditional completion rules.
             if ($customruledescriptions = component_callback($moduledata->modname,
                 'get_completion_active_rule_descriptions', [$moduledata])) {
@@ -316,7 +321,8 @@ class manager {
             if (self::can_edit_bulk_completion($this->courseid, $cm) && $this->apply_completion_cm($cm, $data, $updateinstances)) {
                 $updated = true;
                 if ($cm->completion != COMPLETION_TRACKING_MANUAL || $data['completion'] != COMPLETION_TRACKING_MANUAL) {
-                    // If completion was changed we will need to reset it's state. Exception is when completion was and remains as manual.
+                    // If completion was changed we will need to reset it's state.
+                    // Exception is when completion was and remains as manual.
                     $needreset[] = $cm->id;
                 }
             }

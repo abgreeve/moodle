@@ -65,6 +65,20 @@ abstract class core_completion_edit_base_form extends moodleform {
     }
 
     /**
+     * Returns true if all selected modules support completion passing grade.
+     *
+     * @return bool
+     */
+    protected function support_completion_passing_grade() {
+        foreach ($this->get_module_names() as $modname => $modfullname) {
+            if (!plugin_supports('mod', $modname, FEATURE_COMPLETION_PASSING_GRADE, false)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Returns true if all selected modules support grading.
      *
      * @return bool
@@ -203,6 +217,15 @@ abstract class core_completion_edit_base_form extends moodleform {
                 get_string('completionusegrade_desc', 'completion'));
             $mform->disabledIf('completionusegrade', 'completion', 'ne', COMPLETION_TRACKING_AUTOMATIC);
             $mform->addHelpButton('completionusegrade', 'completionusegrade', 'completion');
+
+            // Designed to add another checkbox for "passing grade".
+            if ($this->support_completion_passing_grade()) {
+                $mform->addElement('checkbox', 'passinggrade', get_string('passinggrade', 'completion'),
+                    get_string('passinggrade_desc', 'completion'));
+                $mform->addHelpButton('passinggrade', 'completionusegrade', 'completion');
+                $mform->disabledIf('passinggrade', 'completion', 'ne', COMPLETION_TRACKING_AUTOMATIC);
+                $mform->disabledIf('passinggrade', 'completionusegrade');
+            }
             $autocompletionpossible = true;
         }
 

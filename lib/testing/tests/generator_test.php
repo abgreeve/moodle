@@ -263,6 +263,16 @@ class core_test_generator_testcase extends advanced_testcase {
             'completionusegrade' => 1, // "Student must receive a grade to complete this activity"
         );
 
+        // Automatic completion is possible if module supports FEATURE_COMPLETION_TRACKS_VIEWS or FEATURE_GRADE_HAS_GRADE.
+        // Note: passinggrade is stored in DB and can be found in cm_info as 'passinggradegradeitemnumber' - either NULL or 0.
+        // Note: module can have more autocompletion rules as defined in moodleform_mod::add_completion_rules().
+        $featurecompletionautomaticpassing = array(
+            'completion' => COMPLETION_TRACKING_AUTOMATIC, // "Show activity as complete when conditions are met".
+            'completionview' => 1, // "Student must view this activity to complete it".
+            'completionusegrade' => 1, // "Student must receive a grade to complete this activity".
+            'passinggrade' => 1, // "Student must receive a passing grade to complete this activity".
+        );
+
         // Module supports FEATURE_RATE:
         $featurerate = array(
             'assessed' => RATING_AGGREGATE_AVERAGE, // "Aggregate type"
@@ -306,6 +316,12 @@ class core_test_generator_testcase extends advanced_testcase {
                 $optionsavailability
         );
 
+        // Create assignment with pass grade.
+        $m5 = $generator->create_module('assign',
+            array('course' => $course->id) +
+            $featurecompletionautomaticpassing +
+            $featuregrade);
+
         // Verifying that everything is generated correctly.
         $modinfo = get_fast_modinfo($course->id);
         $cm1 = $modinfo->cms[$m1->cmid];
@@ -331,13 +347,30 @@ class core_test_generator_testcase extends advanced_testcase {
         $this->assertEquals($featurecompletionautomatic['completion'], $cm3->completion);
         $this->assertEquals($featurecompletionautomatic['completionview'], $cm3->completionview);
         $this->assertEquals(0, $cm3->completiongradeitemnumber); // Zero instead of default null since 'completionusegrade' was set.
-        $gradingitem = grade_item::fetch(array('courseid'=>$course->id, 'itemtype'=>'mod', 'itemmodule' => 'assign', 'iteminstance' => $m3->id));
+        $gradingitem = grade_item::fetch(array('courseid' => $course->id,
+            'itemtype' => 'mod',
+            'itemmodule' => 'assign',
+            'iteminstance' => $m3->id));
         $this->assertEquals(0, $gradingitem->grademin);
         $this->assertEquals($featuregrade['grade'], $gradingitem->grademax);
         $this->assertEquals($featuregrade['gradecat'], $gradingitem->categoryid);
 
         $cm4 = $modinfo->cms[$m4->cmid];
         $this->assertEquals($optionsavailability['availability'], $cm4->availability);
+
+        $cm5 = $modinfo->cms[$m5->cmid];
+        $this->assertEquals($featurecompletionautomaticpassing['completion'], $cm5->completion);
+        $this->assertEquals($featurecompletionautomaticpassing['completionview'], $cm5->completionview);
+        $this->assertEquals(0, $cm5->completiongradeitemnumber); // Zero instead of default null since 'completionusegrade' was set.
+        $this->assertEquals(0, $cm5->passinggradeitemnumber); // Zero instead of default null since 'completiongradeitemnumber' was set.
+        $gradingitem = grade_item::fetch(array('courseid' => $course->id,
+            'itemtype' => 'mod',
+            'itemmodule' => 'assign',
+            'iteminstance' => $m5->id));
+        $this->assertEquals(0, $gradingitem->grademin);
+        $this->assertEquals($featuregrade['grade'], $gradingitem->grademax);
+        $this->assertEquals($featuregrade['gradecat'], $gradingitem->categoryid);
+
     }
 
     public function test_create_block() {

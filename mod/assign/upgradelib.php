@@ -388,6 +388,7 @@ class assign_upgrade_manager {
         $newcm->groupingid       = $cm->groupingid;
         $newcm->completion                = $cm->completion;
         $newcm->completiongradeitemnumber = $cm->completiongradeitemnumber;
+        $newcm->passinggradeitemnumber    = $cm->passinggradeitemnumber;
         $newcm->completionview            = $cm->completionview;
         $newcm->completionexpected        = $cm->completionexpected;
         if (!empty($CFG->enableavailability)) {

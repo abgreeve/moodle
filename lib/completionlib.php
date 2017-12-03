@@ -676,6 +676,13 @@ class completion_info {
                     return COMPLETION_INCOMPLETE;
                 }
 
+                if (!is_null($cm->passinggradeitemnumber)) {
+                    $gradetocheck = end($grades);
+                    if (!$gradetocheck || !$gradetocheck->is_passed()) {
+                        return COMPLETION_INCOMPLETE;
+                    }
+                }
+
             } else {
                 $this->internal_systemerror("Cannot find grade item for '{$cm->modname}'
                     cm '{$cm->id}' matching number '{$cm->completiongradeitemnumber}'");

@@ -231,6 +231,9 @@ $string['withconditions'] = 'With conditions';
 $string['writingcompletiondata'] = 'Writing completion data';
 $string['xdays'] = '{$a} days';
 $string['yourprogress'] = 'Your progress';
+$string['passinggrade'] = 'Requires passing grade';
+$string['passinggrade_desc'] = 'Student must receive a passing grade to complete this activity';
+$string['completionusegrade_help'] = 'If enabled, the activity is considered complete only when a student receives a passing grade.';
 
 // Deprecated since Moodle 3.3.
 $string['completion-title-manual-n'] = 'Mark as complete: {$a}';

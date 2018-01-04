@@ -195,4 +195,16 @@ EOD;
     public function contains_private_data() {
         return false;
     }
+
+    /**
+     * Gets the file reference from the source (pageid).
+     *
+     * @param  string $source The page id for the wikimedia file.
+     * @return string file reference.
+     */
+    public function get_file_reference($source) {
+        $client = new wikimedia();
+        $realurl = $client->get_image_url_with_pageid((int)$source);
+        return parent::get_file_reference($realurl);
+    }
 }

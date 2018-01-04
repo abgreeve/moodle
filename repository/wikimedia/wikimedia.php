@@ -83,6 +83,40 @@ class wikimedia {
         }
         return $image_urls;
     }
+
+    /**
+     * Get the url for a wikimedia file via the pageid.
+     *
+     * @param  int $pageid The identifier for the wikimedia file.
+     * @return string The url for the file.
+     */
+    public function get_image_url_with_pageid($pageid) {
+        $this->_param['action'] = 'query';
+        $this->_param['pageids'] = $pageid;
+        $this->_param['prop']   = 'imageinfo';
+        $this->_param['iiprop'] = 'url|dimensions|mime|timestamp|size|user';
+        $this->_param += array('iiurlwidth' => WIKIMEDIA_IMAGE_SIDE_LENGTH,
+            'iiurlheight' => WIKIMEDIA_IMAGE_SIDE_LENGTH);
+        $content = $this->_conn->post($this->api, $this->_param);
+        $result = unserialize($content);
+        $page = $result['query']['pages'][$pageid];
+        $imagetypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
+        $url = $page['imageinfo'][0]['url'];
+        if (in_array($page['imageinfo'][0]['mime'], $imagetypes)) {  // Is this an image?
+            $extension = pathinfo($page['title'], PATHINFO_EXTENSION);
+            $issvg = strcmp($extension, 'svg') == 0;
+
+            if ($page['imageinfo'][0]['thumbwidth'] < $page['imageinfo'][0]['width']) {
+                $url = $page['imageinfo'][0]['thumburl'];
+            } else if ($issvg) { // We cannot use the source when the file is SVG.
+                // So we generate a PNG thumbnail of the file at its original size.
+                $url = $this->get_thumb_url($page['imageinfo'][0]['url'], $page['imageinfo'][0]['width'],
+                                $page['imageinfo'][0]['height'], $page['imageinfo'][0]['width'], true);
+            }
+        }
+        return $url;
+    }
+
     public function get_images_by_page($title) {
         $image_urls = array();
         $this->_param['action'] = 'query';
@@ -181,15 +215,15 @@ class wikimedia {
                     if ($page['imageinfo'][0]['thumbwidth'] < $page['imageinfo'][0]['width']) {
                         $attrs = array(
                             //upload scaled down image
-                            'source' => $page['imageinfo'][0]['thumburl'],
+                            'source' => $page['pageid'],
                             'image_width' => $page['imageinfo'][0]['thumbwidth'],
                             'image_height' => $page['imageinfo'][0]['thumbheight']
                         );
                         if ($attrs['image_width'] <= WIKIMEDIA_THUMB_SIZE && $attrs['image_height'] <= WIKIMEDIA_THUMB_SIZE) {
-                            $attrs['realthumbnail'] = $attrs['source'];
+                            $attrs['realthumbnail'] = $page['imageinfo'][0]['thumburl'];
                         }
                         if ($attrs['image_width'] <= 24 && $attrs['image_height'] <= 24) {
-                            $attrs['realicon'] = $attrs['source'];
+                            $attrs['realicon'] = $page['imageinfo'][0]['thumburl'];
                         }
 
                     // We use the original file.
@@ -198,17 +232,9 @@ class wikimedia {
                             //upload full size image
                             'image_width' => $page['imageinfo'][0]['width'],
                             'image_height' => $page['imageinfo'][0]['height'],
-                            'size' => $page['imageinfo'][0]['size']
+                            'size' => $page['imageinfo'][0]['size'],
+                            'source' => $page['pageid']
                         );
-
-                        // We cannot use the source when the file is SVG.
-                        if ($issvg) {
-                            // So we generate a PNG thumbnail of the file at its original size.
-                            $attrs['source'] = $this->get_thumb_url($page['imageinfo'][0]['url'], $page['imageinfo'][0]['width'],
-                                $page['imageinfo'][0]['height'], $page['imageinfo'][0]['width'], true);
-                        } else {
-                            $attrs['source'] = $page['imageinfo'][0]['url'];
-                        }
                     }
                     $attrs += array(
                         'realthumbnail' => $this->get_thumb_url($page['imageinfo'][0]['url'], $page['imageinfo'][0]['width'], $page['imageinfo'][0]['height'], WIKIMEDIA_THUMB_SIZE),
@@ -217,7 +243,7 @@ class wikimedia {
                         'datemodified' => strtotime($page['imageinfo'][0]['timestamp']),
                         );
                 } else {  // other file types
-                    $attrs = array('source' => $page['imageinfo'][0]['url']);
+                    $attrs = array('source' => $page['pageid']);
                 }
                 $files_array[] = array(
                     'title'=>substr($title, 5),         //chop off 'File:'

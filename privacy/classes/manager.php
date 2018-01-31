@@ -15,13 +15,41 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the core_privacy\metadata_provider interface.
+ * This file contains the core_privacy\manager class.
  *
- * @package core_privacy
+ * @package core\privacy
  * @copyright 2018 Jake Dallimore <jrhdallimore@gmail.com>
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class manager {
+namespace core\privacy;
 
+/**
+ * Class manager.
+ * Provides the mechanisms to get and delete personal information across Moodle.
+ * @package core\privacy
+ */
+class manager {
+    //TODO: same functions as plugins implement
+
+    /**
+     * Get the privacy metadata for all components or for a subset of components.
+     * @param array $components
+     * @return array
+     */
+    public static function get_metadata_for_components(array $components = []) {
+        // If empty, get the metadata for all components.
+
+        // Else, provide only for those specified.
+        return [];
+    }
+
+    public static function get_contexts_for_userid(int $userid) {
+
+    }
+
+
+
+    //TODO: plugins list
+    //TODO: ss list (assumed mapped elsewhere for now.
 }

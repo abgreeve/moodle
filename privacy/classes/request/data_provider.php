@@ -15,9 +15,8 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the core_privacy\user_data_provider interface.
- *
- * Plugins should implement this if they store personal information.
+ * This file contains the \core\privacy\request\data_provider interface to describe
+ * a class which provides data in some form.
  *
  * @package core_privacy
  * @copyright 2018 Jake Dallimore <jrhdallimore@gmail.com>
@@ -26,8 +25,4 @@
  */
 namespace core\privacy\request;
 
-interface exporter {
-    public function store_message(\context $context, $name, $content, $subcontext = null);
-    public function store_area_files(\context $context, $component, $filearea, $itemid, $subcontext = null);
-    public function store_file(\context $context, \stored_file $file, $subcontext = null);
-}
+interface data_provider {}

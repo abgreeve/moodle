@@ -86,7 +86,6 @@ class moodle_exporter implements exporter {
     protected function get_context_path(\context $finalcontext) : Array {
         $path = [];
         $contexts = array_reverse($finalcontext->get_parent_contexts(true));
-        print_object($contexts);
         foreach ($contexts as $context) {
             $path[] = clean_param($context->get_context_name(), PARAM_SAFEDIR);
         }

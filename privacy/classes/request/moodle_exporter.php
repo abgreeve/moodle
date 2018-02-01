@@ -59,6 +59,10 @@ class moodle_exporter implements exporter {
         $this->write_data($path, $filecontent);
     }
 
+    public function rewrite_pluginfile_urls(\context $context, $component, $filearea, $itemid, $text) : String {
+        return str_replace('@@PLUGINFILE@@/', 'files/', $text);
+    }
+
     public function store_area_files(\context $context, $component, $filearea, $itemid, $subcontext = null) {
         $fs = get_file_storage();
         $files = $fs->get_area_files($context->id, $component, $filearea, $itemid);
@@ -72,10 +76,6 @@ class moodle_exporter implements exporter {
     public function store_file(\context $context, \stored_file $file, $subcontext = null) {
         if (!$file->is_directory()) {
             $path = $this->get_path($context, implode(DIRECTORY_SEPARATOR, ['files', $file->get_filepath(), $file->get_filename()]), $subcontext);
-            $path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path);
-            $path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path);
-            $path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path);
-            $path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path);
             check_dir_exists(dirname($path), true, true);
             $file->copy_content_to($path);
         }
@@ -83,12 +83,24 @@ class moodle_exporter implements exporter {
         return $this;
     }
 
+    protected function get_context_path(\context $finalcontext) : Array {
+        $path = [];
+        $contexts = array_reverse($finalcontext->get_parent_contexts(true));
+        print_object($contexts);
+        foreach ($contexts as $context) {
+            $path[] = clean_param($context->get_context_name(), PARAM_SAFEDIR);
+        }
+
+        return $path;
+    }
+
     protected function get_path(\context $context, $name, $subcontext = null) {
         // TODO
         $path = [
             $this->path,
-            $subcontext
         ];
+        $path += $this->get_context_path($context);
+        $path[] = $subcontext;
 
         return implode(DIRECTORY_SEPARATOR, $path) . DIRECTORY_SEPARATOR . $name;
     }

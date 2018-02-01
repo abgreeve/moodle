@@ -24,7 +24,7 @@
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core\privacy\request;
+namespace core_privacy\request;
 
 class moodle_exporter implements exporter {
     public function store_data(\context $context, \stdClass $data, $subcontext = null) {

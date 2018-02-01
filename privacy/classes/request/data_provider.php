@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the \core\privacy\request\data_provider interface to describe
+ * This file contains the \core_privacy\request\data_provider interface to describe
  * a class which provides data in some form.
  *
  * @package core_privacy
@@ -23,6 +23,6 @@
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core\privacy\request;
+namespace core_privacy\request;
 
 interface data_provider {}

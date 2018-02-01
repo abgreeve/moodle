@@ -17,17 +17,17 @@
 /**
  * This file contains the core_privacy\manager class.
  *
- * @package core\privacy
+ * @package core_privacy
  * @copyright 2018 Jake Dallimore <jrhdallimore@gmail.com>
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core\privacy;
+namespace core_privacy;
 
 /**
  * Class manager.
  * Provides the mechanisms to get and delete personal information across Moodle.
- * @package core\privacy
+ * @package core_privacy
  */
 class manager {
     //TODO: same functions as plugins implement

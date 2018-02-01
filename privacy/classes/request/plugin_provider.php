@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the \core\privacy\request\plugin_provider interface to describe
+ * This file contains the \core_privacy\request\plugin_provider interface to describe
  * a class which provides data in some form for a plugin.
  *
  * Plugins should implement this if they store personal information.
@@ -25,7 +25,7 @@
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core\privacy\request;
+namespace core_privacy\request;
 
 interface plugin_provider extends data_provider {
 

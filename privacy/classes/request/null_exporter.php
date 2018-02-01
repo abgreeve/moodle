@@ -24,6 +24,6 @@
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core\privacy\request;
+namespace core_privacy\request;
 
 class null_exporter {}

@@ -15,7 +15,7 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the \core\privacy\request\subplugin_provider interface to describe
+ * This file contains the \core_privacy\request\subplugin_provider interface to describe
  * a class which provides data in some form for a subplugin.
  *
  * It should not be implemented directly, but should be extended by the
@@ -25,7 +25,7 @@
  * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core\privacy\request;
+namespace core_privacy\request;
 
 /**
  * The subplugin_provider interface to describe a class which provides data in some form for a subplugin.

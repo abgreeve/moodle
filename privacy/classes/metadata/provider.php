@@ -22,7 +22,7 @@
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core\privacy\metadata;
+namespace core_privacy\metadata;
 
 /**
  * Interface component_metadata_provider

@@ -27,6 +27,13 @@
 namespace core_privacy\request;
 
 class moodle_exporter implements exporter {
+    protected $path = null;
+
+    public function __construct() {
+        $basedir = make_temp_directory('privacy');
+        $this->path = make_unique_writable_directory($basedir, true);
+    }
+
     public function store_data(\context $context, \stdClass $data, $subcontext = null) {
         $path = $this->get_path($context, 'data.json', $subcontext);
         $this->write_data($path, json_encode($data));
@@ -35,10 +42,14 @@ class moodle_exporter implements exporter {
     public function store_metadata(\context $context, $key, $value, $subcontext = null) {
         $path = $this->get_path($context, 'metadata.json', $subcontext);
 
-        // TODO
-        // Fetch current file, json_decode() it, add the new $key => $value
-        // pair, then save it.
-        $this->write_data($path, $value);
+        if (file_exists($path)) {
+            $data = json_decode(file_get_contents($path));
+        } else {
+            $data = (object) [];
+        }
+
+        $data->$key = $value;
+        $this->write_data($path, json_encode($data));
 
         return $this;
     }
@@ -59,8 +70,15 @@ class moodle_exporter implements exporter {
     }
 
     public function store_file(\context $context, \stored_file $file, $subcontext = null) {
-        $path = $this->get_path($context, implode(DIRECTORY_SEPARATOR, [$file->get_filepath(), $file->get_filename()]), $subcontext);
-        $file->copy_content_to($path);
+        if (!$file->is_directory()) {
+            $path = $this->get_path($context, implode(DIRECTORY_SEPARATOR, ['files', $file->get_filepath(), $file->get_filename()]), $subcontext);
+            $path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path);
+            $path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path);
+            $path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path);
+            $path = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $path);
+            check_dir_exists(dirname($path), true, true);
+            $file->copy_content_to($path);
+        }
 
         return $this;
     }
@@ -68,7 +86,7 @@ class moodle_exporter implements exporter {
     protected function get_path(\context $context, $name, $subcontext = null) {
         // TODO
         $path = [
-            make_request_directory(),
+            $this->path,
             $subcontext
         ];
 
@@ -76,6 +94,11 @@ class moodle_exporter implements exporter {
     }
 
     protected function write_data($path, $data) {
+        check_dir_exists(dirname($path), true, true);
         file_put_contents($path, $data);
+    }
+
+    public function get_archive() {
+        var_dump($this->path);
     }
 }

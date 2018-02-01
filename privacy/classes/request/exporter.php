@@ -27,9 +27,9 @@
 namespace core\privacy\request;
 
 interface exporter {
-    public function store_data(\context $context, $data, $subcontext = null);
+    public function store_data(\context $context, \stdClass $data, $subcontext = null);
     public function store_metadata(\context $context, $name, $content, $subcontext = null);
+    public function store_custom_file(\context $context, $filename, $filecontent, $subcontext = null);
     public function store_area_files(\context $context, $component, $filearea, $itemid, $subcontext = null);
     public function store_file(\context $context, \stored_file $file, $subcontext = null);
-    public function store_custom_file(\context $context, $filename, $filecontent, $subcontext = null);
 }

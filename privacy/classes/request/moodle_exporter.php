@@ -27,14 +27,9 @@
 namespace core\privacy\request;
 
 class moodle_exporter implements exporter {
-    protected function get_path(\context $context, $name, $subcontext = null) {
-        // TODO
-        $path = [
-            make_request_directory(),
-            $subcontext
-        ];
-
-        return implode(DIRECTORY_SEPARATOR, $path) . DIRECTORY_SEPARATOR . $name;
+    public function store_data(\context $context, \stdClass $data, $subcontext = null) {
+        $path = $this->get_path($context, 'data.json', $subcontext);
+        $this->write_data($path, json_encode($data));
     }
 
     public function store_metadata(\context $context, $key, $value, $subcontext = null) {
@@ -46,6 +41,11 @@ class moodle_exporter implements exporter {
         $this->write_data($path, $value);
 
         return $this;
+    }
+
+    public function store_custom_file(\context $context, $filename, $filecontent, $subcontext = null) {
+        $path = $this->get_path($context, $filename, $subcontext);
+        $this->write_data($path, $filecontent);
     }
 
     public function store_area_files(\context $context, $component, $filearea, $itemid, $subcontext = null) {
@@ -65,14 +65,14 @@ class moodle_exporter implements exporter {
         return $this;
     }
 
-    public function store_data(\context $context, $data, $subcontext = null) {
-        $path = $this->get_path($context, 'data.json', $subcontext);
-        $this->write_data($path, json_encode($data));
-    }
+    protected function get_path(\context $context, $name, $subcontext = null) {
+        // TODO
+        $path = [
+            make_request_directory(),
+            $subcontext
+        ];
 
-    public function store_custom_file(\context $context, $filename, $filecontent, $subcontext = null) {
-        $path = $this->get_path($context, $filename, $subcontext);
-        $this->write_data($path, $filecontent);
+        return implode(DIRECTORY_SEPARATOR, $path) . DIRECTORY_SEPARATOR . $name;
     }
 
     protected function write_data($path, $data) {

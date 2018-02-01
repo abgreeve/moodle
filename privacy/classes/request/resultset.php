@@ -67,7 +67,7 @@ class resultset {
 
         $contextids = [];
         foreach ($contexts as $context) {
-            $contextids[] = $context->id;
+            $contextids[] = $context->ctxid;
             \context_helper::preload_from_record($context);
         }
 

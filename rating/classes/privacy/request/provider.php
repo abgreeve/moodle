@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class provider implements \core_privacy\request\subsystem_provider {
-    public static function store_user_data(int $userid, \context $context, array $subcontext, exporter $exporter, $component, $ratingarea, $itemid) {
+    public static function store_user_data(int $userid, \context $context, array $subcontext, exporter $exporter, string $component, string $ratingarea, int $itemid, bool $onlyuser = true) {
         global $DB;
 
         $sql = "SELECT
@@ -51,12 +51,18 @@ class provider implements \core_privacy\request\subsystem_provider {
             'itemid'        => $itemid,
         ];
 
+        if ($onlyuser) {
+            $sql .= " AND r.userid = :userid";
+            $params['userid'] = $userid;
+        }
+
+
         $ratings = $DB->get_records_sql($sql, $params);
 
         static::store_ratings($userid, $context, $subcontext, $exporter, $ratings);
     }
 
-    public static function store_ratings(int $userid, \context $context, array $subcontext, exporter $exporter, $ratings, $searchuser = null) {
+    public static function store_ratings(int $userid, \context $context, array $subcontext, exporter $exporter, $ratings) {
         foreach ($ratings as $rating) {
             // Do tidyup work?
             \core_user\privacy\request\transformation::user($userid, $rating, ['userid']);

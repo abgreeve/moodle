@@ -104,7 +104,7 @@ class moodle_exporter implements exporter {
             $this->path,
         ];
         $path += $this->get_context_path($context);
-        $path[] = $subcontext;
+        $path += $subcontext;
 
         return implode(DIRECTORY_SEPARATOR, $path) . DIRECTORY_SEPARATOR . $name;
     }

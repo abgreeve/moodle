@@ -63,7 +63,7 @@ class provider implements \core_privacy\request\subsystem_provider {
         }
         if ($ratings) {
             $data = json_encode($ratings);
-            $exporter->store_custom_file($context, 'rating.json', $data, $subcontext);
+            $exporter->store_custom_file($context, $subcontext, 'rating.json', $data);
         }
     }
 

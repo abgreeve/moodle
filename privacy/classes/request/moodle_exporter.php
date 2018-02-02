@@ -100,11 +100,13 @@ class moodle_exporter implements exporter {
 
     protected function get_path(\context $context, array $subcontext, String $name) {
         // TODO
-        $path = [
-            $this->path,
-        ];
-        $path += $this->get_context_path($context);
-        $path += $subcontext;
+        $path = array_merge(
+            [
+                $this->path,
+            ],
+            $this->get_context_path($context),
+            $subcontext
+        );
 
         return implode(DIRECTORY_SEPARATOR, $path) . DIRECTORY_SEPARATOR . $name;
     }

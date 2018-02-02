@@ -34,13 +34,14 @@ class moodle_exporter implements exporter {
         $this->path = make_unique_writable_directory($basedir, true);
     }
 
-    public function store_data(\context $context, \stdClass $data, $subcontext = null) {
-        $path = $this->get_path($context, 'data.json', $subcontext);
+    public function store_data(\context $context, array $subcontext, \stdClass $data) {
+        $path = $this->get_path($context, $subcontext, 'data.json');
+
         $this->write_data($path, json_encode($data));
     }
 
-    public function store_metadata(\context $context, $key, $value, $subcontext = null) {
-        $path = $this->get_path($context, 'metadata.json', $subcontext);
+    public function store_metadata(\context $context, array $subcontext, $key, $value) {
+        $path = $this->get_path($context, $subcontext, 'metadata.json');
 
         if (file_exists($path)) {
             $data = json_decode(file_get_contents($path));
@@ -54,28 +55,32 @@ class moodle_exporter implements exporter {
         return $this;
     }
 
-    public function store_custom_file(\context $context, $filename, $filecontent, $subcontext = null) {
-        $path = $this->get_path($context, $filename, $subcontext);
+    public function store_custom_file(\context $context, array $subcontext, $filename, $filecontent) {
+        $path = $this->get_path($context, $subcontext, $filename);
         $this->write_data($path, $filecontent);
     }
 
-    public function rewrite_pluginfile_urls(\context $context, $component, $filearea, $itemid, $text) : String {
+    public function rewrite_pluginfile_urls(\context $context, array $subcontext, $component, $filearea, $itemid, $text) : String {
         return str_replace('@@PLUGINFILE@@/', 'files/', $text);
     }
 
-    public function store_area_files(\context $context, $component, $filearea, $itemid, $subcontext = null) {
+    public function store_area_files(\context $context, array $subcontext, $component, $filearea, $itemid) {
         $fs = get_file_storage();
         $files = $fs->get_area_files($context->id, $component, $filearea, $itemid);
         foreach ($files as $file) {
-            $this->store_file($context, $file, $subcontext);
+            $this->store_file($context, $subcontext, $file);
         }
 
         return $this;
     }
 
-    public function store_file(\context $context, \stored_file $file, $subcontext = null) {
+    public function store_file(\context $context, array $subcontext, \stored_file $file) {
         if (!$file->is_directory()) {
-            $path = $this->get_path($context, implode(DIRECTORY_SEPARATOR, ['files', $file->get_filepath(), $file->get_filename()]), $subcontext);
+            $subcontextextra = [
+                'files',
+                $file->get_filepath(),
+            ];
+            $path = $this->get_path($context, array_merge($subcontext, $subcontextextra), $file->get_filename());
             check_dir_exists(dirname($path), true, true);
             $file->copy_content_to($path);
         }
@@ -93,7 +98,7 @@ class moodle_exporter implements exporter {
         return $path;
     }
 
-    protected function get_path(\context $context, $name, $subcontext = null) {
+    protected function get_path(\context $context, array $subcontext, String $name) {
         // TODO
         $path = [
             $this->path,
@@ -109,7 +114,11 @@ class moodle_exporter implements exporter {
         file_put_contents($path, $data);
     }
 
+    public function get_archive_location() {
+        return $this->path;
+    }
+
     public function get_archive() {
-        var_dump($this->path);
+        var_dump($this->get_archive_location());
     }
 }

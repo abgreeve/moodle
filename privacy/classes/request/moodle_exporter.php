@@ -40,7 +40,7 @@ class moodle_exporter implements exporter {
         $this->write_data($path, json_encode($data));
     }
 
-    public function store_metadata(\context $context, array $subcontext, $key, $value) {
+    public function store_metadata(\context $context, array $subcontext, String $key, $value, String $description) {
         $path = $this->get_path($context, $subcontext, 'metadata.json');
 
         if (file_exists($path)) {
@@ -49,7 +49,10 @@ class moodle_exporter implements exporter {
             $data = (object) [];
         }
 
-        $data->$key = $value;
+        $data->$key = (object) [
+            'value' => $value,
+            'description' => $description,
+        ];
         $this->write_data($path, json_encode($data));
 
         return $this;

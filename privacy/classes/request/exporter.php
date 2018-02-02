@@ -28,7 +28,7 @@ namespace core_privacy\request;
 
 interface exporter {
     public function store_data(\context $context, array $subcontext, \stdClass $data);
-    public function store_metadata(\context $context, array $subcontext, $name, $content);
+    public function store_metadata(\context $context, array $subcontext, String $name, $value, String $description);
     public function store_custom_file(\context $context, array $subcontext, $filename, $filecontent);
     public function rewrite_pluginfile_urls(\context $context, array $subcontext, $component, $filearea, $itemid, $text) : String;
     public function store_area_files(\context $context, array $subcontext, $component, $filearea, $itemid);

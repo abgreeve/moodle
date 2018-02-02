@@ -360,6 +360,28 @@ class core_plugin_manager {
     }
 
     /**
+     * Returns a tree of known primary plugins (those which are not subplugins) and information about them.
+     *
+     * @return array of plugin types and their respective plugins.
+     * The first keys are plugin type names (e.g. qtype);
+     * the second keys are the plugin local name (e.g. multichoice); and
+     * the values are the corresponding objects extending {@link \core\plugininfo\base}
+     */
+    public function get_primary_plugins() {
+        // Get all plugins, including subplugins.
+        $plugins = $this->get_plugins();
+
+        // Find all subplugins and filter them out.
+        $subplugins = [];
+        foreach ($this->get_subplugins() as $pluginname => $pluginsubplugins) {
+            foreach ($pluginsubplugins as $name => $dir) {
+                $subplugins[$name] = $name;
+            }
+        }
+        return array_diff_key($plugins, $subplugins);
+    }
+
+    /**
      * Returns list of known plugins of the given type.
      *
      * This method returns the subset of the tree returned by {@link self::get_plugins()}.

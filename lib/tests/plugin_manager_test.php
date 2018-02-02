@@ -150,6 +150,24 @@ class core_plugin_manager_testcase extends advanced_testcase {
         $this->assertSame($plugininfos2['mod']['forum'], $plugininfos4['mod']['forum']);
     }
 
+    public function test_get_primary_plugins() {
+        $this->resetAfterTest();
+        // All instances should be of plugininfo base.
+        $primaryplugins = core_plugin_manager::instance()->get_primary_plugins();
+        foreach ($primaryplugins as $type => $info) {
+            foreach ($info as $name => $info) {
+                $this->assertInstanceOf('\core\plugininfo\base', $info);
+            }
+        }
+        // No subplugin types should be included.
+        $subplugins = core_plugin_manager::instance()->get_subplugins();
+        foreach ($subplugins as $parentpluginname => $plugintypes) {
+            foreach ($plugintypes as $typename => $info) {
+                $this->assertNotContains($info->type, $primaryplugins);
+            }
+        }
+    }
+
     public function test_plugininfo_back_reference_to_the_plugin_manager() {
         $plugman1 = core_plugin_manager::instance();
         $plugman2 = testable_core_plugin_manager::instance();

@@ -15,15 +15,32 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the core_privacy\user_data_provider interface.
+ * This file defines the core_privacy\metadata\item_record interface.
  *
- * Plugins should implement this if they store personal information.
+ * The item_record interface defines the standard functions expected
+ * within class objects implementing this interface.
+ *
+ * The objects implementing the item_record interface are organized into
+ * an item_collection defined in the core_privacy\metadata\item_collection
+ * class for a given component.
  *
  * @package core_privacy
- * @copyright 2018 Jake Dallimore <jrhdallimore@gmail.com>
+ * @copyright 2018 Zig Tan <zig@moodle.com>
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace core_privacy\metadata;
 
-class items {}
+/**
+ * Interface item_record
+ * @package core_privacy\metadata
+ */
+interface item_record {
+
+    public function get_name();
+
+    public function get_privacy_fields();
+
+    public function get_summary();
+
+}

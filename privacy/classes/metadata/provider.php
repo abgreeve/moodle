@@ -32,5 +32,5 @@ interface provider {
     /**
      * @return array The array of metadata
      */
-    public static function get_metadata(items $items);
+    public static function get_metadata(item_collection $itemcollection);
 }

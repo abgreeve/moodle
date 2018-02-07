@@ -22,7 +22,7 @@
  * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core_privacy\request;
+namespace core_privacy\request\subsystem;
 
 /**
  * The subsystem_provider interface to describe a class which provides data in some form for a subsystem.
@@ -31,4 +31,4 @@ namespace core_privacy\request;
  * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-interface subsystem_provider extends data_provider {}
+interface plugin_provider extends \core_privacy\request\data_provider {}

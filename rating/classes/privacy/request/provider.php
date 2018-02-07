@@ -34,8 +34,22 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements \core_privacy\request\subsystem_provider {
-    public static function store_user_data(int $userid, \context $context, array $subcontext, exporter $exporter, string $component, string $ratingarea, int $itemid, bool $onlyuser = true) {
+class provider implements \core_privacy\request\subsystem\plugin_provider {
+
+    /**
+     * Store all ratings which match the specified component, areaid, and
+     * itemid.
+     *
+     * @param   int         $userid The user whose information is to be stored
+     * @param   \context    $context The context currently being stored
+     * @param   array       $subcontext The subcontext within the context to store this information
+     * @param   exporter    $exporter The exporter to store information within
+     * @param   string      $component The component to fetch data from
+     * @param   string      $ratingarea The ratingarea that the data was stored in within the component
+     * @param   int         $itemid The itemid within that ratingarea
+     * @param   bool        $onlyuser Whether to only store ratings that the current user has made, or all ratings
+     */
+    public static function store_area_ratings(int $userid, \context $context, array $subcontext, exporter $exporter, string $component, string $ratingarea, int $itemid, bool $onlyuser = true) {
         global $DB;
 
         $sql = "SELECT
@@ -59,10 +73,10 @@ class provider implements \core_privacy\request\subsystem_provider {
 
         $ratings = $DB->get_records_sql($sql, $params);
 
-        static::store_ratings($userid, $context, $subcontext, $exporter, $ratings);
+        static::store_rating_list($userid, $context, $subcontext, $exporter, $ratings);
     }
 
-    public static function store_ratings(int $userid, \context $context, array $subcontext, exporter $exporter, $ratings) {
+    protected static function store_rating_list(int $userid, \context $context, array $subcontext, exporter $exporter, $ratings) {
         foreach ($ratings as $rating) {
             // Do tidyup work?
             \core_user\privacy\request\transformation::user($userid, $rating, ['userid']);

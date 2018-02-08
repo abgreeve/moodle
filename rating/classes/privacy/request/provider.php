@@ -24,8 +24,6 @@
 
 namespace core_rating\privacy\request;
 
-use \core_privacy\request\exporter;
-
 defined('MOODLE_INTERNAL') || die();
 
 /**
@@ -81,8 +79,8 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
         }
         if ($ratings) {
             $data = json_encode($ratings);
-            $exporter = \core_privacy\request\helper::get_exporter();
-            $exporter->store_custom_file($subcontext, 'rating.json', $data);
+            $writer = \core_privacy\request\helper::get_writer();
+            $writer->store_custom_file($subcontext, 'rating.json', $data);
         }
     }
 

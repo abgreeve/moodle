@@ -25,25 +25,25 @@
 namespace core_privacy\request;
 
 class helper {
-    protected static $exporter = null;
+    protected static $writer = null;
 
     /**
-     * Fetch the current exporter.
+     * Fetch the current content writer.
      *
-     * @return  exporter
+     * @return  content_writer
      */
-    public static function get_exporter() : exporter {
-        if (null === static::$exporter) {
-            static::$exporter = new moodle_exporter();
+    public static function get_writer() : content_writer {
+        if (null === static::$writer) {
+            static::$writer = new moodle_content_writer();
         }
 
-        return static::$exporter;
+        return static::$writer;
     }
 
     /**
-     * Clear any current exporters.
+     * Clear any current content_writer.
      */
-    public static function clear_exporter() {
-        static::$exporter = null;
+    public static function clear_writer() {
+        static::$writer = null;
     }
 }

@@ -42,7 +42,6 @@ interface plugin_provider extends data_provider {
      *
      * @param   int         $userid The user to store information for
      * @param   context[]   $contexts   The list of contexts to store information for
-     * @param   exporter    $exporter   The exporter plugin used to write the user data
      */
-    public static function store_user_data(int $userid, array $contexts, exporter $exporter);
+    public static function store_user_data(int $userid, array $contexts);
 }

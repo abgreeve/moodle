@@ -29,7 +29,13 @@ class moodle_content_writer implements content_writer {
 
     protected $context = null;
 
-    public function __construct() {
+    /**
+     * Constructor for the content writer.
+     *
+     * Note: The writer_factory must be passed.
+     * @param   writer          $factory    The factory.
+     */
+    public function __construct(writer $writer) {
         $basedir = make_temp_directory('privacy');
         $this->path = make_unique_writable_directory($basedir, true);
     }
@@ -39,8 +45,10 @@ class moodle_content_writer implements content_writer {
      *
      * @param   \context        $context    The context to use
      */
-    public function set_context(\context $context) {
+    public function set_context(\context $context) : content_writer {
         $this->context = $context;
+
+        return $this;
     }
 
     /**
@@ -49,10 +57,12 @@ class moodle_content_writer implements content_writer {
      * @param   array           $subcontext The location within the current context that this data belongs.
      * @param   \stdClass       $data       The data to be stored
      */
-    public function store_data(array $subcontext, \stdClass $data) {
+    public function store_data(array $subcontext, \stdClass $data) : content_writer {
         $path = $this->get_path($subcontext, 'data.json');
 
         $this->write_data($path, json_encode($data));
+
+        return $this;
     }
 
     /**
@@ -65,7 +75,7 @@ class moodle_content_writer implements content_writer {
      * @param   string          $value      The metadata value.
      * @param   string          $description    The description of the value.
      */
-    public function store_metadata(array $subcontext, String $key, $value, String $description) {
+    public function store_metadata(array $subcontext, String $key, $value, String $description) : content_writer{
         $path = $this->get_path($subcontext, 'metadata.json');
 
         if (file_exists($path)) {
@@ -90,9 +100,11 @@ class moodle_content_writer implements content_writer {
      * @param   string          $filename   The name of the file to be stored.
      * @param   string          $filecontent    The content to be stored.
      */
-    public function store_custom_file(array $subcontext, $filename, $filecontent) {
+    public function store_custom_file(array $subcontext, $filename, $filecontent) : content_writer {
         $path = $this->get_path($subcontext, $filename);
         $this->write_data($path, $filecontent);
+
+        return $this;
     }
 
     /**
@@ -117,7 +129,7 @@ class moodle_content_writer implements content_writer {
      * @param   string          $filearea   The filearea within that component.
      * @param   string          $itemid     Which item those files belong to.
      */
-    public function store_area_files(array $subcontext, $component, $filearea, $itemid) {
+    public function store_area_files(array $subcontext, $component, $filearea, $itemid) : content_writer  {
         $fs = get_file_storage();
         $files = $fs->get_area_files($this->context->id, $component, $filearea, $itemid);
         foreach ($files as $file) {
@@ -133,7 +145,7 @@ class moodle_content_writer implements content_writer {
      * @param   array           $subcontext The location within the current context that this data belongs.
      * @param   \stored_file    $file       The file to be stored.
      */
-    public function store_file(array $subcontext, \stored_file $file) {
+    public function store_file(array $subcontext, \stored_file $file) : content_writer  {
         if (!$file->is_directory()) {
             $subcontextextra = [
                 'files',

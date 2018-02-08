@@ -27,6 +27,15 @@ namespace core_privacy\request;
 class null_content_writer implements content_writer {
 
     /**
+     * Constructor for the content writer.
+     *
+     * Note: The writer_factory must be passed.
+     * @param   writer          $factory    The factory.
+     */
+    public function __construct(writer $writer) {
+    }
+
+    /**
      * Set the context for the current item being processed.
      *
      * @param   \context        $context    The context to use

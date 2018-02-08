@@ -27,10 +27,69 @@
 namespace core_privacy\request;
 
 interface exporter {
-    public function store_data(\context $context, array $subcontext, \stdClass $data);
-    public function store_metadata(\context $context, array $subcontext, String $name, $value, String $description);
-    public function store_custom_file(\context $context, array $subcontext, $filename, $filecontent);
-    public function rewrite_pluginfile_urls(\context $context, array $subcontext, $component, $filearea, $itemid, $text) : String;
-    public function store_area_files(\context $context, array $subcontext, $component, $filearea, $itemid);
-    public function store_file(\context $context, array $subcontext, \stored_file $file);
+    /**
+     * Set the context for the current item being processed.
+     *
+     * @param   \context        $context    The context to use
+     */
+    public function set_context(\context $context);
+
+    /**
+     * Store the supplied data within the current context, at the supplied subcontext.
+     *
+     * @param   array           $subcontext The location within the current context that this data belongs.
+     * @param   \stdClass       $data       The data to be stored
+     */
+    public function store_data(array $subcontext, \stdClass $data);
+
+    /**
+     * Store metadata about the supplied subcontext.
+     *
+     * Metadata consists of a key/value pair and a description of the value.
+     *
+     * @param   array           $subcontext The location within the current context that this data belongs.
+     * @param   string          $name       The metadata name.
+     * @param   string          $value      The metadata value.
+     * @param   string          $description    The description of the value.
+     */
+    public function store_metadata(array $subcontext, String $name, $value, String $description);
+
+    /**
+     * Store a piece of data in a custom format.
+     *
+     * @param   array           $subcontext The location within the current context that this data belongs.
+     * @param   string          $filename   The name of the file to be stored.
+     * @param   string          $filecontent    The content to be stored.
+     */
+    public function store_custom_file(array $subcontext, $filename, $filecontent);
+
+    /**
+     * Prepare a text area by processing pluginfile URLs within it.
+     *
+     * @param   array           $subcontext The location within the current context that this data belongs.
+     * @param   string          $component  The name of the component that the files belong to.
+     * @param   string          $filearea   The filearea within that component.
+     * @param   string          $itemid     Which item those files belong to.
+     * param    string          $text       The text to be processed
+     * @return  string                      The processed string
+     */
+    public function rewrite_pluginfile_urls(array $subcontext, $component, $filearea, $itemid, $text) : String;
+
+    /**
+     * Store all files within the specified component, filearea, itemid combination.
+     *
+     * @param   array           $subcontext The location within the current context that this data belongs.
+     * @param   string          $component  The name of the component that the files belong to.
+     * @param   string          $filearea   The filearea within that component.
+     * @param   string          $itemid     Which item those files belong to.
+     */
+    public function store_area_files(array $subcontext, $component, $filearea, $itemid);
+
+    /**
+     * Store the specified file in the target location.
+     *
+     * @param   array           $subcontext The location within the current context that this data belongs.
+     * @param   \stored_file    $file       The file to be stored.
+     */
+    public function store_file(array $subcontext, \stored_file $file);
 }

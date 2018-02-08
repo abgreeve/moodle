@@ -29,19 +29,25 @@ namespace core_privacy\request;
 class moodle_exporter implements exporter {
     protected $path = null;
 
+    protected $context = null;
+
     public function __construct() {
         $basedir = make_temp_directory('privacy');
         $this->path = make_unique_writable_directory($basedir, true);
     }
 
-    public function store_data(\context $context, array $subcontext, \stdClass $data) {
-        $path = $this->get_path($context, $subcontext, 'data.json');
+    public function set_context(\context $context) {
+        $this->context = $context;
+    }
+
+    public function store_data(array $subcontext, \stdClass $data) {
+        $path = $this->get_path($subcontext, 'data.json');
 
         $this->write_data($path, json_encode($data));
     }
 
-    public function store_metadata(\context $context, array $subcontext, String $key, $value, String $description) {
-        $path = $this->get_path($context, $subcontext, 'metadata.json');
+    public function store_metadata(array $subcontext, String $key, $value, String $description) {
+        $path = $this->get_path($subcontext, 'metadata.json');
 
         if (file_exists($path)) {
             $data = json_decode(file_get_contents($path));
@@ -58,32 +64,32 @@ class moodle_exporter implements exporter {
         return $this;
     }
 
-    public function store_custom_file(\context $context, array $subcontext, $filename, $filecontent) {
-        $path = $this->get_path($context, $subcontext, $filename);
+    public function store_custom_file(array $subcontext, $filename, $filecontent) {
+        $path = $this->get_path($subcontext, $filename);
         $this->write_data($path, $filecontent);
     }
 
-    public function rewrite_pluginfile_urls(\context $context, array $subcontext, $component, $filearea, $itemid, $text) : String {
+    public function rewrite_pluginfile_urls(array $subcontext, $component, $filearea, $itemid, $text) : String {
         return str_replace('@@PLUGINFILE@@/', 'files/', $text);
     }
 
-    public function store_area_files(\context $context, array $subcontext, $component, $filearea, $itemid) {
+    public function store_area_files(array $subcontext, $component, $filearea, $itemid) {
         $fs = get_file_storage();
-        $files = $fs->get_area_files($context->id, $component, $filearea, $itemid);
+        $files = $fs->get_area_files($this->context->id, $component, $filearea, $itemid);
         foreach ($files as $file) {
-            $this->store_file($context, $subcontext, $file);
+            $this->store_file($subcontext, $file);
         }
 
         return $this;
     }
 
-    public function store_file(\context $context, array $subcontext, \stored_file $file) {
+    public function store_file(array $subcontext, \stored_file $file) {
         if (!$file->is_directory()) {
             $subcontextextra = [
                 'files',
                 $file->get_filepath(),
             ];
-            $path = $this->get_path($context, array_merge($subcontext, $subcontextextra), $file->get_filename());
+            $path = $this->get_path(array_merge($subcontext, $subcontextextra), $file->get_filename());
             check_dir_exists(dirname($path), true, true);
             $file->copy_content_to($path);
         }
@@ -91,9 +97,9 @@ class moodle_exporter implements exporter {
         return $this;
     }
 
-    protected function get_context_path(\context $finalcontext) : Array {
+    protected function get_context_path() : Array {
         $path = [];
-        $contexts = array_reverse($finalcontext->get_parent_contexts(true));
+        $contexts = array_reverse($this->context->get_parent_contexts(true));
         foreach ($contexts as $context) {
             $path[] = clean_param($context->get_context_name(), PARAM_SAFEDIR);
         }
@@ -101,13 +107,13 @@ class moodle_exporter implements exporter {
         return $path;
     }
 
-    protected function get_path(\context $context, array $subcontext, String $name) {
+    protected function get_path(array $subcontext, String $name) {
         // TODO
         $path = array_merge(
             [
                 $this->path,
             ],
-            $this->get_context_path($context),
+            $this->get_context_path(),
             $subcontext
         );
 

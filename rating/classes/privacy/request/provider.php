@@ -41,7 +41,6 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
      * itemid.
      *
      * @param   int         $userid The user whose information is to be stored
-     * @param   \context    $context The context currently being stored
      * @param   array       $subcontext The subcontext within the context to store this information
      * @param   exporter    $exporter The exporter to store information within
      * @param   string      $component The component to fetch data from
@@ -49,7 +48,7 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
      * @param   int         $itemid The itemid within that ratingarea
      * @param   bool        $onlyuser Whether to only store ratings that the current user has made, or all ratings
      */
-    public static function store_area_ratings(int $userid, \context $context, array $subcontext, exporter $exporter, string $component, string $ratingarea, int $itemid, bool $onlyuser = true) {
+    public static function store_area_ratings(int $userid, array $subcontext, exporter $exporter, string $component, string $ratingarea, int $itemid, bool $onlyuser = true) {
         global $DB;
 
         $sql = "SELECT
@@ -73,17 +72,17 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
 
         $ratings = $DB->get_records_sql($sql, $params);
 
-        static::store_rating_list($userid, $context, $subcontext, $exporter, $ratings);
+        static::store_rating_list($userid, $subcontext, $exporter, $ratings);
     }
 
-    protected static function store_rating_list(int $userid, \context $context, array $subcontext, exporter $exporter, $ratings) {
+    protected static function store_rating_list(int $userid, array $subcontext, exporter $exporter, $ratings) {
         foreach ($ratings as $rating) {
             // Do tidyup work?
             \core_user\privacy\request\transformation::user($userid, $rating, ['userid']);
         }
         if ($ratings) {
             $data = json_encode($ratings);
-            $exporter->store_custom_file($context, $subcontext, 'rating.json', $data);
+            $exporter->store_custom_file($subcontext, 'rating.json', $data);
         }
     }
 

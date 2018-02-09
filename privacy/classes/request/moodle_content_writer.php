@@ -168,7 +168,7 @@ class moodle_content_writer implements content_writer {
         $path = [];
         $contexts = array_reverse($this->context->get_parent_contexts(true));
         foreach ($contexts as $context) {
-            $path[] = clean_param($context->get_context_name(), PARAM_SAFEDIR);
+            $path[] = clean_param($context->get_context_name(), PARAM_FILE);
         }
 
         return $path;

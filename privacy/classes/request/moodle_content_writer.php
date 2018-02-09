@@ -208,6 +208,14 @@ class moodle_content_writer implements content_writer {
         file_put_contents($path, $data);
     }
 
+    /**
+     * Perform any required finalisation steps.
+     * TODO: Compress and archive the content into a tgz or zip.
+     */
+    public function finalise_content() {
+        // Not implemented yet.
+    }
+
     public function get_archive_location() {
         debugging('This is not part of the API - use with caution');
         return $this->path;

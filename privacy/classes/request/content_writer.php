@@ -99,4 +99,9 @@ interface content_writer {
      * @param   \stored_file    $file       The file to be stored.
      */
     public function store_file(array $subcontext, \stored_file $file) : content_writer ;
+
+    /**
+     * Perform any required finalisation steps.
+     */
+    public function finalise_content() ;
 }

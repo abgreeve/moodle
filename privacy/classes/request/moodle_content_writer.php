@@ -101,6 +101,7 @@ class moodle_content_writer implements content_writer {
      * @param   string          $filecontent    The content to be stored.
      */
     public function store_custom_file(array $subcontext, $filename, $filecontent) : content_writer {
+        $filename = clean_param($filename, PARAM_FILE);
         $path = $this->get_path($subcontext, $filename);
         $this->write_data($path, $filecontent);
 

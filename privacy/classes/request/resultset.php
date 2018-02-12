@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class resultset {
+class resultset implements approved_contextlist {
     // TODO: Possibly make this class implement Iterator.
     protected $contextids = [];
 

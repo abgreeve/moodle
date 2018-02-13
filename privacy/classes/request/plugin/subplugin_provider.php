@@ -27,6 +27,8 @@
  */
 namespace core_privacy\request;
 
+use core_privacy\request\data_provider;
+
 /**
  * The subplugin_provider interface to describe a class which provides data in some form for a subplugin.
  *

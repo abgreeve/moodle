@@ -32,7 +32,7 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2018 Zig Tan <zig@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements \core_privacy\metadata\provider, \core_privacy\request\subsystem\plugin_provider {
+class provider implements \core_privacy\request\subsystem\plugin_provider {
 
     /**
      * @inheritdoc

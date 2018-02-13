@@ -53,8 +53,17 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
     public static function store_item_tags(int $userid, \context $context, array $subcontext, string $component, string $itemtype, int $itemid, bool $onlyuser = false) {
         global $DB;
 
+        // Do not include the mdl_tag userid data because of bug with re-using existing tags by other users.
         $sql = "SELECT
-                    t.*
+                    t.id,
+                    t.tagcollid,
+                    t.name,
+                    t.rawname,
+                    t.isstandard,
+                    t.description,
+                    t.descriptionformat,
+                    t.flag,
+                    t.timemodified
                   FROM {tag} t 
             INNER JOIN {tag_instance} ti ON ti.tagid = t.id
                  WHERE ti.component = :component
@@ -80,7 +89,6 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
     }
 
     protected static function store_tag_list(\context $context, array $subcontext, $tags) {
-        // TODO - do not include the user's details by userid due to bug with re-using existing tags by other users.
         if ($tags) {
             $data = json_encode($tags);
             $writer = \core_privacy\request\writer::with_context($context)

@@ -16,17 +16,23 @@
 
 /**
  * This file contains the \core_privacy\request\subsystem\provider interface to describe
- * a class which provides data in some form for a plugin.
+ * a class which provides data in some form for a subsystem.
  *
- * Plugins should implement this if they store personal information.
+ * Plugins should implement this if they directly store personal information.
  *
  * @package core_privacy
  * @copyright 2018 Jake Dallimore <jrhdallimore@gmail.com>
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core_privacy\request\subsystem;
+namespace core_privacy\request\plugin;
 
-use core_privacy\request\data_provider;
-
-interface provider extends user_data_provider {}
+/**
+ * The provider interface for plugins which provide data from a subsystem
+ * directly to the Privacy subsystem.
+ *
+ * @package    privacy
+ * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+interface provider extends core_privacy\request\user_data_provider {}

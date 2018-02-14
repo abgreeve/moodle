@@ -69,7 +69,6 @@ trait privacy_helper {
         ]);
 
         $exportedratings = $this->get_ratings_on_subcontext($context, $subcontext);
-        $user = \core_user\privacy\request\transformation::user($userid, $userid);
 
         foreach ($exportedratings as $rating) {
             $ratingid = $rating->id;
@@ -121,9 +120,6 @@ trait privacy_helper {
      */
     protected function assert_rating_matches(int $userid, $expected, $stored) {
         $this->assertEquals($expected->rating, $stored->rating);
-        $this->assertEquals(
-            \core_user\privacy\request\transformation::user($userid, $expected->userid),
-            $stored->author
-        );
+        $this->assertEquals($expected->userid, $stored->author);
     }
 }

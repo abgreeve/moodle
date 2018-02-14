@@ -75,7 +75,7 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
             $tostore[$rating->id] = (object) [
                 'id' => $rating->id,
                 'rating' => $rating->rating,
-                'author' => \core_user\privacy\request\transformation::user($userid, $rating->userid),
+                'author' => $rating->userid,
             ];
         }
         if ($ratings) {

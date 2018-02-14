@@ -25,7 +25,7 @@
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core_privacy\request\plugin;
+namespace core_privacy\request\subsystem;
 
 /**
  * The provider interface for plugins which provide data from a subsystem

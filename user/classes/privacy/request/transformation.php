@@ -35,16 +35,20 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class transformation {
-    public static function user(int $sourceuser, \stdClass $record, array $fields) {
+    public static function user_fields(int $sourceuser, \stdClass $record, array $fields) {
         foreach ($fields as $field) {
             if (empty($record->$field)) {
                 continue;
             }
 
             $value = $record->$field;
-            $record->$field = fullname(\core_user::get_user($sourceuser));
+            $record->$field = static::user($sourceuser, $record->$field);
         }
 
         return $record;
+    }
+
+    public static function user(int $sourceuser, $value) {
+        return fullname(\core_user::get_user($value));
     }
 }

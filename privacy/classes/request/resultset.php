@@ -32,9 +32,19 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class resultset implements approved_contextlist {
-    // TODO: Possibly make this class implement Iterator.
+class resultset implements
+    // This is currently an approved_contextlist until we decide upon implementation of that interface.
+    approved_contextlist,
+
+    // Implement an Iterator to fetch the Context objects.
+    \Iterator,
+
+    // Implement the Countable interface to allow the number of returned results to be queried easily.
+    \Countable
+{
     protected $contextids = [];
+
+    protected $position = 0;
 
     public function get_contextids() {
         return array_unique($this->contextids);
@@ -74,5 +84,50 @@ class resultset implements approved_contextlist {
         $this->contextids += $contextids;
 
         return $this;
+    }
+
+    /**
+     * Return the current context.
+     *
+     * @return  \context
+     */
+    public function current() {
+        return \context::instance_by_id($this->contextids[$this->position]);
+    }
+
+    /**
+     * Return the key of the current element.
+     *
+     * @return  mixed
+     */
+    public function key() {
+        return $this->position;
+    }
+
+    /**
+     * Move to the next context in the list.
+     */
+    public function next() {
+        ++$this->position;
+    }
+
+    /**
+     * Check if the current position is valid.
+     *
+     * @return  bool
+     */
+    public function valid() {
+        return isset($this->contextids[$this->position]);
+    }
+
+    /**
+     * Rewind to the first found context.
+     */
+    public function rewind() {
+        $this->position = 0;
+    }
+
+    public function count() {
+        return count($this->contextids);
     }
 }

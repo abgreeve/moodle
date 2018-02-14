@@ -48,39 +48,39 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
     public static function store_area_ratings(int $userid, \context $context, array $subcontext, string $component, string $ratingarea, int $itemid, bool $onlyuser = true) {
         global $DB;
 
-        $sql = "SELECT
-                    r.*
-                  FROM {rating} r
-                 WHERE r.component = :component
-                   AND r.ratingarea = :ratingarea
-                   AND r.itemid = :itemid";
-
-        $params = [
-            'component'     => $component,
-            'ratingarea'    => $ratingarea,
-            'itemid'        => $itemid,
-        ];
+        $rm = new \rating_manager();
+        $ratings = $rm->get_all_ratings_for_item((object) [
+            'context' => $context,
+            'component' => $component,
+            'ratingarea' => $ratingarea,
+            'itemid' => $itemid,
+        ]);
 
         if ($onlyuser) {
-            $sql .= " AND r.userid = :userid";
-            $params['userid'] = $userid;
+            $tostore = [];
+            foreach ($ratings as $rating) {
+                if ($rating->userid == $userid) {
+                    $tostore[] = $rating;
+                }
+            }
+            static::store_rating_list($userid, $context, $subcontext, $tostore);
+        } else {
+            static::store_rating_list($userid, $context, $subcontext, $ratings);
         }
-
-
-        $ratings = $DB->get_records_sql($sql, $params);
-
-        static::store_rating_list($userid, $context, $subcontext, $ratings);
     }
 
     protected static function store_rating_list(int $userid, \context $context, array $subcontext, $ratings) {
+        $tostore = [];
         foreach ($ratings as $rating) {
-            // Do tidyup work?
-            \core_user\privacy\request\transformation::user($userid, $rating, ['userid']);
+            $tostore[$rating->id] = (object) [
+                'id' => $rating->id,
+                'rating' => $rating->rating,
+                'author' => \core_user\privacy\request\transformation::user($userid, $rating->userid),
+            ];
         }
         if ($ratings) {
-            $data = json_encode($ratings);
             $writer = \core_privacy\request\writer::with_context($context)
-                ->store_custom_file($subcontext, 'rating.json', $data);
+                ->store_custom_file($subcontext, 'rating.json', json_encode($tostore));
         }
     }
 

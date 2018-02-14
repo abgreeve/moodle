@@ -22,9 +22,9 @@
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core_privacy\request;
+namespace core_privacy\phpunit;
 
-class phpunit_content_writer implements content_writer {
+class content_writer implements \core_privacy\request\content_writer {
     protected $context = null;
 
     protected $metadata = [];
@@ -50,7 +50,7 @@ class phpunit_content_writer implements content_writer {
      * Note: The writer_factory must be passed.
      * @param   writer          $factory    The factory.
      */
-    public function __construct(writer $writer) {
+    public function __construct(\core_privacy\request\writer $writer) {
     }
 
     /**
@@ -58,7 +58,7 @@ class phpunit_content_writer implements content_writer {
      *
      * @param   \context        $context    The context to use
      */
-    public function set_context(\context $context) : content_writer {
+    public function set_context(\context $context) : \core_privacy\request\content_writer {
         $this->context = $context;
 
         if (empty($this->data[$this->context->id])) {
@@ -86,7 +86,7 @@ class phpunit_content_writer implements content_writer {
      * @param   array           $subcontext The location within the current context that this data belongs.
      * @param   \stdClass       $data       The data to be stored
      */
-    public function store_data(array $subcontext, \stdClass $data) : content_writer {
+    public function store_data(array $subcontext, \stdClass $data) : \core_privacy\request\content_writer {
         array_push($subcontext, 'data');
 
         $finalcontent = $data;
@@ -135,7 +135,7 @@ class phpunit_content_writer implements content_writer {
      * @param   string          $value      The metadata value.
      * @param   string          $description    The description of the value.
      */
-    public function store_metadata(array $subcontext, String $key, $value, String $description) : content_writer{
+    public function store_metadata(array $subcontext, String $key, $value, String $description) : \core_privacy\request\content_writer {
         array_push($subcontext, 'metadata');
 
         $finalcontent = [
@@ -203,7 +203,7 @@ class phpunit_content_writer implements content_writer {
      * @param   string          $filename   The name of the file to be stored.
      * @param   string          $filecontent    The content to be stored.
      */
-    public function store_custom_file(array $subcontext, $filename, $filecontent) : content_writer {
+    public function store_custom_file(array $subcontext, $filename, $filecontent) : \core_privacy\request\content_writer {
         $filename = clean_param($filename, PARAM_FILE);
 
         $finalcontent = [
@@ -264,7 +264,7 @@ class phpunit_content_writer implements content_writer {
      * @param   string          $filearea   The filearea within that component.
      * @param   string          $itemid     Which item those files belong to.
      */
-    public function store_area_files(array $subcontext, $component, $filearea, $itemid) : content_writer  {
+    public function store_area_files(array $subcontext, $component, $filearea, $itemid) : \core_privacy\request\content_writer  {
         $fs = get_file_storage();
         $files = $fs->get_area_files($this->context->id, $component, $filearea, $itemid);
         foreach ($files as $file) {
@@ -280,7 +280,7 @@ class phpunit_content_writer implements content_writer {
      * @param   array           $subcontext The location within the current context that this data belongs.
      * @param   \stored_file    $file       The file to be stored.
      */
-    public function store_file(array $subcontext, \stored_file $file) : content_writer  {
+    public function store_file(array $subcontext, \stored_file $file) : \core_privacy\request\content_writer  {
         if (!$file->is_directory()) {
             $subcontextextra = [
                 'files',

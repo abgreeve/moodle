@@ -46,7 +46,7 @@ class writer {
     protected function get_writer_instance() {
         if (null === $this->realwriter) {
             if (PHPUNIT_TEST) {
-                $this->realwriter = new phpunit_content_writer(static::instance());
+                $this->realwriter = new \core_privacy\phpunit\content_writer(static::instance());
             } else {
                 $this->realwriter = new moodle_content_writer(static::instance());
             }

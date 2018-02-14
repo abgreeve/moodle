@@ -46,8 +46,7 @@ class writer {
     protected function get_writer_instance() {
         if (null === $this->realwriter) {
             if (PHPUNIT_TEST) {
-                // TODO Make a writer for unit tests.
-                $this->realwriter = new moodle_content_writer(static::instance());
+                $this->realwriter = new phpunit_content_writer(static::instance());
             } else {
                 $this->realwriter = new moodle_content_writer(static::instance());
             }
@@ -65,8 +64,7 @@ class writer {
     }
 
     public static final function reset() {
-        self::$realwrite = null;
-        self::$factory = null;
+        static::$instance = null;
     }
 
     /**

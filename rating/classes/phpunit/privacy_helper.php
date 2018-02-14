@@ -73,8 +73,8 @@ trait privacy_helper {
         foreach ($exportedratings as $rating) {
             $ratingid = $rating->id;
             $this->assertTrue(isset($dbratings[$ratingid]));
-            $this->assertEquals($user, $rating->author);
-            $this->assert_rating_matches($userid, $dbratings[$ratingid], $rating);
+            $this->assertEquals($userid, $rating->author);
+            $this->assert_rating_matches($dbratings[$ratingid], $rating);
             $ratingid = $rating->id;
         }
 
@@ -89,10 +89,9 @@ trait privacy_helper {
      * Check that all included ratings are valid. They may belong to any user.
      *
      * @param   content_writer      $writer     The contextualised writer to fetch ratings for.
-     * @param   int                 $userid     The ID of the user being rated.
      * @param   array               $subcontext The subcontext path to check.
      */
-    protected function assert_all_ratings_on_context(int $userid, \context $context, array $subcontext, $component, $ratingarea, $itemid) {
+    protected function assert_all_ratings_on_context(\context $context, array $subcontext, $component, $ratingarea, $itemid) {
         $writer = \core_privacy\request\writer::with_context($context);
         $rm = new \rating_manager();
         $dbratings = $rm->get_all_ratings_for_item((object) [
@@ -107,7 +106,7 @@ trait privacy_helper {
         foreach ($exportedratings as $rating) {
             $ratingid = $rating->id;
             $this->assertTrue(isset($dbratings[$ratingid]));
-            $this->assert_rating_matches($userid, $dbratings[$ratingid], $rating);
+            $this->assert_rating_matches($dbratings[$ratingid], $rating);
         }
 
         foreach ($dbratings as $rating) {
@@ -118,7 +117,7 @@ trait privacy_helper {
     /**
      * Assert that the rating matches.
      */
-    protected function assert_rating_matches(int $userid, $expected, $stored) {
+    protected function assert_rating_matches($expected, $stored) {
         $this->assertEquals($expected->rating, $stored->rating);
         $this->assertEquals($expected->userid, $stored->author);
     }

@@ -82,8 +82,10 @@ class provider_testcase extends \advanced_testcase {
             throw new \coding_exception("{$plugin} does not declare that it provides any user data");
         }
 
-
-        $classname::store_user_data($userid, $classname::get_contexts_for_userid($userid));
+        if ($contextlist = $classname::get_contexts_for_userid($userid)) {
+            $contextlist->set_user(\core_user::get_user($userid));
+            $classname::store_user_data($contextlist);
+        }
     }
 
     /**
@@ -104,9 +106,10 @@ class provider_testcase extends \advanced_testcase {
             throw new \coding_exception("{$plugin} does not declare that it provides any user data");
         }
 
-        $cl = new \core_privacy\phpunit\approved_contextlist();
+        $cl = new \core_privacy\phpunit\request\approved_contextlist();
+        $cl->set_user(\core_user::get_user($userid));
         $cl->add_context($context);
 
-        $classname::store_user_data($userid, $cl);
+        $classname::store_user_data($cl);
     }
 }

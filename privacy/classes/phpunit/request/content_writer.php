@@ -22,7 +22,7 @@
  *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core_privacy\phpunit;
+namespace core_privacy\phpunit\request;
 
 class content_writer implements \core_privacy\request\content_writer {
     protected $context = null;

@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy Fetch Result Set.
+ * Approved result set for unit testing.
  *
  * @package    privacy
  * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace core_privacy\request;
+namespace core_privacy\phpunit\request;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -32,25 +32,51 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class resultset implements
-    // This is currently an approved_contextlist until we decide upon implementation of that interface.
-    approved_contextlist,
-
-    // Implement an Iterator to fetch the Context objects.
-    \Iterator,
-
-    // Implement the Countable interface to allow the number of returned results to be queried easily.
-    \Countable
-{
+class approved_contextlist implements \core_privacy\request\approved_contextlist {
+    // TODO: Possibly make this class implement Iterator.
     protected $contextids = [];
 
-    protected $position = 0;
+    protected $user;
 
-    public function get_contextids() {
+    protected $iteratorposition = 0;
+
+    /**
+     * Specify the user which owns this request.
+     *
+     * @param   \stdClass       $user The user record.
+     * @return  $this
+     */
+    public function set_user(\stdClass $user) : \core_privacy\request\approved_contextlist {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * Get the user which requested their data.
+     *
+     * @return  \stdClass
+     */
+    public function get_user() : \stdClass {
+        return $this->user;
+    }
+
+    /**
+     * Get the list of context IDs that relate to this request.
+     *
+     * @return  int[]
+     */
+    public function get_contextids() : array {
         return array_unique($this->contextids);
     }
 
-    public function get_contexts() {
+    /**
+     * Get the complete list of context objects that relate to this
+     * request.
+     *
+     * @return  \contect[]
+     */
+    public function get_contexts() : array {
         $contexts = [];
         foreach ($this->contextids as $contextid) {
             $contexts[] = \context::instance_by_id($contextid);
@@ -59,31 +85,24 @@ class resultset implements
         return $contexts;
     }
 
-    /**
-     * Add a set of contexts from  SQL.
-     *
-     * The SQL should only return a list of context IDs.
-     *
-     * @param   string  $sql    The SQL which will fetch the list of * context IDs
-     * @param   array   $params The set of SQL parameters
-     * @return  $this
-     */
-    public function add_from_sql($sql, $params) {
-        global $DB;
+    public function add_context(\context $context) {
+        $this->contextids[] = $context->id;
+    }
 
-        $fields = \context_helper::get_preload_record_columns_sql('ctx');
-        $wrapper = "SELECT {$fields} FROM {context} ctx WHERE id IN ({$sql})";
-        $contexts = $DB->get_recordset_sql($wrapper, $params);
+    public function add_context_by_id($contextid) {
+        $this->contextids[] = $contextid;
+    }
 
-        $contextids = [];
+    public function add_contexts(array $contexts) {
         foreach ($contexts as $context) {
-            $contextids[] = $context->ctxid;
-            \context_helper::preload_from_record($context);
+            $this->add_context($context);
         }
+    }
 
-        $this->contextids += $contextids;
-
-        return $this;
+    public function add_contexts_by_id(array $contexts) {
+        foreach ($contexts as $contextid) {
+            $this->add_context_by_id($contextid);
+        }
     }
 
     /**
@@ -92,7 +111,7 @@ class resultset implements
      * @return  \context
      */
     public function current() {
-        return \context::instance_by_id($this->contextids[$this->position]);
+        return \context::instance_by_id($this->contextids[$this->iteratorposition]);
     }
 
     /**
@@ -101,14 +120,14 @@ class resultset implements
      * @return  mixed
      */
     public function key() {
-        return $this->position;
+        return $this->iteratorposition;
     }
 
     /**
      * Move to the next context in the list.
      */
     public function next() {
-        ++$this->position;
+        ++$this->iteratorposition;
     }
 
     /**
@@ -117,14 +136,14 @@ class resultset implements
      * @return  bool
      */
     public function valid() {
-        return isset($this->contextids[$this->position]);
+        return isset($this->contextids[$this->iteratorposition]);
     }
 
     /**
      * Rewind to the first found context.
      */
     public function rewind() {
-        $this->position = 0;
+        $this->iteratorposition = 0;
     }
 
     public function count() {

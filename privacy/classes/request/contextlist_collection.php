@@ -15,9 +15,9 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file defines the core_privacy\request\resultset_collection class object.
+ * This file defines the core_privacy\request\contextlist_collection class object.
  *
- * The resultset_collection is used to organize a collection of resultsets.
+ * The contextlist_collection is used to organize a collection of contextlists.
  *
  * @package core_privacy
  * @copyright 2018 Jake Dallimore <jrhdallimore@gmail.com>
@@ -27,34 +27,34 @@
 namespace core_privacy\request;
 
 /**
- * Class resultset_collection
+ * Class contextlist_collection
  * @package core_privacy\request
  */
-class resultset_collection {
+class contextlist_collection {
     /**
-     * @var array $resultsets the internal array of resultset objects.
+     * @var array $contextlists the internal array of contextlist objects.
      */
-    protected $resultsets;
+    protected $contextlists;
 
     public function __construct() {
-        $this->resultsets = [];
+        $this->contextlists = [];
     }
 
     /**
-     * @param string $component the frankenstyle name of the component to which the resultset applies. E.g. core_comment.
-     * @param resultset $resultset the resultset to store.
+     * @param string $component the frankenstyle name of the component to which the contextlist applies. E.g. core_comment.
+     * @param contextlist $contextlist the contextlist to store.
      */
-    public function add_resultset($component, resultset $resultset) {
-        $this->resultsets[$component] = $resultset;
+    public function add_contextlist($component, contextlist $contextlist) {
+        $this->contextlists[$component] = $contextlist;
     }
 
     /**
-     * Get the resultsets in this collection.
+     * Get the contextlists in this collection.
      *
-     * @return array the associative array of resultsets stored in this collection, indexeb by component name.
-     * E.g. mod_assign => resultset, core_comment => resultset.
+     * @return array the associative array of contextlists stored in this collection, indexeb by component name.
+     * E.g. mod_assign => contextlist, core_comment => contextlist.
      */
-    public function get_resultsets() : array {
-        return $this->resultsets;
+    public function get_contextlists() : array {
+        return $this->contextlists;
     }
 }

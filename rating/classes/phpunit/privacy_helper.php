@@ -26,7 +26,7 @@ namespace core_rating\phpunit;
 
 defined('MOODLE_INTERNAL') || die();
 
-use \core_privacy\phpunit\content_writer;
+use \core_privacy\phpunit\request\content_writer;
 
 global $CFG;
 

@@ -28,10 +28,42 @@ namespace core_privacy\request;
  * Interface approved_contextlist
  * @package core_privacy\request
  */
-interface approved_contextlist {
+interface approved_contextlist extends
 
-    public function get_contextids();
+    // Implement an Iterator to fetch the Context objects.
+    \Iterator,
 
-    public function get_contexts();
+    // Implement the Countable interface to allow the number of returned results to be queried easily.
+    \Countable
+{
 
+    /**
+     * Specify the user which owns this request.
+     *
+     * @param   \stdClass       $user The user record.
+     * @return  $this
+     */
+    public function set_user(\stdClass $user) : approved_contextlist ;
+
+    /**
+     * Get the user which requested their data.
+     *
+     * @return  \stdClass
+     */
+    public function get_user() : \stdClass;
+
+    /**
+     * Get the list of context IDs that relate to this request.
+     *
+     * @return  int[]
+     */
+    public function get_contextids() : array ;
+
+    /**
+     * Get the complete list of context objects that relate to this
+     * request.
+     *
+     * @return  \contect[]
+     */
+    public function get_contexts() : array ;
 }

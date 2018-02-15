@@ -31,15 +31,14 @@ interface user_data_provider extends data_provider {
      * Get the list of contexts that contain user information for the specified user.
      *
      * @param   int         $userid     The user to search.
-     * @return  resultset   $resultset  The resultset containing the list of contexts used in this plugin.
+     * @return  contextlist   $contextlist  The contextlist containing the list of contexts used in this plugin.
      */
-    public static function get_contexts_for_userid(int $userid) : resultset;
+    public static function get_contexts_for_userid(int $userid) : contextlist;
 
     /**
      * Store all user data for the specified user, in the specified contexts, using the supplied exporter instance.
      *
-     * @param   int                     $userid     The user to store information for.
-     * @param   approved_contextlist    $contexts   The approved contexts to store information for.
+     * @param   approved_contextlist    $contextlist    The approved contexts to store information for.
      */
-    public static function store_user_data(int $userid, approved_contextlist $contexts);
+    public static function store_user_data(approved_contextlist $contextlist);
 }

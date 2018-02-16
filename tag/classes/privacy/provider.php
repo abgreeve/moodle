@@ -43,6 +43,11 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
     /**
      * Store all tags which match the specified component, itemtype, and itemid.
      *
+     * In most situations you will want to specify $onlyuser as false.
+     * This will fetch only tags where the user themselves set the tag, or where tags are a shared resource.
+     *
+     * If you specify $onlyuser as true, only the tags created by that user will be included.
+     *
      * @param   int         $userid The user whose information is to be stored
      * @param   array       $subcontext The subcontext within the context to store this information
      * @param   string      $component The component to fetch data from
@@ -64,7 +69,7 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
                     t.descriptionformat,
                     t.flag,
                     t.timemodified
-                  FROM {tag} t 
+                  FROM {tag} t
             INNER JOIN {tag_instance} ti ON ti.tagid = t.id
                  WHERE ti.component = :component
                    AND ti.itemtype = :itemtype
@@ -84,16 +89,10 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
             'userid' => $userid,
         ];
 
-        $tags = $DB->get_records_sql($sql, $params);
-        static::store_tag_list($context, $subcontext, $tags);
-    }
-
-    protected static function store_tag_list(\context $context, array $subcontext, $tags) {
-        if ($tags) {
+        if ($tags = $DB->get_records_sql($sql, $params)) {
             $data = json_encode($tags);
             $writer = \core_privacy\request\writer::with_context($context)
                         ->store_custom_file($subcontext, 'tags.json', $data);
         }
     }
-
 }

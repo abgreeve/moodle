@@ -35,8 +35,11 @@ defined('MOODLE_INTERNAL') || die();
 class provider implements \core_privacy\request\subsystem\plugin_provider {
 
     /**
-     * Store all ratings which match the specified component, areaid, and
-     * itemid.
+     * Store all ratings which match the specified component, areaid, and itemid.
+     *
+     * If requesting ratings for a users own content, and you wish to include all ratings of that content, specify $onlyuser as false.
+     *
+     * When requesting ratings for another users content, you should only export the ratings that the specified user made themselves.
      *
      * @param   int         $userid The user whose information is to be stored
      * @param   array       $subcontext The subcontext within the context to store this information

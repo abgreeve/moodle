@@ -57,31 +57,25 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
         ]);
 
         if ($onlyuser) {
-            $tostore = [];
-            foreach ($ratings as $rating) {
-                if ($rating->userid == $userid) {
-                    $tostore[] = $rating;
-                }
-            }
-            static::store_rating_list($userid, $context, $subcontext, $tostore);
-        } else {
-            static::store_rating_list($userid, $context, $subcontext, $ratings);
+            $ratings = array_filter($ratings, function($rating) use ($userid){
+                return ($rating->userid == $userid);
+            });
         }
-    }
 
-    protected static function store_rating_list(int $userid, \context $context, array $subcontext, $ratings) {
-        $tostore = [];
-        foreach ($ratings as $rating) {
-            $tostore[$rating->id] = (object) [
+        if (empty($ratings)) {
+            return;
+        }
+
+        $tostore = array_map(function($rating) {
+            return (object) [
                 'id' => $rating->id,
                 'rating' => $rating->rating,
                 'author' => $rating->userid,
             ];
-        }
-        if ($ratings) {
-            $writer = \core_privacy\request\writer::with_context($context)
-                ->store_custom_file($subcontext, 'rating.json', json_encode($tostore));
-        }
+        }, $ratings);
+
+        $writer = \core_privacy\request\writer::with_context($context)
+            ->store_custom_file($subcontext, 'rating.json', json_encode($tostore));
     }
 
     public static function get_sql_join($alias, $component, $ratingarea, $itemidjoin, $userid) {

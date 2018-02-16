@@ -78,7 +78,7 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
         }, $ratings);
 
         $writer = \core_privacy\request\writer::with_context($context)
-            ->store_custom_file($subcontext, 'rating.json', json_encode($tostore));
+            ->store_related_data($subcontext, 'rating', $tostore);
     }
 
     public static function get_sql_join($alias, $component, $ratingarea, $itemidjoin, $userid) {

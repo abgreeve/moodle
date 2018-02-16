@@ -90,9 +90,8 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
         ];
 
         if ($tags = $DB->get_records_sql($sql, $params)) {
-            $data = json_encode($tags);
             $writer = \core_privacy\request\writer::with_context($context)
-                        ->store_custom_file($subcontext, 'tags.json', $data);
+                ->store_related_data($subcontext, 'tags', $tags);
         }
     }
 }

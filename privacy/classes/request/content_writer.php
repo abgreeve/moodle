@@ -62,6 +62,15 @@ interface content_writer {
     public function store_metadata(array $subcontext, String $name, $value, String $description) : content_writer ;
 
     /**
+     * Store a piece of related data.
+     *
+     * @param   array           $subcontext The location within the current context that this data belongs.
+     * @param   string          $name       The name of the file to be stored.
+     * @param   \stdClass       $data       The related data to store.
+     */
+    public function store_related_data(array $subcontext, $name, $data) : content_writer ;
+
+    /**
      * Store a piece of data in a custom format.
      *
      * @param   array           $subcontext The location within the current context that this data belongs.

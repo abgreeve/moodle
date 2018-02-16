@@ -29,6 +29,7 @@ class content_writer implements \core_privacy\request\content_writer {
 
     protected $metadata = [];
     protected $data = [];
+    protected $relateddata = [];
     protected $files = [];
     protected $customfiles = [];
 
@@ -37,11 +38,12 @@ class content_writer implements \core_privacy\request\content_writer {
      */
     public function has_any_data() {
         $hasdata = !empty($this->data[$this->context->id]);
+        $hasrelateddata = !empty($this->relateddata[$this->context->id]);
         $hasmetadata = !empty($this->metadata[$this->context->id]);
         $hasfiles = !empty($this->files[$this->context->id]);
         $hascustomfiles = !empty($this->customfiles[$this->context->id]);
 
-        return $hasdata || $hasmetadata || $hasfiles || $hascustomfiles;
+        return $hasdata || $hasrelateddata || $hasmetadata || $hasfiles || $hascustomfiles;
     }
 
     /**
@@ -63,6 +65,10 @@ class content_writer implements \core_privacy\request\content_writer {
 
         if (empty($this->data[$this->context->id])) {
             $this->data[$this->context->id] = [];
+        }
+
+        if (empty($this->relateddata[$this->context->id])) {
+            $this->relateddata[$this->context->id] = [];
         }
 
         if (empty($this->metadata[$this->context->id])) {
@@ -193,6 +199,54 @@ class content_writer implements \core_privacy\request\content_writer {
             return $metadata->value;
         } else {
             return $metadata;
+        }
+    }
+
+    /**
+     * Store a piece of related data.
+     *
+     * @param   array           $subcontext The location within the current context that this data belongs.
+     * @param   string          $name       The name of the file to be stored.
+     * @param   \stdClass       $data       The related data to store.
+     */
+    public function store_related_data(array $subcontext, $name, $data) : \core_privacy\request\content_writer {
+        array_push($subcontext, $name);
+        array_push($subcontext, 'data');
+
+        $finalcontent = $data;
+
+        while ($pathtail = array_pop($subcontext)) {
+            $finalcontent = [
+                $pathtail => $finalcontent,
+            ];
+        }
+
+        $this->relateddata[$this->context->id] = array_replace_recursive($this->relateddata[$this->context->id], $finalcontent);
+
+        return $this;
+    }
+
+    /**
+     * Get all data within the subcontext.
+     *
+     * @param   array           $subcontext The location within the current context that this data belongs.
+     * @return  array                       The metadata as a series of keys to value + descrition objects.
+     */
+    public function get_related_data(array $subcontext = [], $filename) {
+        $basepath = $this->relateddata[$this->context->id];
+        $subcontext[] = $filename;
+        while ($subpath = array_shift($subcontext)) {
+            if (isset($basepath[$subpath])) {
+                $basepath = $basepath[$subpath];
+            } else {
+                return [];
+            }
+        }
+
+        if (isset($basepath['data'])) {
+            return $basepath['data'];
+        } else {
+            return [];
         }
     }
 

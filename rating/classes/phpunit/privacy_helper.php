@@ -46,9 +46,7 @@ trait privacy_helper {
      */
     protected function get_ratings_on_subcontext(\context $context, array $subcontext) {
         $writer = \core_privacy\request\writer::with_context($context);
-        $content = $writer->get_custom_file($subcontext, 'rating.json');
-
-        return json_decode($content);
+        return $writer->get_related_data($subcontext, 'rating');
     }
 
     /**
@@ -110,7 +108,7 @@ trait privacy_helper {
         }
 
         foreach ($dbratings as $rating) {
-            $this->assertTrue(isset($exportedratings->{$rating->id}));
+            $this->assertTrue(isset($exportedratings[$rating->id]));
         }
     }
 

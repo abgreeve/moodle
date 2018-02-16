@@ -75,7 +75,7 @@ class moodle_content_writer implements content_writer {
      * @param   string          $value      The metadata value.
      * @param   string          $description    The description of the value.
      */
-    public function store_metadata(array $subcontext, String $key, $value, String $description) : content_writer{
+    public function store_metadata(array $subcontext, String $key, $value, String $description) : content_writer {
         $path = $this->get_path($subcontext, 'metadata.json');
 
         if (file_exists($path)) {
@@ -88,6 +88,21 @@ class moodle_content_writer implements content_writer {
             'value' => $value,
             'description' => $description,
         ];
+        $this->write_data($path, json_encode($data));
+
+        return $this;
+    }
+
+    /**
+     * Store a piece of related data.
+     *
+     * @param   array           $subcontext The location within the current context that this data belongs.
+     * @param   string          $name       The name of the file to be stored.
+     * @param   \stdClass       $data       The related data to store.
+     */
+    public function store_related_data(array $subcontext, $name, $data) : content_writer {
+        $path = $this->get_path($subcontext, "{$name}.json");
+
         $this->write_data($path, json_encode($data));
 
         return $this;

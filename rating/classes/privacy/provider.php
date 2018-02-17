@@ -81,6 +81,13 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
             ->store_related_data($subcontext, 'rating', $tostore);
     }
 
+    /**
+     * Get the SQL required to find all submission items where this user has had any involvements.
+     *
+     * @param   int           $userid       The user to search.
+     * @return  \stdClass
+
+     */
     public static function get_sql_join($alias, $component, $ratingarea, $itemidjoin, $userid) {
         static $count = 0;
         $count++;
@@ -106,11 +113,12 @@ class provider implements \core_privacy\request\subsystem\plugin_provider {
             'ratinguserid' . $count     => $userid,
         ];
 
-        return [
-            implode(', ', $select),
-            $join,
-            $params,
-            $userwhere,
+        $return = (object) [
+            'select' => implode(', ', $select),
+            'join' => $join,
+            'params' => $params,
+            'userwhere' => $userwhere,
         ];
+        return $return;
     }
 }

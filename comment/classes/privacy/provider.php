@@ -31,7 +31,6 @@ use \core_privacy\metadata\provider as metadataprovider;
 use \core_privacy\request\resultset;
 use \core_privacy\request\subsystem\plugin_provider as subsystemprovider;
 use \core_privacy\request\writer;
-use \lang_string;
 
 /**
  * Privacy class for requesting user data.
@@ -86,7 +85,9 @@ class provider implements metadataprovider, subsystemprovider {
                 }
             });
         }
-        writer::with_context($context)
-                ->store_data($path, (object)$comments);
+        if (!empty($comments)) {
+            writer::with_context($context)
+                    ->store_data($path, (object)$comments);
+        }
     }
 }

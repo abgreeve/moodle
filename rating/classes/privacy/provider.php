@@ -26,6 +26,8 @@ namespace core_rating\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->dirroot . '/rating/lib.php');
+
 /**
  * Privacy Subsystem implementation for core_ratings.
  *

@@ -15,38 +15,33 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file defines the core_privacy\metadata\item_record class object.
- *
- * The subsystem_item_record object implements the item_record interface and is
- * used to add references to subsystems associated with a component.
- *
- * The subsystem_item_record object DOES NOT store the privacy field details
- * from the subsystems as they are derived directly from them.
- *
- * The subsystem_item_record is organized into an item_collection defined in the
- * core_privacy\metadata\item_collection class for a given component.
+ * This file defines a link to another Moodle subsystem.
  *
  * @package core_privacy
  * @copyright 2018 Zig Tan <zig@moodle.com>
- *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace core_privacy\metadata\item_record;
 
-namespace core_privacy\metadata;
+/**
+ * The subsystem item record.
+ *
+ * @copyright 2018 Zig Tan <zig@moodle.com>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class subsystem_link implements type {
 
-class subsystem_item_record implements item_record {
-
-    // Subsystem item record name.
+    // The name of the core subsystem to link.
     protected $name;
 
-    // Subsystem item record summary.
+    // A description of what this subsystem is used to store.
     protected $summary;
 
     /**
-     * subsystem_item_record constructor.
+     * Constructor for the subsystem_link.
      *
-     * @param string $name name of subsystem.
-     * @param string $summary (optional) language identifier within specified component describing this item record.
+     * @param   string  $name The name of the subsystem to link.
+     * @param   string  $summary A description of what is stored within this subsystem.
      */
     public function __construct($name, $summary = '') {
         $this->name = $name;
@@ -63,23 +58,20 @@ class subsystem_item_record implements item_record {
     }
 
     /**
-     * Function to return privacy fields of this subsystem item record.
+     * A subsystem link does not define any fields itself.
      *
-     * NOTE: For subsystems, the privacy fields are derived directly so return null here.
-     *
-     * @return null
+     * @return  array
      */
-    public function get_privacy_fields() {
+    public function get_privacy_fields() : array {
         return null;
     }
 
     /**
-     * Function to return the summary of this subsystem item record.
+     * A summary of what this subsystem is used for.
      *
      * @return string $summary
      */
     public function get_summary() {
         return $this->summary;
     }
-
 }

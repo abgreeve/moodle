@@ -176,6 +176,39 @@ class moodle_content_writer implements content_writer {
     }
 
     /**
+     * Store the specified user preference.
+     *
+     * @param   string          $component  The name of the component.
+     * @param   string          $key        The name of th key to be stored.
+     * @param   string          $value      The value of the preference
+     * @param   string          $description    A description of the value
+     * @return  content_writer
+     */
+    public function store_user_preference(string $component, string $key, string $value, string $description) : content_writer {
+        if ($this->context !== \context_system::instance()) {
+            throw new \coding_exception('store_user_preference must be called against the system context');
+        }
+        $subcontext = [
+            get_string('userpreferences'),
+        ];
+        $path = $this->get_path($subcontext, "{$component}.json");
+
+        if (file_exists($path)) {
+            $data = json_decode(file_get_contents($path));
+        } else {
+            $data = (object) [];
+        }
+
+        $data->$key = (object) [
+            'value' => $value,
+            'description' => $description,
+        ];
+        $this->write_data($path, json_encode($data));
+
+        return $this;
+    }
+
+    /**
      * Determine the path for the current context.
      *
      * @return  array                       The context path.

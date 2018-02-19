@@ -32,6 +32,7 @@ class content_writer implements \core_privacy\request\content_writer {
     protected $relateddata = [];
     protected $files = [];
     protected $customfiles = [];
+    protected $userprefs = [];
 
     /**
      * Whether any data has been stored at all within the current context.
@@ -42,8 +43,9 @@ class content_writer implements \core_privacy\request\content_writer {
         $hasmetadata = !empty($this->metadata[$this->context->id]);
         $hasfiles = !empty($this->files[$this->context->id]);
         $hascustomfiles = !empty($this->customfiles[$this->context->id]);
+        $hasuserprefs = !empty($this->userprefs);
 
-        return $hasdata || $hasrelateddata || $hasmetadata || $hasfiles || $hascustomfiles;
+        return $hasdata || $hasrelateddata || $hasmetadata || $hasfiles || $hascustomfiles || $hasuserprefs;
     }
 
     /**
@@ -372,6 +374,42 @@ class content_writer implements \core_privacy\request\content_writer {
         }
 
         return $basepath;
+    }
+
+    /**
+     * Store the specified user preference.
+     *
+     * @param   string          $component  The name of the component.
+     * @param   string          $key        The name of th key to be stored.
+     * @param   string          $value      The value of the preference
+     * @param   string          $description    A description of the value
+     * @return  content_writer
+     */
+    public function store_user_preference(string $component, string $key, string $value, string $description) : \core_privacy\request\content_writer {
+        if (!isset($this->userprefs[$component])) {
+            $this->userprefs[$component] = (object) [];
+        }
+
+        $this->userprefs[$component]->$key = (object) [
+            'value' => $value,
+            'description' => $description,
+        ];
+
+        return $this;
+    }
+
+    /**
+     * Get all user preferences for the specified component.
+     *
+     * @param   string          $component  The name of the component.
+     * @return  \stdClas
+     */
+    public function get_user_preferences(string $component) {
+        if (isset($this->userprefs[$component])) {
+            return $this->userprefs[$component];
+        } else {
+            return (object) [];
+        }
     }
 
     /**

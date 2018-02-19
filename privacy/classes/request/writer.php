@@ -78,4 +78,18 @@ class writer {
             ->get_writer_instance()
             ->set_context($context);
     }
+
+    /**
+     * Store the specified user preference.
+     *
+     * @param   string          $component  The name of the component.
+     * @param   string          $key        The name of th key to be stored.
+     * @param   string          $value      The value of the preference
+     * @param   string          $description    A description of the value
+     * @return  content_writer
+     */
+    public static function store_user_preference(string $component, string $key, string $value, string $description) : content_writer {
+        return static::with_context(\context_system::instance())
+            ->store_user_preference($component, $key, $value, $description);
+    }
 }

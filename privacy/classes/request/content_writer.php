@@ -38,6 +38,7 @@ interface content_writer {
      * Set the context for the current item being processed.
      *
      * @param   \context        $context    The context to use
+     * @return  content_writer
      */
     public function set_context(\context $context) : content_writer ;
 
@@ -46,6 +47,7 @@ interface content_writer {
      *
      * @param   array           $subcontext The location within the current context that this data belongs.
      * @param   \stdClass       $data       The data to be stored
+     * @return  content_writer
      */
     public function store_data(array $subcontext, \stdClass $data) : content_writer ;
 
@@ -58,6 +60,7 @@ interface content_writer {
      * @param   string          $name       The metadata name.
      * @param   string          $value      The metadata value.
      * @param   string          $description    The description of the value.
+     * @return  content_writer
      */
     public function store_metadata(array $subcontext, String $name, $value, String $description) : content_writer ;
 
@@ -67,6 +70,7 @@ interface content_writer {
      * @param   array           $subcontext The location within the current context that this data belongs.
      * @param   string          $name       The name of the file to be stored.
      * @param   \stdClass       $data       The related data to store.
+     * @return  content_writer
      */
     public function store_related_data(array $subcontext, $name, $data) : content_writer ;
 
@@ -76,6 +80,7 @@ interface content_writer {
      * @param   array           $subcontext The location within the current context that this data belongs.
      * @param   string          $filename   The name of the file to be stored.
      * @param   string          $filecontent    The content to be stored.
+     * @return  content_writer
      */
     public function store_custom_file(array $subcontext, $filename, $filecontent) : content_writer ;
 
@@ -86,7 +91,7 @@ interface content_writer {
      * @param   string          $component  The name of the component that the files belong to.
      * @param   string          $filearea   The filearea within that component.
      * @param   string          $itemid     Which item those files belong to.
-     * param    string          $text       The text to be processed
+     * @param   string          $text       The text to be processed
      * @return  string                      The processed string
      */
     public function rewrite_pluginfile_urls(array $subcontext, $component, $filearea, $itemid, $text) : String;
@@ -98,6 +103,7 @@ interface content_writer {
      * @param   string          $component  The name of the component that the files belong to.
      * @param   string          $filearea   The filearea within that component.
      * @param   string          $itemid     Which item those files belong to.
+     * @return  content_writer
      */
     public function store_area_files(array $subcontext, $component, $filearea, $itemid) : content_writer ;
 
@@ -106,8 +112,20 @@ interface content_writer {
      *
      * @param   array           $subcontext The location within the current context that this data belongs.
      * @param   \stored_file    $file       The file to be stored.
+     * @return  content_writer
      */
     public function store_file(array $subcontext, \stored_file $file) : content_writer ;
+
+    /**
+     * Store the specified user preference.
+     *
+     * @param   string          $component  The name of the component.
+     * @param   string          $key        The name of th key to be stored.
+     * @param   string          $value      The value of the preference
+     * @param   string          $description    A description of the value
+     * @return  content_writer
+     */
+    public function store_user_preference(string $component, string $key, string $value, string $description) : content_writer ;
 
     /**
      * Perform any required finalisation steps.

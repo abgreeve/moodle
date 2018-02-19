@@ -15,37 +15,37 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file defines the core_privacy\metadata\datastore_item_record class object.
- *
- * The datastore_item_record object implements the item_record interface and is
- * used to store a component's database table(s) privacy field details.
- *
- * The datastore_item record is organized into an item_collection defined in the
- * core_privacy\metadata\item_collection class for a given component.
+ * This file defines an item of metadata which encapsulates a database table.
  *
  * @package core_privacy
  * @copyright 2018 Zig Tan <zig@moodle.com>
- *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core_privacy\metadata;
+namespace core_privacy\metadata\item_record;
 
-class datastore_item_record implements item_record {
+/**
+ * The database_table item record.
+ *
+ * @copyright 2018 Zig Tan <zig@moodle.com>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class database_table implements type {
 
-    // Datastore item record name.
+    // Database table name.
     protected $name;
 
-    // Datastore item record privacy fields.
+    // Fields which contain user information within the table.
     protected $privacyfields;
 
-    // Datastore item record summary.
+    // A description of what this table is used for.
     protected $summary;
 
     /**
-     * datastore_item_record constructor.
-     * @param string $name name of datastore.
-     * @param array $privacyfields is an associative array.
-     * @param string $summary (optional) language identifier within specified component describing this item record.
+     * Constructor to create a new database_table item_record.
+     *
+     * @param   string  $name The name of the database table being described.
+     * @param   array   $privacyfields A list of fields iwth their description.
+     * @param   string  $summary A description of what the table is used for.
      */
     public function __construct($name, array $privacyfields = [], $summary = '') {
         $this->name = $name;
@@ -54,30 +54,29 @@ class datastore_item_record implements item_record {
     }
 
     /**
-     * Function to return the name of this datastore item record.
+     * The name of the database table.
      *
-     * @return string $name
+     * @return  string
      */
     public function get_name() {
         return $this->name;
     }
 
     /**
-     * Function to return the name of this datastore item record.
+     * The list of fields within the table which contain user data, with a description of each field.
      *
-     * @return array $privacyfields
+     * @return  array
      */
     public function get_privacy_fields() {
         return $this->privacyfields;
     }
 
     /**
-     * Function to return the summary of this datastore item record.
+     * A summary of what this table is used for.
      *
-     * @return string $summary
+     * @return  string
      */
     public function get_summary() {
         return $this->summary;
     }
-
 }

@@ -15,32 +15,31 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file defines the core_privacy\metadata\item_record interface.
- *
- * The item_record interface defines the standard functions expected
- * within class objects implementing this interface.
- *
- * The objects implementing the item_record interface are organized into
- * an item_collection defined in the core_privacy\metadata\item_collection
- * class for a given component.
+ * An item_record which encapsulates a set of data held by a component with
+ * Moodle.
  *
  * @package core_privacy
  * @copyright 2018 Zig Tan <zig@moodle.com>
- *
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core_privacy\metadata;
+namespace core_privacy\metadata\item_record;
 
 /**
- * Interface item_record
+ * The item_record interface which all item_record types must implement.
+ *
+ * @copyright 2018 Zig Tan <zig@moodle.com>
  * @package core_privacy\metadata
  */
-interface item_record {
+interface type {
 
+    /**
+     * Get the name describing this item record.
+     *
+     * @return  string
+     */
     public function get_name();
 
     public function get_privacy_fields();
 
     public function get_summary();
-
 }

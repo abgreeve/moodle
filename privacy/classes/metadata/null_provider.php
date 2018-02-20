@@ -26,4 +26,13 @@
  */
 namespace core_privacy\metadata;
 
-interface null_provider {}
+interface null_provider {
+
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  String
+     */
+    public static function get_reason() : String ;
+}

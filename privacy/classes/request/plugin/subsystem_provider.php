@@ -48,4 +48,4 @@ namespace core_privacy\request\plugin;
  * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-interface subsystem_provider extends \core_privacy\request\data_provider {}
+interface subsystem_provider extends \core_privacy\request\shared_data_provider {}

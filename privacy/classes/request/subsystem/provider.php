@@ -35,4 +35,4 @@ namespace core_privacy\request\subsystem;
  * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-interface provider extends \core_privacy\request\user_data_provider {}
+interface provider extends \core_privacy\request\core_user_data_provider {}

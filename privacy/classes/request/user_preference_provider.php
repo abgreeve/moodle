@@ -15,24 +15,21 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the \core_privacy\request\plugin\provider interface to describe
- * a class which provides data in some form for a plugin.
- *
- * Plugins should implement this if they store personal information.
+ * This file contains the \core_privacy\request\user_preference_provider interface to describe
+ * a class which provides preference data in some form to core.
  *
  * @package core_privacy
- * @copyright 2018 Jake Dallimore <jrhdallimore@gmail.com>
- *
+ * @copyright 2018 Andrew Nicols <andrew@nicols.co.uk>
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-namespace core_privacy\request\plugin;
+namespace core_privacy\request;
 
-/**
- * The provider interface for plugins which provide data from a plugin
- * directly to the Privacy subsystem.
- *
- * @package    privacy
- * @copyright  2018 Andrew Nicols <andrew@nicols.co.uk>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-interface provider extends \core_privacy\request\core_user_data_provider {}
+interface user_preference_provider extends core_data_provider {
+
+    /**
+     * Store all user preferences for the plugin.
+     *
+     * @param   int         $userid The userid of the user whose data is to be stored.
+     */
+    public static function store_user_preferences(int $userid);
+}

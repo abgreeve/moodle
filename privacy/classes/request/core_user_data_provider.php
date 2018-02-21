@@ -15,8 +15,8 @@
 // along with Moodle. If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the \core_privacy\request\data_provider interface to describe
- * a class which provides data in some form.
+ * This file contains the \core_privacy\request\core_user_data_provider interface to describe
+ * classes which provide user data in some form to core.
  *
  * @package core_privacy
  * @copyright 2018 Jake Dallimore <jrhdallimore@gmail.com>
@@ -25,7 +25,7 @@
  */
 namespace core_privacy\request;
 
-interface user_data_provider extends data_provider {
+interface core_user_data_provider extends core_data_provider {
 
     /**
      * Get the list of contexts that contain user information for the specified user.

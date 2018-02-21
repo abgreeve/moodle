@@ -57,7 +57,7 @@ class provider_testcase extends \advanced_testcase {
         if (!$rc->implementsInterface(\core_privacy\metadata\provider::class)) {
             throw new \coding_exception("{$plugin} does not implement metadata provider");
         }
-        if (!$rc->implementsInterface(\core_privacy\request\user_data_provider::class)) {
+        if (!$rc->implementsInterface(\core_privacy\request\core_user_data_provider::class)) {
             throw new \coding_exception("{$plugin} does not declare that it provides any user data");
         }
 
@@ -78,7 +78,7 @@ class provider_testcase extends \advanced_testcase {
         if (!$rc->implementsInterface(\core_privacy\metadata\provider::class)) {
             throw new \coding_exception("{$plugin} does not implement metadata provider");
         }
-        if (!$rc->implementsInterface(\core_privacy\request\user_data_provider::class)) {
+        if (!$rc->implementsInterface(\core_privacy\request\core_user_data_provider::class)) {
             throw new \coding_exception("{$plugin} does not declare that it provides any user data");
         }
 
@@ -102,7 +102,7 @@ class provider_testcase extends \advanced_testcase {
         if (!$rc->implementsInterface(\core_privacy\metadata\provider::class)) {
             throw new \coding_exception("{$plugin} does not implement metadata provider");
         }
-        if (!$rc->implementsInterface(\core_privacy\request\user_data_provider::class)) {
+        if (!$rc->implementsInterface(\core_privacy\request\core_user_data_provider::class)) {
             throw new \coding_exception("{$plugin} does not declare that it provides any user data");
         }
 

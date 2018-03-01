@@ -1,0 +1,104 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Privacy class for requesting user data.
+ *
+ * @package    core_comment
+ * @copyright  2018 Adrian Greeve <adrian@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+namespace core_comment\privacy;
+
+defined('MOODLE_INTERNAL') || die();
+
+use \core_privacy\metadata\item_collection;
+use \core_privacy\metadata\provider as metadataprovider;
+use \core_privacy\request\resultset;
+use \core_privacy\request\subsystem\plugin_provider as subsystemprovider;
+use \core_privacy\request\writer;
+
+/**
+ * Privacy class for requesting user data.
+ *
+ * @package    core_comment
+ * @copyright  2018 Adrian Greeve <adrian@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements metadataprovider, subsystemprovider {
+
+    /**
+     * Returns meta data about this system.
+     *
+     * @param   item_collection     $itemcollection The initialised item collection to add items to.
+     * @return  item_collection     A listing of user data stored through this system.
+     */
+    public static function get_metadata(item_collection $itemcollection) : item_collection {
+        $itemcollection->add_database_table('comments', [
+                'content' => 'privacy:metadata:comment:content',
+                'timecreated' => 'privacy:metadata:comment:timecreated',
+                'userid' => 'privacy:metadata:comment:userid',
+            ], 'privacy:metadata:comment');
+
+        return $itemcollection;
+    }
+
+    /**
+     * Writes user data to the writer for the user to download.
+     *
+     * @param  array  $context Contexts to run through and return data.
+     * @param  string $component The component that is calling this function
+     * @param  string $commentarea The comment area related to the component
+     * @param  int    $itemid An identifier for a group of comments
+     * @param  array  $subcontext The sub-context in which to export this data
+     * @param  int    $onlyforthisuser  Only return the comments this user made.
+     */
+    public static function export_comments($context, $component, $commentarea, $itemid, $subcontext, $onlyforthisuser = null) {
+
+        $data = new \stdClass;
+        $data->context   = $context;
+        $data->area      = $commentarea;
+        $data->itemid    = $itemid;
+        $data->component = $component;
+
+        $commentobject = new \comment($data);
+        $commentobject->set_view_permission(true);
+        $comments = $commentobject->get_comments(0);
+        $subcontext[] = get_string('commentsubcontext', 'core_comment');
+
+        $comments = array_filter($comments, function($comment) use ($onlyforthisuser) {
+            unset($comment->id);
+            unset($comment->profileurl);
+            unset($comment->avatar);
+            unset($comment->delete);
+            unset($comment->timecreated);
+            unset($comment->strftimeformat);
+            if ($onlyforthisuser) {
+                if ($comment->userid == $onlyforthisuser) {
+                    return $comment;
+                }
+            } else {
+                return $comment;
+            }
+        });
+
+        if (!empty($comments)) {
+            writer::with_context($context)
+                    ->export_data($subcontext, (object)$comments);
+        }
+    }
+}

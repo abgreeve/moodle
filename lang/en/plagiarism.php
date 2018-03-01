@@ -29,3 +29,4 @@ $string['configenableplagiarism'] = 'This will allow administrators to configure
 $string['manageplagiarism'] = 'Manage plagiarism plugins';
 $string['nopluginsinstalled'] = 'No plagiarism plugins are installed.';
 $string['plagiarism'] = 'Plagiarism';
+$string['privacy:metadata'] = 'The plagiarism subsystem does not store or export any data of it\'s own. It acts as a conduit between plugins and each plagiarism plugin.';

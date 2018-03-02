@@ -27,10 +27,6 @@ namespace core_comment\privacy;
 defined('MOODLE_INTERNAL') || die();
 
 use \core_privacy\metadata\item_collection;
-use \core_privacy\metadata\provider as metadataprovider;
-use \core_privacy\request\resultset;
-use \core_privacy\request\subsystem\plugin_provider as subsystemprovider;
-use \core_privacy\request\writer;
 
 /**
  * Privacy class for requesting user data.
@@ -39,7 +35,7 @@ use \core_privacy\request\writer;
  * @copyright  2018 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements metadataprovider, subsystemprovider {
+class provider implements \core_privacy\metadata\provider, \core_privacy\request\subsystem\plugin_provider {
 
     /**
      * Returns meta data about this system.
@@ -97,8 +93,37 @@ class provider implements metadataprovider, subsystemprovider {
         });
 
         if (!empty($comments)) {
-            writer::with_context($context)
+            \core_privacy\request\writer::with_context($context)
                     ->export_data($subcontext, (object)$comments);
         }
+    }
+
+    /**
+     * Deletes all comments for a specified context.
+     *
+     * @param  \core_privacy\request\deletion_criteria $criteria Details about which context to delete comments for.
+     */
+    public static function delete_comments_for_context(\core_privacy\request\deletion_criteria $criteria) {
+        global $DB;
+        $DB->delete_records('comments', ['contextid' => $criteria->get_context()->id]);
+    }
+
+    /**
+     * Deletes all records for a user from a list of approved contexts.
+     *
+     * @param  \core_privacy\request\approved_contextlist $contextlist Contains the user ID and a list of contexts to be
+     * deleted from.
+     */
+    public static function delete_comments_for_user_in_context(\core_privacy\request\approved_contextlist $contextlist) {
+        global $DB;
+
+        $userid = $contextlist->get_user()->id;
+        $contextids = implode(',', $contextlist->get_contextids());
+        $params = ['userid' => $userid];
+        list($insql, $inparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
+        $params += $inparams;
+
+        $select = "userid = :userid and contextid $insql";
+        $DB->delete_records_select('comments', $select, $params);
     }
 }

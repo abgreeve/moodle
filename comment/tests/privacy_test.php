@@ -46,15 +46,7 @@ class core_comment_privacy_testcase extends provider_testcase {
         $course = $this->getDataGenerator()->create_course();
         $context = context_course::instance($course->id);
 
-        // Comment on course page.
-        $args = new stdClass;
-        $args->context = $context;
-        $args->course = $course;
-        $args->area = 'page_comments';
-        $args->itemid = 0;
-        $args->component = 'block_comments';
-        $comment = new comment($args);
-        $comment->set_post_permission(true);
+        $comment = $this->get_comment_object($context, $course);
 
         $user1 = $this->getDataGenerator()->create_user();
         $user2 = $this->getDataGenerator()->create_user();
@@ -69,18 +61,120 @@ class core_comment_privacy_testcase extends provider_testcase {
 
         $writer = \core_privacy\request\writer::with_context($context);
         // Retrieve comments only for this user.
-        \core_comment\privacy\provider::export_comments($context, $args->component, $args->area, $args->itemid, [], $user1->id);
+        \core_comment\privacy\provider::export_comments($context, 'block_comments', 'page_comments', 0, [], $user1->id);
 
         $exportedcomments = (array)$writer->get_data([get_string('commentsubcontext', 'core_comment')]);
+
         // There is only one comment made by this user.
         $this->assertCount(1, $exportedcomments);
         $this->assertContains($firstcomment, $exportedcomments[0]->content);
         // Retrieve the whole conversation.
-        \core_comment\privacy\provider::export_comments($context, $args->component, $args->area, $args->itemid, []);
+        \core_comment\privacy\provider::export_comments($context, 'block_comments', 'page_comments', 0, []);
         $exportedcomments = (array)$writer->get_data([get_string('commentsubcontext', 'core_comment')]);
         // The whole conversation is two comments.
         $this->assertCount(2, $exportedcomments);
         $this->assertContains($firstcomment, $exportedcomments[0]->content);
         $this->assertContains($secondcomment, $exportedcomments[1]->content);
+    }
+
+    /**
+     * Tests the deletion of all comments in a context.
+     */
+    public function test_delete_comments_for_context() {
+        $this->resetAfterTest();
+
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+
+        $coursecontext1 = context_course::instance($course1->id);
+        $coursecontext2 = context_course::instance($course2->id);
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $comment1 = $this->get_comment_object($coursecontext1, $course1);
+        $comment2 = $this->get_comment_object($coursecontext2, $course2);
+
+        $this->setUser($user1);
+        $comment1->add('First comment for user 1 on comment 1');
+        $comment2->add('First comment for user 1 on comment 2');
+        $this->setUser($user2);
+        $comment1->add('First comment for user 2 on comment 1');
+        $comment2->add('First comment for user 2 on comment 2');
+
+        // Delete only for the first context. All records in the comments table for this context should be removed.
+        $deletioncriteria = new \core_privacy\request\deletion_criteria($coursecontext1);
+        \core_comment\privacy\provider::delete_comments_for_context($deletioncriteria);
+        // No records left here.
+        $this->assertCount(0, $comment1->get_comments());
+        // All of the records are left intact here.
+        $this->assertCount(2, $comment2->get_comments());
+
+    }
+
+    /**
+     * Tests deletion of comments for a specified user and contexts.
+     */
+    public function test_delete_comments_for_user_in_context() {
+        $this->resetAfterTest();
+
+        $course1 = $this->getDataGenerator()->create_course();
+        $course2 = $this->getDataGenerator()->create_course();
+        $course3 = $this->getDataGenerator()->create_course();
+
+        $coursecontext1 = context_course::instance($course1->id);
+        $coursecontext2 = context_course::instance($course2->id);
+        $coursecontext3 = context_course::instance($course3->id);
+
+        $user1 = $this->getDataGenerator()->create_user();
+        $user2 = $this->getDataGenerator()->create_user();
+
+        $comment1 = $this->get_comment_object($coursecontext1, $course1);
+        $comment2 = $this->get_comment_object($coursecontext2, $course2);
+        $comment3 = $this->get_comment_object($coursecontext3, $course3);
+
+        $this->setUser($user1);
+        $comment1->add('First comment for user 1');
+        $comment2->add('User 1 comment in second comment');
+
+        $this->setUser($user2);
+        $comment2->add('User two replied in comment two');
+        $comment3->add('Comment three for user 2.');
+
+        // Delete the comments for user 1.
+        $approvedcontextlist = new core_privacy\phpunit\request\approved_contextlist($user1, 'block_comments',
+                [$coursecontext1->id, $coursecontext2->id]);
+        \core_comment\privacy\provider::delete_comments_for_user_in_context($approvedcontextlist);
+
+        // No comments left in comments 1 as only user 1 commented there.
+        $this->assertCount(0, $comment1->get_comments());
+        // Only user 2 comments left in comments 2.
+        $comment2comments = $comment2->get_comments();
+        $this->assertCount(1, $comment2comments);
+        $this->assertEquals($user2->id, $comment2comments[0]->userid);
+        // Nothing changed here as user 1 did not leave a comment.
+        $comment3comments = $comment3->get_comments();
+        $this->assertCount(1, $comment3comments);
+        $this->assertEquals($user2->id, $comment3comments[0]->userid);
+    }
+
+    /**
+     * Creates a comment object
+     *
+     * @param  context $context A context object.
+     * @param  stdClass $course A course object.
+     * @return comment The comment object.
+     */
+    protected function get_comment_object($context, $course) {
+        // Comment on course page.
+        $args = new stdClass;
+        $args->context = $context;
+        $args->course = $course;
+        $args->area = 'page_comments';
+        $args->itemid = 0;
+        $args->component = 'block_comments';
+        $comment = new comment($args);
+        $comment->set_post_permission(true);
+        return $comment;
     }
 }

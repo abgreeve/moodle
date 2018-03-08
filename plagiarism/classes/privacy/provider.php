@@ -63,16 +63,7 @@ class provider implements
      * @param   array       $linkarray The weird and wonderful link array used to display information for a specific item
      */
     public static function export_plagiarism_user_data(int $userid, \context $context, array $subcontext, array $linkarray) {
-        // Note: Even if plagiarism is _now_ disabled, there may be legacy data to export.
-        $plugins = \core_component::get_plugin_list('plagiarism');
-        foreach (array_keys($plugins) as $plugin) {
-            $component = "plagiarism_{$plugin}";
-            $classname = manager::get_provider_classname_for_component($component);
-            if (static::provider_implements($classname, plagiarism_provider::class)) {
-                // This plagiarism plugin implements the plagiarism_provider.
-                $classname::export_plagiarism_user_data($userid, $context, $subcontext, $linkarray);
-            }
-        }
+        static::call_plugin_method('export_plagiarism_user_data', [$userid, $context, $subcontext, $linkarray]);
     }
 
     /**
@@ -92,4 +83,42 @@ class provider implements
         return false;
     }
 
+    /**
+     * Deletes all user content for a context in all plagiarism plugins.
+     *
+     * @param  \context $context The context to delete user data for.
+     */
+    public static function delete_plagiarism_for_context(\context $context) {
+        static::call_plugin_method('delete_plagiarism_for_context', [$context, $linkarray]);
+    }
+
+    /**
+     * Deletes all user content for a user in a context in all plagiarism plugins.
+     *
+     * @param  int      $userid    The user to delete
+     * @param  \context $context   The context to refine the deletion.
+     */
+    public static function delete_plagiarism_for_user(int $userid, \context $context) {
+        static::call_plugin_method('delete_plagiarism_for_user', [$userid, $context, $linkarray]);
+    }
+
+    /**
+     * Internal method for looping through all of the plagiarism plugins and calling a method.
+     *
+     * @param  string $methodname Name of the method to call on the plugins.
+     * @param  array $params     The parameters that go with the method being called.
+     */
+    protected static function call_plugin_method($methodname, $params) {
+        // Note: Even if plagiarism is _now_ disabled, there may be legacy data to export.
+        $plugins = \core_component::get_plugin_list('plagiarism');
+        foreach (array_keys($plugins) as $plugin) {
+            $component = "plagiarism_{$plugin}";
+            $classname = manager::get_provider_classname_for_component($component);
+            if (static::component_implements($classname, plagiarism_provider::class)) {
+                // This plagiarism plugin implements the plagiarism_provider.
+                $fullfunction = $classname . '::' . $methodname;
+                call_user_func_array($fullfunction, $params);
+            }
+        }
+    }
 }

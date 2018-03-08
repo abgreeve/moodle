@@ -48,4 +48,19 @@ interface plagiarism_provider extends
      * @param   array       $linkarray The weird and wonderful link array used to display information for a specific item
      */
     public static function export_plagiarism_user_data(int $userid, \context $context, array $subcontext, array $linkarray);
+
+    /**
+     * Delete all user information for the provided context.
+     *
+     * @param  \context $context The context to delete user data for.
+     */
+    public static function delete_plagiarism_for_context(\context $context);
+
+    /**
+     * Delete all user information for the provided user and context.
+     *
+     * @param  int      $userid    The user to delete
+     * @param  \context $context   The context to refine the deletion.
+     */
+    public static function delete_plagiarism_for_user(int $userid, \context $context);
 }

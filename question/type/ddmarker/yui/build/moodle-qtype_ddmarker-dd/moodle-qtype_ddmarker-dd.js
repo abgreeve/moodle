@@ -357,7 +357,7 @@ Y.extend(DDMARKER_QUESTION, M.qtype_ddmarker.dd_base_class, {
             }
             this.touchscrolldisable = document.addEventListener(touchmove, function(e) {
                 e.preventDefault();
-            }, { passive: false });
+            }, {passive: false});
         }, this);
 
         // Allow scrolling after releasing the draggable items.

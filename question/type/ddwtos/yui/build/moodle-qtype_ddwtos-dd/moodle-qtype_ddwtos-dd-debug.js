@@ -240,10 +240,9 @@ Y.extend(DDWTOS_DD, Y.Base, {
             if (this.touchscrolldisable) {
                 return; // Already disabled.
             }
-            this.touchscrolldisable = document.addEventListener(touchmove, function(e) { //Y.one('body').on(touchmove, function(e) {
-                //e = e || window.event;
+            this.touchscrolldisable = document.addEventListener(touchmove, function(e) {
                 e.preventDefault();
-            }, { passive: false });
+            }, {passive: false});
         }, this);
 
         // Allow scrolling after releasing the draggable items.

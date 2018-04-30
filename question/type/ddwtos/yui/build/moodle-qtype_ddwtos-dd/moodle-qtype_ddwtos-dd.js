@@ -240,10 +240,10 @@ Y.extend(DDWTOS_DD, Y.Base, {
             if (this.touchscrolldisable) {
                 return; // Already disabled.
             }
-            this.touchscrolldisable = Y.one('body').on(touchmove, function(e) {
-                e = e || window.event;
+            this.touchscrolldisable = document.addEventListener(touchmove, function(e) { //Y.one('body').on(touchmove, function(e) {
+                //e = e || window.event;
                 e.preventDefault();
-            });
+            }, { passive: false });
         }, this);
 
         // Allow scrolling after releasing the draggable items.
@@ -433,5 +433,6 @@ M.qtype_ddwtos = M.qtype_ddwtos || {};
 M.qtype_ddwtos.init_question = function(config) {
     return new DDWTOS_DD(config);
 };
+
 
 }, '@VERSION@', {"requires": ["node", "dd", "dd-drop", "dd-constrain"]});

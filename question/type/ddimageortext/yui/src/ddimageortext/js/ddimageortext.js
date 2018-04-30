@@ -284,10 +284,9 @@ Y.extend(DDIMAGEORTEXT_QUESTION, M.qtype_ddimageortext.dd_base_class, {
             if (this.touchscrolldisable) {
                 return; // Already disabled.
             }
-            this.touchscrolldisable = Y.one('body').on(touchmove, function(e) {
-                e = e || window.event;
+            this.touchscrolldisable = document.addEventListener(touchmove, function(e) {
                 e.preventDefault();
-            });
+            }, {passive: false});
         }, this);
 
         // Allow scrolling after releasing the draggable items.

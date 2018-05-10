@@ -106,12 +106,12 @@ class provider implements
         // Get contexts of Calendar Events for the owner.
         $sql = "SELECT ctx.id
                   FROM {context} ctx
-                  JOIN {event} e ON
-                       (e.eventtype = 'site' AND ctx.contextlevel = :sitecontext) OR
-                       (e.courseid = ctx.instanceid AND e.eventtype = 'course' AND ctx.contextlevel = :coursecontext) OR
-                       (e.courseid = ctx.instanceid AND e.eventtype = 'group' AND ctx.contextlevel = :groupcontext) OR
-                       (e.userid = ctx.instanceid AND e.eventtype = 'user' AND ctx.contextlevel = :usercontext)
-                 WHERE e.userid = :cuserid
+                  JOIN {event} e ON e.userid = :cuserid
+                   AND ((e.eventtype = 'site' AND ctx.contextlevel = :sitecontext) OR
+                        (e.categoryid = ctx.instanceid AND e.eventtype = 'category' AND ctx.contextlevel = :categorycontext) OR
+                        (e.courseid = ctx.instanceid AND e.eventtype = 'course' AND ctx.contextlevel = :coursecontext) OR
+                        (e.courseid = ctx.instanceid AND e.eventtype = 'group' AND ctx.contextlevel = :groupcontext) OR
+                        (e.userid = ctx.instanceid AND e.eventtype = 'user' AND ctx.contextlevel = :usercontext))
                  UNION
                 SELECT ctx.id
                   FROM {context} ctx

@@ -150,23 +150,21 @@ class provider implements
         $sql = "
             SELECT ctx.id
               FROM {context} ctx
-         LEFT JOIN {badge_manual_award} bma
-                ON bma.recipientid = ctx.instanceid
-         LEFT JOIN {badge_issued} bi
-                ON bi.userid = ctx.instanceid
-         LEFT JOIN {badge_criteria_met} bcm
-                ON bcm.userid = ctx.instanceid
-         LEFT JOIN {badge_backpack} bb
-                ON bb.userid = ctx.instanceid
+         LEFT JOIN {badge_manual_award} bma ON bma.recipientid = ctx.instanceid AND bma.recipientid = :bmauserid
+         LEFT JOIN {badge_issued} bi ON bi.userid = ctx.instanceid AND bi.userid = :biuserid
+         LEFT JOIN {badge_criteria_met} bcm ON bcm.userid = ctx.instanceid AND bcm.userid = :bcmuserid
+         LEFT JOIN {badge_backpack} bb ON bb.userid = ctx.instanceid AND bb.userid = :bbuserid
              WHERE ctx.contextlevel = :userlevel
-               AND ctx.instanceid = :userid
                AND (bma.id IS NOT NULL
                 OR bi.id IS NOT NULL
                 OR bcm.id IS NOT NULL
                 OR bb.id IS NOT NULL)";
         $params = [
             'userlevel' => CONTEXT_USER,
-            'userid' => $userid,
+            'bmauserid' => $userid,
+            'biuserid' => $userid,
+            'bcmuserid' => $userid,
+            'bbuserid' => $userid,
         ];
         $contextlist->add_from_sql($sql, $params);
 
@@ -309,8 +307,7 @@ class provider implements
                        c.fullname AS coursename,
                        $ctxfields
                   FROM {badge} b
-             LEFT JOIN {badge_issued} bi
-                    ON bi.badgeid = b.id
+             LEFT JOIN {badge_issued} bi ON bi.badgeid = b.id
                    AND bi.userid = :userid1
              LEFT JOIN {badge_manual_award} bma
                     ON bma.badgeid = b.id

@@ -33,12 +33,21 @@
         "types" : {
             "plugin_type_raw" : "mod",
             "plugin_type" : "Activities and Modules"
-        }
+        },
+        "count" : 5
     }
 }}
 <div class="dataprivacy-main">
     <h2>{{#str}}pluginregistrytitle, tool_dataprivacy{{/str}}</h2>
     <hr />
+    {{#count}}
+        <div class="alert alert-warning alert-block fade in">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            {{#pix}}i/risk_xss, moodle, {{#str}}requiresattention, tool_dataprivacy{{/str}}{{/pix}}
+            {{#str}}requiresattentionareas, tool_dataprivacy, {{count}}{{/str}}
+            <button class="tool_dataprivacy-filter" data-display="show" data-type="api-issue">{{#str}}filterresults, tool_dataprivacy{{/str}}</button>
+        </div>
+    {{/count}}
     <p><strong>{{#str}}explanationtitle, tool_dataprivacy{{/str}}</strong></p>
     <dl>
         <dt>{{#pix}}i/risk_xss, moodle, {{#str}}requiresattention, tool_dataprivacy{{/str}}{{/pix}}</dt>
@@ -47,6 +56,14 @@
         <dd>{{#str}}externalexplanation, tool_dataprivacy{{/str}}</dd>
     </dl>
     <hr />
+    <!-- Search and filtering area -->
+    <div class="tool_dataprivacy-search-area">
+        <input type="text" class="tool_dataprivacy-search-box" placeholder="{{#str}}searchplaceholder, tool_dataprivacy{{/str}}" />
+        <input class="tool_dataprivacy-filter" type="checkbox" name="additional" data-type="additional" data-display="show">{{#str}}external, tool_dataprivacy{{/str}}
+        <input class="tool_dataprivacy-filter" type="checkbox" name="api-issue" data-type="api-issue" data-display="show">{{#str}}requiresattention, tool_dataprivacy{{/str}}
+    </div>
+    <br />
+    <br />
     <div class="clearfix"><a class="tool_dataprivacy-expand-all pull-right" href="#" data-visibility-state='visible'>{{#str}}visible, tool_dataprivacy{{/str}}</a></div>
     {{#types}}
     <div>
@@ -55,13 +72,16 @@
             <h3 id="{{plugin_type_raw}}">{{#pix}}t/collapsed, moodle, {{#str}}expandplugintype, tool_dataprivacy{{/str}}{{/pix}}{{plugin_type}}</h3>
             </a>
         </div>
-        <div class="hide p-b-1" data-plugintarget="{{plugin_type_raw}}" aria-expanded="false">
+        <div class="tool_dataprivacy-element hide p-b-1" data-plugintarget="{{plugin_type_raw}}" aria-expanded="false">
             {{#plugins}}
                 {{> tool_dataprivacy/component_status}}
             {{/plugins}}
         </div>
     </div>
     {{/types}}
+    <div class="tool_dataprivacy-component-count hide">
+        <p>{{#str}}allcomponentsgood, tool_dataprivacy{{/str}}</p>
+    </div>
 </div>
 {{#js}}
 require(['jquery', 'tool_dataprivacy/expand_contract'], function($, ec) {
@@ -90,5 +110,25 @@ require(['jquery', 'tool_dataprivacy/expand_contract'], function($, ec) {
         var nextstate = $(this).data('visibilityState');
         ec.expandCollapseAll(nextstate);
     });
+
+    $('.tool_dataprivacy-filter').click(function() {
+        if ($(this).data('display') == "show") {
+            ec.resetAll($(this).data('type'));
+            ec.expandFilter($(this).data('type'));
+            $(this).data('display', 'hide');
+        } else {
+            ec.resetAll($(this).data('type'));
+            $(this).data('display', 'show');
+        }
+    });
+
+    $('[data-link]').click(function(e) {
+        ec.followLink($(this).data('link'));
+    });
+
+    $('.tool_dataprivacy-search-box').keyup(function() {
+        ec.search();
+    });
+
 });
 {{/js}}

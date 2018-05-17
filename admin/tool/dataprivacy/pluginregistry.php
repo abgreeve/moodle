@@ -40,7 +40,7 @@ echo $output->header();
 $metadatatool = new \tool_dataprivacy\metadata_registry();
 $metadata = $metadatatool->get_registry_metadata();
 
-$dataregistry = new tool_dataprivacy\output\data_registry_compliance_page($metadata);
+$dataregistry = new tool_dataprivacy\output\data_registry_compliance_page($metadata, $metadatatool->get_non_compliance_count());
 
 echo $output->render($dataregistry);
 echo $OUTPUT->footer();

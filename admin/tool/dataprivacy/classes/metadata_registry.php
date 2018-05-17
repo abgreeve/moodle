@@ -33,6 +33,18 @@ defined('MOODLE_INTERNAL') || die();
  */
 class metadata_registry {
 
+    /** @var integer The current count of non-compliant components. */
+    protected $noncompliancecount = 0;
+
+    /**
+     * Returns the number of non-compliant components.
+     *
+     * @return int The count of non-compliant components.
+     */
+    public function get_non_compliance_count() {
+        return $this->noncompliancecount;
+    }
+
     /**
      * Returns plugin types / plugins and the user data that it stores in a format that can be sent to a template.
      *
@@ -68,6 +80,7 @@ class metadata_registry {
                     }
                 } else {
                     $internaldata['compliant'] = false;
+                    $this->noncompliancecount++;
                 }
                 // Check to see if we are an external plugin.
                 $componentshortname = explode('_', $component);

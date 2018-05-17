@@ -43,8 +43,7 @@ if (\tool_dataprivacy\api::is_site_dpo($USER->id)) {
     $metadatatool = new \tool_dataprivacy\metadata_registry();
     $metadata = $metadatatool->get_registry_metadata();
 
-    $dataregistry = new tool_dataprivacy\output\data_registry_compliance_page($metadata);
-
+    $dataregistry = new tool_dataprivacy\output\data_registry_compliance_page($metadata, $metadatatool->get_non_compliance_count());
     echo $output->render($dataregistry);
 } else {
     $dponamestring = implode (', ', tool_dataprivacy\api::get_dpo_role_names());

@@ -33,6 +33,18 @@ defined('MOODLE_INTERNAL') || die();
  */
 class metadata_registry {
 
+    /** @var integer The current count of non-compliant components. */
+    protected $noncompliancecount = 0;
+
+    /**
+     * Returns the number of non-compliant components.
+     *
+     * @return int The count of non-compliant components.
+     */
+    public function get_non_compliance_count() {
+        return $this->noncompliancecount;
+    }
+
     /**
      * Returns plugin types / plugins and the user data that it stores in a format that can be sent to a template.
      *
@@ -68,6 +80,7 @@ class metadata_registry {
                     }
                 } else {
                     $internaldata['compliant'] = false;
+                    $this->noncompliancecount++;
                 }
                 // Check to see if we are an external plugin.
                 // Plugin names can contain _ characters, limit to 2 to just remove initial plugintype.
@@ -77,8 +90,8 @@ class metadata_registry {
                     $internaldata['external'] = true;
                 }
 
-                // Additional interface checks.
-                if (!$manager->is_empty_subsystem($component)) {
+                // Check if the interface is deprecated.
+                if (!$manager->is_empty_subsystem($component) && $internaldata['compliant']) {
                     $classname = $manager->get_provider_classname_for_component($component);
                     if (class_exists($classname)) {
                         $componentclass = new $classname();

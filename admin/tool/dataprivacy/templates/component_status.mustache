@@ -46,16 +46,16 @@
     }
 }}
 
-<div class="container-fluid">
+<div class="container-fluid" data-id="{{raw_component}}">
     <hr />
     <div class="row">
         {{#compliant}}
-            <a class="component-expand p-l-2" data-component="{{raw_component}}" href='#'>
-            <h4 class=" d-inline p-l-2 " id="{{raw_component}}">{{#pix}}t/collapsed, moodle, {{#str}}expandplugin, tool_dataprivacy{{/str}}{{/pix}}{{component}}</h4>
+            <a class="component expand p-l-2" data-component="{{raw_component}}" href='#'>
+            <h4 class=" d-inline p-l-2 " id="{{raw_component}}" data-compliant="true" {{#external}}data-thing="external"{{/external}}>{{#pix}}t/collapsed, moodle, {{#str}}expandplugin, tool_dataprivacy{{/str}}{{/pix}}{{component}}</h4>
             </a>
         {{/compliant}}
         {{^compliant}}
-            <h4 class="d-inline p-l-3 " id="{{raw_component}}">{{component}}</h4>
+            <h4 class="d-inline p-l-3 " id="{{raw_component}}" data-compliant="false" {{#external}}data-thing="external"{{/external}}>{{component}}</h4>
             <span>{{#pix}}i/risk_xss, moodle, {{#str}}requiresattention, tool_dataprivacy{{/str}}{{/pix}}</span>
         {{/compliant}}
         {{#external}}
@@ -70,14 +70,14 @@
     </div>
 
     {{#compliant}}
-        <div class="hide" data-section="{{raw_component}}" aria-expanded="false" role="contentinfo">
+        <div class="tool_dataprivacy-element hide" data-section="{{raw_component}}" aria-expanded="false" role="contentinfo">
             {{#metadata}}
                 <hr />
                 <div class="p-l-3">
                     <dl class="row">
                         <dt class="span3 col-xs-3">
                             {{#link}}
-                                <a href="#{{name}}"><strong style="word-wrap:break-word">{{name}}</strong></a>
+                                <a href="#{{name}}" data-link="{{name}}"><strong style="word-wrap:break-word">{{name}}</strong></a>
                             {{/link}}
                             {{^link}}
                                 <strong style="word-wrap:break-word">{{name}}</strong>

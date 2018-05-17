@@ -39,22 +39,37 @@ class data_registry_compliance_page implements renderable, templatable {
     /** @var array meta-data to be displayed about the system. */
     protected $metadata;
 
+    /** @var int The number of plugins / components that are non-compliant. */
+    protected $count;
+
     /**
      * Constructor.
      *
      * @param array $metadata
+     * @param int $count The number of plugins / components that are non-compliant.
      */
-    public function __construct($metadata) {
+    public function __construct($metadata, $count) {
         $this->metadata = $metadata;
+        $this->count = $count;
     }
 
     /**
      * Export this data so it can be used as the context for a mustache template.
      *
      * @param renderer_base $output
-     * @return stdClass
+     * @return array
      */
     public function export_for_template(renderer_base $output) {
-        return ['types' => $this->metadata];
+
+        $rawdata = [];
+        foreach ($this->metadata as $key => $value) {
+            $rawdata[$value['plugin_type_raw']] = $value;
+        }
+
+        return [
+            'types' => $this->metadata,
+            'count' => $this->count,
+            'rawdata' => json_encode($rawdata)
+        ];
     }
 }

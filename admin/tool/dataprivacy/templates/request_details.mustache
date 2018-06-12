@@ -69,6 +69,10 @@
                 <strong>{{#str}}statusdetail, tool_dataprivacy{{/str}}</strong>
                 <span class="label {{statuslabelclass}}">{{statuslabel}}</span>
             </span>
+            <span class="pull-left m-r-1">
+                <strong>{{#str}}requestbydetail, tool_dataprivacy{{/str}}</strong>
+                <span><a href="{{requestedbyuser.profileurl}}" title="{{#str}}viewprofile{{/str}}">{{requestedbyuser.fullname}}</a></span>
+            </span>
             </div>
             {{#canreview}}
                 <!--a href="{{reviewurl}}" class="btn btn-default">{{#str}}reviewdata, tool_dataprivacy{{/str}}</a-->

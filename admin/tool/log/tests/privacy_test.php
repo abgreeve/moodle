@@ -169,6 +169,7 @@ class tool_log_privacy_testcase extends provider_testcase {
      * @return void
      */
     protected function enable_logging() {
+        set_config('exportlogfordataprivacy', 1);
         set_config('enabled_stores', 'logstore_standard', 'tool_log');
         set_config('buffersize', 0, 'logstore_standard');
         set_config('logguests', 1, 'logstore_standard');

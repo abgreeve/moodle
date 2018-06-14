@@ -62,11 +62,10 @@ trait moodle_database_export_and_delete {
         $userid = $contextlist->get_user()->id;
         list($insql, $inparams) = $db->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
-        $sql = "(userid = :userid1 OR relateduserid = :userid2 OR realuserid = :userid3) AND contextid $insql";
+        $sql = "(userid = :userid1 OR realuserid = :userid2) AND contextid $insql";
         $params = array_merge($inparams, [
             'userid1' => $userid,
             'userid2' => $userid,
-            'userid3' => $userid,
         ]);
 
         $path = static::get_export_subcontext();

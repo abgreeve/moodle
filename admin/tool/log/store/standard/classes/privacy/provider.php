@@ -77,11 +77,9 @@ class provider implements
             SELECT l.contextid
               FROM {logstore_standard_log} l
              WHERE l.userid = :userid1
-                OR l.relateduserid = :userid2
                 OR l.realuserid = :userid3";
         $contextlist->add_from_sql($sql, [
             'userid1' => $userid,
-            'userid2' => $userid,
             'userid3' => $userid,
         ]);
     }

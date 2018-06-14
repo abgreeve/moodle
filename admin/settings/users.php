@@ -243,6 +243,11 @@ if ($hassiteconfig) {
     );
     $temp->add($setting);
 
+    $setting = new admin_setting_configcheckbox('exportlogfordataprivacy',
+        new lang_string('exportlogfordataprivacy', 'admin'),
+        new lang_string('exportlogfordataprivacydetail', 'admin'), 0);
+    $temp->add($setting);
+
     $ADMIN->add('privacy', $temp);
 
     // Policy settings.

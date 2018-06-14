@@ -78,8 +78,8 @@ class provider implements
             return;
         }
 
-        $sql = 'userid = :userid1 OR relateduserid = :userid2 OR realuserid = :userid3';
-        $params = ['userid1' => $userid, 'userid2' => $userid, 'userid3' => $userid];
+        $sql = 'userid = :userid1 OR realuserid = :userid2';
+        $params = ['userid1' => $userid, 'userid2' => $userid];
         $contextids = $db->get_fieldset_select($table, 'DISTINCT contextid', $sql, $params);
         if (empty($contextids)) {
             return;

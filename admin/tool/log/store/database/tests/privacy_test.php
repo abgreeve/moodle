@@ -126,7 +126,7 @@ class logstore_database_privacy_testcase extends provider_testcase {
         $this->assert_contextlist_equals($this->get_contextlist_for_user($u2), []);
         $e = \logstore_database\event\unittest_executed::create(['context' => $cm2ctx, 'relateduserid' => $u2->id]);
         $e->trigger();
-        $this->assert_contextlist_equals($this->get_contextlist_for_user($u2), [$cm2ctx]);
+        $this->assert_contextlist_equals($this->get_contextlist_for_user($u2), []);
 
         // Admin user is the real user.
         $this->assert_contextlist_equals($this->get_contextlist_for_user($admin), []);
@@ -136,18 +136,18 @@ class logstore_database_privacy_testcase extends provider_testcase {
         $e = \logstore_database\event\unittest_executed::create(['context' => $c1ctx]);
         $e->trigger();
         $this->assert_contextlist_equals($this->get_contextlist_for_user($admin), [$sysctx, $c1ctx]);
-        $this->assert_contextlist_equals($this->get_contextlist_for_user($u3), [$sysctx, $c1ctx]);
+        $this->assert_contextlist_equals($this->get_contextlist_for_user($u3), [$c1ctx]);
 
         // By admin user masquerading u1 related to u3.
         $this->assert_contextlist_equals($this->get_contextlist_for_user($u1), [$cm1ctx]);
-        $this->assert_contextlist_equals($this->get_contextlist_for_user($u3), [$sysctx, $c1ctx]);
+        $this->assert_contextlist_equals($this->get_contextlist_for_user($u3), [$c1ctx]);
         $this->assert_contextlist_equals($this->get_contextlist_for_user($admin), [$sysctx, $c1ctx]);
         $this->setAdminUser();
         \core\session\manager::loginas($u1->id, context_system::instance());
         $e = \logstore_database\event\unittest_executed::create(['context' => $c2ctx, 'relateduserid' => $u3->id]);
         $e->trigger();
-        $this->assert_contextlist_equals($this->get_contextlist_for_user($u1), [$sysctx, $cm1ctx, $c2ctx]);
-        $this->assert_contextlist_equals($this->get_contextlist_for_user($u3), [$sysctx, $c1ctx, $c2ctx]);
+        $this->assert_contextlist_equals($this->get_contextlist_for_user($u1), [$cm1ctx, $c2ctx]);
+        $this->assert_contextlist_equals($this->get_contextlist_for_user($u3), [$c1ctx]);
         $this->assert_contextlist_equals($this->get_contextlist_for_user($admin), [$sysctx, $c1ctx, $c2ctx]);
     }
 
@@ -286,10 +286,8 @@ class logstore_database_privacy_testcase extends provider_testcase {
         $data = writer::with_context($c2ctx)->get_data($path);
         $this->assertEmpty($data);
         $data = writer::with_context($c1ctx)->get_data($path);
-        $this->assertCount(1, $data->logs);
-        $this->assertEquals(transform::yesno(false), $data->logs[0]['author_of_the_action_was_you']);
-        $this->assertEquals(transform::yesno(true), $data->logs[0]['related_user_was_you']);
-        $this->assertSame(1, $data->logs[0]['other']['i']);
+        // Related data has been removed, should still be empty.
+        $this->assertEmpty($data);
 
         // Confirm data present for u3.
         writer::reset();
@@ -310,12 +308,8 @@ class logstore_database_privacy_testcase extends provider_testcase {
         $data = writer::with_context($c2ctx)->get_data($path);
         $this->assertEmpty($data);
         $data = writer::with_context($c1ctx)->get_data($path);
-        $this->assertCount(1, $data->logs);
-        $this->assertEquals(transform::yesno(false), $data->logs[0]['author_of_the_action_was_you']);
-        $this->assertEquals(transform::yesno(true), $data->logs[0]['related_user_was_you']);
-        $this->assertEquals(transform::yesno(true), $data->logs[0]['author_of_the_action_was_masqueraded']);
-        $this->assertEquals(transform::yesno(false), $data->logs[0]['masquerading_user_was_you']);
-        $this->assertSame(2, $data->logs[0]['other']['i']);
+        // Related data has been removed, should still be empty.
+        $this->assertEmpty($data);
 
         // Add anonymous events.
         $this->setUser($u1);
@@ -339,11 +333,7 @@ class logstore_database_privacy_testcase extends provider_testcase {
         writer::reset();
         provider::export_user_data(new approved_contextlist($u2, 'logstore_database', [$c2ctx->id]));
         $data = writer::with_context($c2ctx)->get_data($path);
-        $this->assertCount(1, $data->logs);
-        $this->assertEquals(transform::yesno(true), $data->logs[0]['action_was_done_anonymously']);
-        $this->assertArrayNotHasKey('author_of_the_action_was_you', $data->logs[0]);
-        $this->assertArrayNotHasKey('authorid', $data->logs[0]);
-        $this->assertEquals(transform::yesno(true), $data->logs[0]['related_user_was_you']);
+        $this->assertEmpty($data);
 
         // Confirm data present for u3.
         writer::reset();
@@ -360,14 +350,7 @@ class logstore_database_privacy_testcase extends provider_testcase {
         writer::reset();
         provider::export_user_data(new approved_contextlist($u4, 'logstore_database', [$c2ctx->id]));
         $data = writer::with_context($c2ctx)->get_data($path);
-        $this->assertCount(1, $data->logs);
-        $this->assertEquals(transform::yesno(true), $data->logs[0]['action_was_done_anonymously']);
-        $this->assertArrayNotHasKey('author_of_the_action_was_you', $data->logs[0]);
-        $this->assertArrayNotHasKey('authorid', $data->logs[0]);
-        $this->assertEquals(transform::yesno(true), $data->logs[0]['related_user_was_you']);
-        $this->assertEquals(transform::yesno(true), $data->logs[0]['author_of_the_action_was_masqueraded']);
-        $this->assertArrayNotHasKey('masquerading_user_was_you', $data->logs[0]);
-        $this->assertArrayNotHasKey('masqueradinguserid', $data->logs[0]);
+        $this->assertEmpty($data);
     }
 
     /**
@@ -396,6 +379,7 @@ class logstore_database_privacy_testcase extends provider_testcase {
      * @return void
      */
     protected function enable_logging() {
+        set_config('exportlogfordataprivacy', 1);
         set_config('enabled_stores', 'logstore_database', 'tool_log');
         set_config('buffersize', 0, 'logstore_database');
         set_config('logguests', 1, 'logstore_database');

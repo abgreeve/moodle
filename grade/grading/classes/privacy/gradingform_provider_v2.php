@@ -15,24 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file contains the polyfill to allow a plugin to operate with Moodle 3.3 up.
+ * Privacy class for requesting user data.
  *
  * @package    core_grading
- * @copyright  2018 Sara Arjona <sara@moodle.com>
+ * @copyright  2018 Adrian Greeve <adriangreeve.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 namespace core_grading\privacy;
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * The trait used to provide backwards compatability for third-party plugins.
- *
- * @copyright  2018 Sara Arjona <sara@moodle.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
-trait gradingform_legacy_polyfill {
+interface gradingform_provider_v2 extends
+    \core_privacy\local\request\plugin\subsystem_provider {
 
     /**
      * Export user data relating to an instance ID.
@@ -41,16 +35,12 @@ trait gradingform_legacy_polyfill {
      * @param  int $instanceid The instance ID to export data for.
      * @param  array $subcontext The directory to export this data to.
      */
-    public static function get_gradingform_export_data(\context $context, int $instanceid, array $subcontext) {
-        return static::_get_gradingform_export_data($context, $instanceid, $subcontext);
-    }
+    public static function get_gradingform_export_data(\context $context, int $instanceid, array $subcontext);
 
     /**
      * Deletes all user data related to the provided instance IDs.
      *
      * @param  array  $instanceids The instance IDs to delete information from.
      */
-    public static function delete_gradingform_for_instances(array $instanceids) {
-        static::_delete_gradingform_for_instances($instanceids);
-    }
+    public static function delete_gradingform_for_instances(array $instanceids);
 }

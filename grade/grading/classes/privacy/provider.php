@@ -134,6 +134,73 @@ class provider implements
     }
 
     /**
+     * Export all user data related to a context and itemid.
+     *
+     * @param  \context $context    Context to export on.
+     * @param  int      $itemid     Item ID to export on.
+     * @param  array    $subcontext Directory location to export to.
+     */
+    public static function export_item_data(\context $context, int $itemid, array $subcontext) {
+        global $DB;
+
+        $sql = "SELECT gi.id AS instanceid, gd.id AS definitionid, gd.method
+                  FROM {grading_areas} ga
+                  JOIN {grading_definitions} gd ON gd.areaid = ga.id
+                  JOIN {grading_instances} gi ON gi.definitionid = gd.id AND gi.itemid = :itemid
+                 WHERE ga.contextid = :contextid";
+        $params = [
+            'itemid' => $itemid,
+            'contextid' => $context->id,
+        ];
+        $records = $DB->get_recordset_sql($sql, $params);
+        foreach ($records as $record) {
+            $instancedata = manager::component_class_callback(
+                "gradingform_{$record->method}",
+                gradingform_provider_v2::class,
+                'get_gradingform_export_data',
+                [$context, $record->instanceid, $subcontext]
+            );
+        }
+        $records->close();
+    }
+
+    /**
+     * Deletes all user data related to a context and possibly an itemid.
+     *
+     * @param  \context $context The context to delete on.
+     * @param  int|null $itemid  An optional item ID to refine the deletion.
+     */
+    public static function delete_instance_data(\context $context, int $itemid = null) {
+        global $DB;
+        $itemsql = '';
+        $params = ['contextid' => $context->id];
+        if (isset($itemid)) {
+            $params['itemid'] = $itemid;
+            $itemsql = 'AND gi.itemid = :itemid';
+        }
+        $sql = "SELECT gi.id AS instanceid, gd.id, gd.method
+                  FROM {grading_definitions} gd
+                  JOIN {grading_instances} gi ON gi.definitionid = gd.id
+                  JOIN {grading_areas} ga ON ga.id = gd.areaid
+                 WHERE ga.contextid = :contextid $itemsql";
+        $records = $DB->get_records_sql($sql, $params);
+        if ($records) {
+            $firstrecord = current($records);
+            $method = $firstrecord->method;
+            $instanceids = array_map(function($record) {
+                return $record->instanceid;
+            }, $records);
+            manager::component_class_callback(
+                "gradingform_{$method}",
+                gradingform_provider_v2::class,
+                'delete_gradingform_for_instances',
+                [$instanceids]);
+            // Delete grading_instances rows.
+            $DB->delete_records_list('grading_instances', 'id', $instanceids);
+        }
+    }
+
+    /**
      * Exports the data related to grading definitions within the specified context/subcontext.
      *
      * @param  \context         $context Context owner of the data.
@@ -191,17 +258,6 @@ class provider implements
             if (!empty($definition->timecopied)) {
                 $tmpdata['timecopied'] = transform::datetime($definition->timecopied);
             }
-            // Export gradingform information (if needed).
-            $instancedata = manager::component_class_callback(
-                "gradingform_{$definition->method}",
-                gradingform_provider::class,
-                'get_gradingform_export_data',
-                [$context, $definition, $userid]
-            );
-            if (null !== $instancedata) {
-                $tmpdata = array_merge($tmpdata, $instancedata);
-            }
-
             $defdata[] = (object) $tmpdata;
 
             // Export grading_instances information.
@@ -258,34 +314,21 @@ class provider implements
     }
 
     /**
-     * Delete all use data which matches the specified $context.
+     * No deletion of the advanced grading is done.
      *
-     * We never delete grading content.
-     *
-     * @param context $context A user context.
+     * @param \context $context the context to delete in.
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
-        manager::plugintype_class_callback(
-            'gradingform',
-            gradingform_provider::class,
-            'delete_gradingform_for_context',
-            [$context]
-        );
+
     }
 
     /**
-     * Delete all user data for the specified user, in the specified contexts.
+     * Deletion of data in this provider is only related to grades and so can not be
+     * deleted for the creator of the advanced grade criteria.
      *
-     * We never delete grading content.
-     *
-     * @param approved_contextlist $contextlist The approved contexts and user information to delete information for.
+     * @param approved_contextlist $contextlist a list of contexts approved for deletion.
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
-        manager::plugintype_class_callback(
-            'gradingform',
-            gradingform_provider::class,
-            'delete_gradingform_for_userid',
-            [$contextlist]
-        );
+        // No deletion of user specific data is done.
     }
 }

@@ -259,6 +259,13 @@ class provider implements metadataprovider, pluginprovider, preference_provider 
                     'delete_feedback_for_context', [$requestdata]);
                 $DB->delete_records('assign_grades', ['assignment' => $assign->get_instance()->id]);
 
+                // Delete advanced grading information.
+                $gradingmanager = get_grading_manager($context, 'mod_assign', 'submissions');
+                $controller = $gradingmanager->get_active_controller();
+                if (isset($controller)) {
+                    \core_grading\privacy\provider::delete_instance_data($context);
+                }
+
                 // Time to roll my own method for deleting overrides.
                 static::delete_user_overrides($assign);
                 $DB->delete_records('assign_submission', ['assignment' => $assign->get_instance()->id]);
@@ -298,6 +305,12 @@ class provider implements metadataprovider, pluginprovider, preference_provider 
                 $requestdata = new assign_plugin_request_data($context, $assign, $grade, [], $user);
                 manager::plugintype_class_callback('assignfeedback', self::ASSIGNFEEDBACK_INTERFACE,
                         'delete_feedback_for_grade', [$requestdata]);
+                // Delete advanced grading information.
+                $gradingmanager = get_grading_manager($context, 'mod_assign', 'submissions');
+                $controller = $gradingmanager->get_active_controller();
+                if (isset($controller)) {
+                    \core_grading\privacy\provider::delete_instance_data($context, $grade->id);
+                }
             }
 
             static::delete_user_overrides($assign, $user);
@@ -518,6 +531,12 @@ class provider implements metadataprovider, pluginprovider, preference_provider 
                         [$params]);
 
                 self::export_grade_data($grade, $context, $submissionpath);
+                // Check for advanced grading and retrieve that information.
+                $gradingmanager = get_grading_manager($context, 'mod_assign', 'submissions');
+                $controller = $gradingmanager->get_active_controller();
+                if (isset($controller)) {
+                    \core_grading\privacy\provider::export_item_data($context, $grade->id, $submissionpath);
+                }
             }
         }
     }

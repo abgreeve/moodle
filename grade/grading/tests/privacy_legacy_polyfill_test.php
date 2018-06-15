@@ -42,10 +42,10 @@ class gradeform_privacy_legacy_polyfill_test extends advanced_testcase {
         $mock = $this->createMock(test_gradingform_legacy_polyfill_mock_wrapper::class);
         $mock->expects($this->once())
             ->method('get_return_value')
-            ->with('_get_gradingform_export_data', [$context, (object)[], $userid]);
+            ->with('_get_gradingform_export_data', [$context, 3, ['subcontext']]);
 
         test_legacy_polyfill_gradingform_provider::$mock = $mock;
-        test_legacy_polyfill_gradingform_provider::get_gradingform_export_data($context, (object)[], $userid);
+        test_legacy_polyfill_gradingform_provider::get_gradingform_export_data($context, 3, ['subcontext']);
     }
 
     /**
@@ -59,32 +59,16 @@ class gradeform_privacy_legacy_polyfill_test extends advanced_testcase {
     /**
      * Test the _delete_gradingform_for_context shim.
      */
-    public function test_delete_gradingform_for_context() {
+    public function test_delete_gradingform_for_instances() {
         $context = context_system::instance();
 
         $mock = $this->createMock(test_gradingform_legacy_polyfill_mock_wrapper::class);
         $mock->expects($this->once())
             ->method('get_return_value')
-            ->with('_delete_gradingform_for_context', [$context]);
+            ->with('_delete_gradingform_for_instances', [[3, 17]]);
 
         test_legacy_polyfill_gradingform_provider::$mock = $mock;
-        test_legacy_polyfill_gradingform_provider::delete_gradingform_for_context($context);
-    }
-
-    /**
-     * Test the _delete_gradingform_for_context shim.
-     */
-    public function test_delete_gradingform_for_user() {
-        $userid = 696;
-        $context = \context_system::instance();
-
-        $mock = $this->createMock(test_gradingform_legacy_polyfill_mock_wrapper::class);
-        $mock->expects($this->once())
-            ->method('get_return_value')
-            ->with('_delete_gradingform_for_userid', [$userid, $context]);
-
-        test_legacy_polyfill_gradingform_provider::$mock = $mock;
-        test_legacy_polyfill_gradingform_provider::delete_gradingform_for_userid($userid, $context);
+        test_legacy_polyfill_gradingform_provider::delete_gradingform_for_instances([3, 17]);
     }
 }
 
@@ -96,7 +80,7 @@ class gradeform_privacy_legacy_polyfill_test extends advanced_testcase {
  */
 class test_legacy_polyfill_gradingform_provider implements
     \core_privacy\local\metadata\provider,
-    \core_grading\privacy\gradingform_provider {
+    \core_grading\privacy\gradingform_provider_v2 {
 
     use \core_grading\privacy\gradingform_legacy_polyfill;
     use \core_privacy\local\legacy_polyfill;
@@ -107,32 +91,22 @@ class test_legacy_polyfill_gradingform_provider implements
     public static $mock = null;
 
     /**
-     * Export all user data for the gradingform plugin.
+     * Export user data relating to an instance ID.
      *
-     * @param context $context
-     * @param stdClass $definition
-     * @param int $userid
+     * @param  \context $context Context to use with the export writer.
+     * @param  int $instanceid The instance ID to export data for.
+     * @param  array $subcontext The directory to export this data to.
      */
-    protected static function _get_gradingform_export_data(\context $context, $definition, $userid) {
+    protected static function _get_gradingform_export_data(\context $context, $instanceid, $subcontext) {
         static::$mock->get_return_value(__FUNCTION__, func_get_args());
     }
 
     /**
-     * Deletes all user data for the given context.
+     * Deletes all user data related to the provided instance IDs.
      *
-     * @param context $context
+     * @param  array  $instanceids The instance IDs to delete information from.
      */
-    protected static function _delete_gradingform_for_context(\context $context) {
-        static::$mock->get_return_value(__FUNCTION__, func_get_args());
-    }
-
-    /**
-     * Delete personal data for the given user and context.
-     *
-     * @param int $userid
-     * @param context $context
-     */
-    protected static function _delete_gradingform_for_userid($userid, \context $context) {
+    public static function _delete_gradingform_for_instances($instanceids) {
         static::$mock->get_return_value(__FUNCTION__, func_get_args());
     }
 

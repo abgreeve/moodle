@@ -102,32 +102,59 @@ define(['jquery', 'core/url', 'core/str'], function($, url, str) {
          */
         expandFilter: function(filtertype) {
 
-            var filternode = (filtertype == 'api-issue') ? $('[data-compliant="false"]') : $('.badge-notice');
+            // Okay this needs to change to incorporate all filters.
+            // Get activated filters.
+            var filters = $('.tool_dataprivacy-filter');
+            var filternodes = [];
+            filters.each(function() {
+                if ($(this).attr('data-display') == 'hide') {
+                    var node = ($(this).attr('data-type') == 'api-issue') ? $('[data-compliant="false"]') : $('[data-thing="external"]');
+                    // var node = ($(this).attr('data-type') == 'api-issue') ? $('[data-compliant="false"]') : $('.badge-notice');
+                    filternodes.push(node);
+                }
+            });
 
-            filternode.each(function() {
-                var parentNode = $(this).parents('[data-plugintarget]');
-                parentNode.removeClass('hide');
-                parentNode.attr('aria-expanded', true);
+            var activefiltercount = filternodes.length;
 
-                // My thing.
-                var componentname = $(this).prev().data('component');
-                var thing = $('[data-id="' + componentname + '"]');
-                thing.removeClass('hide');
-                thing.data('filtered', 'true');
+            // window.console.log('filternodes: ' + filternodes.length);
+            // Okay this has to change, but I can at least get it working to start off with.
+            if (activefiltercount == 3) {
+                filternodes = $('[data-thing="external"][data-compliant="false"]');
+            }
 
-                var preNode = parentNode.prev();
-                preNode.find(':header img.icon').attr('src', expandedImage.attr('src'));
-                preNode.find(':header i.fa').removeClass('fa-plus-square');
-                preNode.find(':header i.fa').addClass('fa-minus-square');
+            var thiscount = 0;
+            $.each(filternodes, function() {
+                thiscount = thiscount + $(this).length;
+                $(this).each(function() {
+                    var parentNode = $(this).parents('[data-plugintarget]');
+                    parentNode.removeClass('hide');
+                    parentNode.attr('aria-expanded', true);
+
+                    var componentname = $(this).attr('id');
+                    var thing = $('[data-id="' + componentname + '"]');
+                    thing.removeClass('hide');
+                    thing.data('filtered', 'true');
+
+                    var preNode = parentNode.prev();
+                    preNode.find(':header img.icon').attr('src', expandedImage.attr('src'));
+                    preNode.find(':header i.fa').removeClass('fa-plus-square');
+                    preNode.find(':header i.fa').addClass('fa-minus-square');
+                });
             });
             $('.tool_dataprivacy-element[aria-expanded="false"]').each(function() {
                 if ($(this).parent('div').data('filtered') != 'true') {
                     $(this).parent('div').addClass('hide');
                 }
             });
-            if (filternode.length == 0) {
-                // Display that everything is great!
-                $('.tool_dataprivacy-component-count').removeClass('hide');
+
+            // window.console.log('filternodes: ' + filternodes.length);
+
+            if (activefiltercount == 0) {
+                this.resetAll();
+            }
+            if (thiscount == 0) {
+                // Display a message saying there are no results.
+                window.console.log('this count: ' + thiscount);
             }
 
         },

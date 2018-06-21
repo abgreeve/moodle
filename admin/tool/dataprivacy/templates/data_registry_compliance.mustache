@@ -112,14 +112,16 @@ require(['jquery', 'tool_dataprivacy/expand_contract'], function($, ec) {
     });
 
     $('.tool_dataprivacy-filter').click(function() {
-        if ($(this).data('display') == "show") {
-            ec.resetAll($(this).data('type'));
-            ec.expandFilter($(this).data('type'));
-            $(this).data('display', 'hide');
+        var type = $(this).attr('data-type');
+        if ($(this).attr('data-display') == "show") {
+            $('.tool_dataprivacy-filter[data-type="' + type + '"]').attr('data-display', 'hide');
+            $('.tool_dataprivacy-filter[data-type="' + type + '"]').attr('checked', true);
         } else {
-            ec.resetAll($(this).data('type'));
-            $(this).data('display', 'show');
+            $('.tool_dataprivacy-filter[data-type="' + type + '"]').attr('data-display', 'show');
+            $('.tool_dataprivacy-filter[data-type="' + type + '"]').attr('checked', false);
         }
+        ec.resetAll($(this).data('type'));
+        ec.expandFilter($(this).data('type'));
     });
 
     $('[data-link]').click(function(e) {

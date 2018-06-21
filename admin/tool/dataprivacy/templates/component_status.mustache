@@ -51,11 +51,11 @@
     <div class="row">
         {{#compliant}}
             <a class="component-expand p-l-2" data-component="{{raw_component}}" href='#'>
-            <h4 class=" d-inline p-l-2 " id="{{raw_component}}" data-compliant="true">{{#pix}}t/collapsed, moodle, {{#str}}expandplugin, tool_dataprivacy{{/str}}{{/pix}}{{component}}</h4>
+            <h4 class=" d-inline p-l-2 " id="{{raw_component}}" data-compliant="true" {{#external}}data-thing="external"{{/external}}>{{#pix}}t/collapsed, moodle, {{#str}}expandplugin, tool_dataprivacy{{/str}}{{/pix}}{{component}}</h4>
             </a>
         {{/compliant}}
         {{^compliant}}
-            <h4 class="d-inline p-l-3 " id="{{raw_component}}" data-compliant="false">{{component}}</h4>
+            <h4 class="d-inline p-l-3 " id="{{raw_component}}" data-compliant="false" {{#external}}data-thing="external"{{/external}}>{{component}}</h4>
             <span>{{#pix}}i/risk_xss, moodle, {{#str}}requiresattention, tool_dataprivacy{{/str}}{{/pix}}</span>
         {{/compliant}}
         {{#external}}

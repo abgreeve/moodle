@@ -25,6 +25,9 @@
 
 define(['jquery', 'core/url', 'core/str'], function($, url, str) {
 
+    var filtering = false;
+    var searchlength = 0;
+
     var expandedImage = $('<img alt="" src="' + url.imageUrl('t/expanded') + '"/>');
     var collapsedImage = $('<img alt="" src="' + url.imageUrl('t/collapsed') + '"/>');
 
@@ -37,7 +40,6 @@ define(['jquery', 'core/url', 'core/str'], function($, url, str) {
          * @return {null}
          */
         expandCollapse: function(targetnode, thisnode) {
-            window.console.log(thisnode);
             // Section -- Attempt to open section with filtering.
             if (thisnode.attr('data-plugin')) {
                 var tname = thisnode.data('plugin');
@@ -126,9 +128,13 @@ define(['jquery', 'core/url', 'core/str'], function($, url, str) {
             $.each(filternodes, function() {
                 thiscount = thiscount + $(this).length;
                 $(this).each(function() {
+                    $(this).addClass('component-filtered');
+
                     var parentNode = $(this).parents('[data-plugintarget]');
                     parentNode.removeClass('hide');
                     parentNode.attr('aria-expanded', true);
+                    var pluginname = parentNode.attr('data-plugintarget');
+                    $('[data-plugin="' + pluginname + '"] > h3').addClass('plugin-filtered');
 
                     var componentname = $(this).attr('id');
                     var thing = $('[data-id="' + componentname + '"]');
@@ -151,10 +157,12 @@ define(['jquery', 'core/url', 'core/str'], function($, url, str) {
 
             if (activefiltercount == 0) {
                 this.resetAll();
+            } else {
+                filtering = true;
             }
             if (thiscount == 0) {
                 // Display a message saying there are no results.
-                window.console.log('this count: ' + thiscount);
+                // window.console.log('this count: ' + thiscount);
             }
 
         },
@@ -163,6 +171,9 @@ define(['jquery', 'core/url', 'core/str'], function($, url, str) {
          * Reset the filters back to normal.
          */
         resetAll: function() {
+            filtering = false;
+            $('.component-filtered').removeClass('component-filtered');
+            $('.plugin-filtered').removeClass('plugin-filtered');
             $('div[class="hide"]').each(function() {
                 $(this).removeClass('hide');
             });
@@ -200,9 +211,25 @@ define(['jquery', 'core/url', 'core/str'], function($, url, str) {
 
         search: function() {
 
+            // window.console.log('filtering: ' + filtering);
+
             var searchText = $('.tool_dataprivacy-search-box').val();
             var plugintypes = $('h3');
             var components = $('h4');
+            // var searchText.length;
+
+            // window.console.log('search text length: ' + searchText.length);
+
+            if (filtering && (searchlength <= searchText.length)) {
+                window.console.log('YEP');
+                // var tmep = $('.component-filtered');
+                components = $('.component-filtered');
+                plugintypes = $('.plugin-filtered');
+                // window.console.log(components);
+                // window.console.log(plugintypes);
+            }
+
+            searchlength = searchText.length;
 
             // Components first then plugins.
             components.each(function() {
@@ -219,6 +246,7 @@ define(['jquery', 'core/url', 'core/str'], function($, url, str) {
                     } else {
                         $(this).parent('a').parent('div').parent('div').removeClass('hide');
                     }
+                    $(this).addClass('component-filtered');
                 } else {
                     // Hide!
                     if ($(this).data('compliant') == false) {
@@ -226,6 +254,7 @@ define(['jquery', 'core/url', 'core/str'], function($, url, str) {
                     } else {
                         $(this).parent('a').parent('div').parent('div').addClass('hide');
                     }
+                    $(this).removeClass('component-filtered');
                 }
             });
 
@@ -234,6 +263,7 @@ define(['jquery', 'core/url', 'core/str'], function($, url, str) {
                 stuff = stuff.toLowerCase();
                 if (stuff.indexOf(searchText.toLowerCase()) !== -1) {
                     $(this).parent('a').parent('div').parent('div').removeClass('hide');
+                    $(this).addClass('plugin-filtered');
                 } else {
                     // Check to see if all children are hidden.
                     var pluginname = $(this).parent('a').data('plugin');
@@ -248,19 +278,29 @@ define(['jquery', 'core/url', 'core/str'], function($, url, str) {
                     // Hide this node.
                     if (!doesit) {
                         $(this).parent('a').parent('div').parent('div').addClass('hide');
+                        $(this).removeClass('plugin-filtered');
                         // Collapse as well.
+                    } else {
+                        $(this).addClass('plugin-filtered');
                     }
                 }
             });
 
             // If we have an empty search then collapse everything back to it's original state.
             if (searchText == '') {
+                components.each(function() {
+                    $(this).removeClass('component-filtered');
+                });
                 plugintypes.each(function() {
+                    $(this).removeClass('plugin-filtered');
                     var pluginname = $(this).attr('id');
                     $('[data-plugintarget="' + pluginname + '"]').addClass('hide');
                     $('[data-plugintarget="' + pluginname + '"]').removeClass('done');
                     $('[data-plugintarget="' + pluginname + '"]').attr('aria-expanded', false);
                 });
+                filtering = false;
+            } else {
+                filtering = true;
             }
         }
     };

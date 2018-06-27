@@ -61,9 +61,16 @@ class data_registry_compliance_page implements renderable, templatable {
      */
     public function export_for_template(renderer_base $output) {
 
+        $rawdata = [];
+        // print_object($this->metadata);
+        foreach ($this->metadata as $key => $value) {
+            $rawdata[$value['plugin_type_raw']] = $value;
+        }
+
         return [
             'types' => $this->metadata,
-            'count' => $this->count
+            'count' => $this->count,
+            'rawdata' => json_encode($rawdata)
         ];
     }
 }

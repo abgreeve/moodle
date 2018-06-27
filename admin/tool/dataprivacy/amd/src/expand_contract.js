@@ -25,45 +25,137 @@
 
 define(['jquery', 'core/url', 'core/str'], function($, url, str) {
 
+    var filterlist;
+    var currentlist;
+
     var filtering = false;
     var searchlength = 0;
+    var filterlength = 0;
 
     var expandedImage = $('<img alt="" src="' + url.imageUrl('t/expanded') + '"/>');
     var collapsedImage = $('<img alt="" src="' + url.imageUrl('t/collapsed') + '"/>');
 
+    var updatedisplay = function() {
+        // Check each component and see if it is already hidden. Hide if necessary.
+        var pluginstohide = $.extend(true, {}, filterlist);
+        if (Object.keys(filterlist).length != Object.keys(currentlist).length || searchlength > 0) {
+            for (key in currentlist) {
+                delete pluginstohide[key];
+            }
+
+            // Hide all plugins.
+            for (key in pluginstohide) {
+                // Collapse previously expanded areas.
+                var node = $('[data-plugintarget="' + key + '"]');
+                node.addClass('hide');
+                node.attr('aria-expanded', false);
+                $('[data-plugin="' + key + '"]').addClass('hide');
+            }
+
+            // Expand and unhide the remaining plugins.
+            for (key in currentlist) {
+                $('[data-plugin="' + key + '"]').removeClass('hide');
+                var node = $('[data-plugintarget="' + key + '"]');
+                node.attr('aria-expanded', true);
+                if (currentlist[key].plugins.length == 0) {
+                    node.attr('aria-expanded', false);
+                    node.addClass('hide');
+                    // Set children to unhidden.
+                    node.children().each(function() {
+                        $(this).removeClass('hide');
+                    });
+                } else {
+                    node.removeClass('hide');
+                    // Hide all components then just unhide from our list.
+                    node.children().each(function() {
+                        $(this).addClass('hide');
+                    });
+                }
+
+                currentlist[key].plugins.forEach(function(plugin) {
+                    $('[data-id="' + plugin['raw_component'] + '"]').removeClass('hide');
+                });
+            }
+        } else {
+            // Reset back to normal.
+            resetNodes();
+        }
+    };
+
+    var resetNodes = function() {
+        for (key in filterlist) {
+            var node = $('[data-plugintarget="' + key + '"]');
+            node.addClass('hide');
+            node.attr('aria-expanded', false);
+            $('[data-plugin="' + key + '"]').removeClass('hide');
+        }
+    };
+
+    var hidenode = function(basenode, parentnode) {
+        basenode.addClass('hide');
+        basenode.attr('aria-expanded', false);
+        parentnode.find(':header i.fa').removeClass('fa-minus-square');
+        parentnode.find(':header i.fa').addClass('fa-plus-square');
+        parentnode.find(':header img.icon').attr('src', collapsedImage.attr('src'));
+    };
+
+    var shownode = function(basenode, parentnode) {
+        basenode.removeClass('hide');
+        basenode.attr('aria-expanded', true);
+        parentnode.find(':header i.fa').removeClass('fa-plus-square');
+        parentnode.find(':header i.fa').addClass('fa-minus-square');
+        parentnode.find(':header img.icon').attr('src', expandedImage.attr('src'));
+    }
+
     return /** @alias module:tool_dataprivacy/expand-collapse */ {
+        init: function(data) {
+            filterlist = data;
+            currentlist = $.extend(true, {}, filterlist);
+        },
+
         /**
          * Expand or collapse a selected node.
          *
-         * @param  {object} targetnode The node that we want to expand / collapse
          * @param  {object} thisnode The node that was clicked.
          * @return {null}
          */
-        expandCollapse: function(targetnode, thisnode) {
+        expandCollapse: function(thisnode) {
             // Section -- Attempt to open section with filtering.
+            var partiallyopen = false;
+            var cantthinkofaname;
             if (thisnode.attr('data-plugin')) {
-                var tname = thisnode.data('plugin');
-                var anoth = $('[data-plugintarget="' + tname + '"]').children();
-                anoth.each(function() {
+                var tname = thisnode.attr('data-plugin');
+                var cantthinkofaname = $('[data-plugintarget="' + tname + '"]');
+                var pluginchildren = cantthinkofaname.children();
+                var childcount = pluginchildren.length;
+                var hidecount = childcount;
+                pluginchildren.each(function() {
+                    hidecount = ($(this).hasClass('hide')) ? hidecount - 1 : hidecount;
                     $(this).removeClass('hide');
                 });
+                partiallyopen = (childcount !== hidecount) ? true : false;
             }
 
-            if (targetnode.hasClass('hide') || targetnode.hasClass('done')) {
-                targetnode.removeClass('hide');
-                targetnode.addClass('visible');
-                targetnode.removeClass('done');
-                targetnode.attr('aria-expanded', true);
-                thisnode.find(':header i.fa').removeClass('fa-plus-square');
-                thisnode.find(':header i.fa').addClass('fa-minus-square');
-                thisnode.find(':header img.icon').attr('src', expandedImage.attr('src'));
-            } else {
-                targetnode.removeClass('visible');
-                targetnode.addClass('hide');
-                targetnode.attr('aria-expanded', false);
-                thisnode.find(':header i.fa').removeClass('fa-minus-square');
-                thisnode.find(':header i.fa').addClass('fa-plus-square');
-                thisnode.find(':header img.icon').attr('src', collapsedImage.attr('src'));
+            if (typeof(cantthinkofaname) !== 'undefined') {
+
+                if (!partiallyopen && cantthinkofaname.attr('aria-expanded') == 'true') {
+                    hidenode(cantthinkofaname, thisnode);
+                } else {
+                    shownode(cantthinkofaname, thisnode);
+                }
+            }
+
+            // Move onto child nodes.
+            if (thisnode.attr('data-component')) {
+                var componentname = thisnode.attr('data-component');
+                var infosection = $('[data-section="' + componentname + '"]');
+                if (infosection.attr('aria-expanded') == 'false') {
+                    // Open up the section.
+                    shownode(infosection, thisnode);
+                } else {
+                    // Hide the section.
+                    hidenode(infosection, thisnode);
+                }
             }
         },
 
@@ -74,121 +166,99 @@ define(['jquery', 'core/url', 'core/str'], function($, url, str) {
          * @return {null}
          */
         expandCollapseAll: function(nextstate) {
-            var currentstate = (nextstate == 'visible') ? 'hide' : 'visible';
-            var ariaexpandedstate = (nextstate == 'visible') ? true : false;
-            var iconclassnow = (nextstate == 'visible') ? 'fa-plus-square' : 'fa-minus-square';
-            var iconclassnext = (nextstate == 'visible') ? 'fa-minus-square' : 'fa-plus-square';
-            var imagenow = (nextstate == 'visible') ? expandedImage.attr('src') : collapsedImage.attr('src');
-            $('.' + currentstate).each(function() {
-                $(this).removeClass(currentstate);
-                $(this).addClass(nextstate);
-                $(this).attr('aria-expanded', ariaexpandedstate);
-            });
-            $('.tool_dataprivacy-expand-all').data('visibilityState', currentstate);
 
-            str.get_string(currentstate, 'tool_dataprivacy').then(function(langString) {
+            // $('.expand').each(function() {
+            //     var infosection;
+            //     if ($(this).attr('data-plugin')) {
+            //         var name = $(this).attr('data-plugin');
+            //         infosection = $('[data-plugintarget="' + name + '"]');
+            //     } else {
+            //         var name = $(this).attr('data-component');
+            //         infosection = $('[data-section="' + name + '"]');
+            //     }
+            //     if (nextstate == 'visible') {
+            //         shownode(infosection, $(this));
+            //         } else {
+            //         hidenode(infosection, $(this));
+            //     }
+            // });
+            // 
+            var showall = (nextstate == 'visible') ? true : false;
+            var state = (nextstate == 'visible') ? 'hide' : 'visible';
+            // 
+            $('.tool_dataprivacy-element').each(function() {
+                $(this).addClass(nextstate);
+                $(this).removeClass(state);
+                $(this).attr('aria-expanded', showall);
+            });
+
+            $('.tool_dataprivacy-expand-all').attr('data-visibility-state', state);
+
+            str.get_string(nextstate, 'tool_dataprivacy').then(function(langString) {
                 $('.tool_dataprivacy-expand-all').html(langString);
             }).catch(Notification.exception);
 
-            $(':header i.fa').each(function() {
-                $(this).removeClass(iconclassnow);
-                $(this).addClass(iconclassnext);
-            });
-            $(':header img.icon').each(function() {
-                $(this).attr('src', imagenow);
-            });
+
+            // var ariaexpandedstate = (nextstate == 'visible') ? true : false;
+            // var iconclassnow = (nextstate == 'visible') ? 'fa-plus-square' : 'fa-minus-square';
+            // var iconclassnext = (nextstate == 'visible') ? 'fa-minus-square' : 'fa-plus-square';
+            // var imagenow = (nextstate == 'visible') ? expandedImage.attr('src') : collapsedImage.attr('src');
+            // $('.' + currentstate).each(function() {
+            //     $(this).removeClass(currentstate);
+            //     $(this).addClass(nextstate);
+            //     $(this).attr('aria-expanded', ariaexpandedstate);
+            // });
+            // $('.tool_dataprivacy-expand-all').data('visibilityState', currentstate);
+
+
+            // $(':header i.fa').each(function() {
+            //     $(this).removeClass(iconclassnow);
+            //     $(this).addClass(iconclassnext);
+            // });
+            // $(':header img.icon').each(function() {
+            //     $(this).attr('src', imagenow);
+            // });
         },
 
-        /**
-         * Filter all node and show ones that require attention.
-         */
-        expandFilter: function(filtertype) {
+        filterList: function() {
 
-            // Okay this needs to change to incorporate all filters.
-            // Get activated filters.
-            var filters = $('.tool_dataprivacy-filter');
-            var filternodes = [];
-            filters.each(function() {
-                if ($(this).attr('data-display') == 'hide') {
-                    var node = ($(this).attr('data-type') == 'api-issue') ? $('[data-compliant="false"]') : $('[data-thing="external"]');
-                    // var node = ($(this).attr('data-type') == 'api-issue') ? $('[data-compliant="false"]') : $('.badge-notice');
-                    filternodes.push(node);
+            var filterfunctions = {
+                "api-issue": function(test) {
+                    return (test.compliant) ? false : true;
+                },
+                "additional": function(test) {
+                    return (test.hasOwnProperty('external')) ? true : false;
                 }
-            });
+            };
 
-            var activefiltercount = filternodes.length;
-
-            // window.console.log('filternodes: ' + filternodes.length);
-            // Okay this has to change, but I can at least get it working to start off with.
-            if (activefiltercount == 3) {
-                filternodes = $('[data-thing="external"][data-compliant="false"]');
+            var selectedfilters = $('.tool_dataprivacy-filter[data-display="hide"]');
+            if (selectedfilters.length < filterlength && searchlength == 0) {
+                currentlist = $.extend(true, {}, filterlist);
             }
+            filterlength = selectedfilters.length;
 
-            var thiscount = 0;
-            $.each(filternodes, function() {
-                thiscount = thiscount + $(this).length;
-                $(this).each(function() {
-                    $(this).addClass('component-filtered');
+            selectedfilters.each(function() {
+                var filtertype = $(this).attr('data-type');
+                var newlist = {};
 
-                    var parentNode = $(this).parents('[data-plugintarget]');
-                    parentNode.removeClass('hide');
-                    parentNode.attr('aria-expanded', true);
-                    var pluginname = parentNode.attr('data-plugintarget');
-                    $('[data-plugin="' + pluginname + '"] > h3').addClass('plugin-filtered');
+                // Reduce current list.
+                for (listitem in currentlist) {
+                    var newpluginlist = [];
+                    currentlist[listitem].plugins.forEach(function(component) {
+                        if (filterfunctions[filtertype](component)) {
+                            newpluginlist.push(component);
+                        }
+                    });
+                    if (newpluginlist.length > 0) {
+                        var item = currentlist[listitem];
+                        item.plugins = newpluginlist;
+                        newlist[listitem] = item;
+                    }
+                };
 
-                    var componentname = $(this).attr('id');
-                    var thing = $('[data-id="' + componentname + '"]');
-                    thing.removeClass('hide');
-                    thing.data('filtered', 'true');
-
-                    var preNode = parentNode.prev();
-                    preNode.find(':header img.icon').attr('src', expandedImage.attr('src'));
-                    preNode.find(':header i.fa').removeClass('fa-plus-square');
-                    preNode.find(':header i.fa').addClass('fa-minus-square');
-                });
+                currentlist = newlist;
             });
-            $('.tool_dataprivacy-element[aria-expanded="false"]').each(function() {
-                if ($(this).parent('div').data('filtered') != 'true') {
-                    $(this).parent('div').addClass('hide');
-                }
-            });
-
-            // window.console.log('filternodes: ' + filternodes.length);
-
-            if (activefiltercount == 0) {
-                this.resetAll();
-            } else {
-                filtering = true;
-            }
-            if (thiscount == 0) {
-                // Display a message saying there are no results.
-                // window.console.log('this count: ' + thiscount);
-            }
-
-        },
-
-        /**
-         * Reset the filters back to normal.
-         */
-        resetAll: function() {
-            filtering = false;
-            $('.component-filtered').removeClass('component-filtered');
-            $('.plugin-filtered').removeClass('plugin-filtered');
-            $('div[class="hide"]').each(function() {
-                $(this).removeClass('hide');
-            });
-            $('[data-filtered="false"]').each(function() {
-                $(this).removeClass('hide');
-            });
-            $('.tool_dataprivacy-element[aria-expanded="true"]').each(function() {
-                $(this).addClass('hide');
-                $(this).attr('aria-expanded', false);
-                var preNode = $(this).prev();
-                preNode.find(':header img.icon').attr('src', collapsedImage.attr('src'));
-                preNode.find(':header i.fa').removeClass('fa-minus-square');
-                preNode.find(':header i.fa').addClass('fa-plus-square');
-            });
-            $('.tool_dataprivacy-component-count').addClass('hide');
+            updatedisplay();
         },
 
         /**
@@ -210,98 +280,28 @@ define(['jquery', 'core/url', 'core/str'], function($, url, str) {
         },
 
         search: function() {
-
-            // window.console.log('filtering: ' + filtering);
-
             var searchText = $('.tool_dataprivacy-search-box').val();
-            var plugintypes = $('h3');
-            var components = $('h4');
-            // var searchText.length;
-
-            // window.console.log('search text length: ' + searchText.length);
-
-            if (filtering && (searchlength <= searchText.length)) {
-                window.console.log('YEP');
-                // var tmep = $('.component-filtered');
-                components = $('.component-filtered');
-                plugintypes = $('.plugin-filtered');
-                // window.console.log(components);
-                // window.console.log(plugintypes);
+            if (searchlength > searchText.length) {
+                currentlist = $.extend(true, {}, filterlist);
             }
+             searchlength = searchText.length;
 
-            searchlength = searchText.length;
-
-            // Components first then plugins.
-            components.each(function() {
-                var htmlstring = $(this).text();
-                htmlstring = htmlstring.toLowerCase();
-                if (htmlstring.indexOf(searchText.toLowerCase()) !== -1) {
-                    // Expand this area.
-                    var parentNode = $(this).parents('[data-plugintarget]');
-                    parentNode.removeClass('hide');
-                    parentNode.attr('aria-expanded', true);
-                    parentNode.addClass('done');
-                    if ($(this).data('compliant') == false) {
-                        $(this).parent('div').parent('div').removeClass('hide');
-                    } else {
-                        $(this).parent('a').parent('div').parent('div').removeClass('hide');
+            for (key in currentlist) {
+                var matchingplugins = [];
+                currentlist[key].plugins.forEach(function(plugin) {
+                    var componentstring = plugin.component.toLowerCase();
+                    if (componentstring.indexOf(searchText.toLowerCase()) !== -1) {
+                        // Add to the matching list.
+                        matchingplugins.push(plugin);
                     }
-                    $(this).addClass('component-filtered');
-                } else {
-                    // Hide!
-                    if ($(this).data('compliant') == false) {
-                        $(this).parent('div').parent('div').addClass('hide');
-                    } else {
-                        $(this).parent('a').parent('div').parent('div').addClass('hide');
-                    }
-                    $(this).removeClass('component-filtered');
-                }
-            });
-
-            plugintypes.each(function() {
-                var stuff = $(this).text();
-                stuff = stuff.toLowerCase();
-                if (stuff.indexOf(searchText.toLowerCase()) !== -1) {
-                    $(this).parent('a').parent('div').parent('div').removeClass('hide');
-                    $(this).addClass('plugin-filtered');
-                } else {
-                    // Check to see if all children are hidden.
-                    var pluginname = $(this).parent('a').data('plugin');
-                    var doesit = false;
-                    $('[data-plugintarget="' + pluginname + '"]').each(function() {
-                        $(this).children().each(function() {
-                            if (!$(this).hasClass('hide')) {
-                                doesit = true;
-                            }
-                        });
-                    });
-                    // Hide this node.
-                    if (!doesit) {
-                        $(this).parent('a').parent('div').parent('div').addClass('hide');
-                        $(this).removeClass('plugin-filtered');
-                        // Collapse as well.
-                    } else {
-                        $(this).addClass('plugin-filtered');
-                    }
-                }
-            });
-
-            // If we have an empty search then collapse everything back to it's original state.
-            if (searchText == '') {
-                components.each(function() {
-                    $(this).removeClass('component-filtered');
                 });
-                plugintypes.each(function() {
-                    $(this).removeClass('plugin-filtered');
-                    var pluginname = $(this).attr('id');
-                    $('[data-plugintarget="' + pluginname + '"]').addClass('hide');
-                    $('[data-plugintarget="' + pluginname + '"]').removeClass('done');
-                    $('[data-plugintarget="' + pluginname + '"]').attr('aria-expanded', false);
-                });
-                filtering = false;
-            } else {
-                filtering = true;
+                currentlist[key].plugins = matchingplugins;
+                var pluginstring = currentlist[key].plugin_type.toLowerCase();
+                if (pluginstring.indexOf(searchText.toLowerCase()) == -1 && matchingplugins.length == 0) {
+                    delete currentlist[key];
+                }
             }
-        }
+            updatedisplay();
+        },
     };
 });

@@ -64,11 +64,11 @@
     </div>
     <br />
     <br />
-    <div class="clearfix"><a class="tool_dataprivacy-expand-all pull-right" href="#" data-visibility-state='visible'>{{#str}}visible, tool_dataprivacy{{/str}}</a></div>
+    <div class="clearfix"><a class="tool_dataprivacy-expand-all pull-right" href="#" data-visibility-state='visible'>{{#str}}hide, tool_dataprivacy{{/str}}</a></div>
     {{#types}}
     <div>
         <div>
-            <a class="type-expand" href='#' data-plugin="{{plugin_type_raw}}">
+            <a class="type expand" href='#' data-plugin="{{plugin_type_raw}}">
             <h3 id="{{plugin_type_raw}}">{{#pix}}t/collapsed, moodle, {{#str}}expandplugintype, tool_dataprivacy{{/str}}{{/pix}}{{plugin_type}}</h3>
             </a>
         </div>
@@ -86,28 +86,18 @@
 {{#js}}
 require(['jquery', 'tool_dataprivacy/expand_contract'], function($, ec) {
 
-    $('.type-expand').click(function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        var thisnode = $(this);
-        var plugin = thisnode.data('plugin');
-        var metadata = $('[data-plugintarget=\'' + plugin + '\']');
-        ec.expandCollapse(metadata, thisnode);
-    });
+    ec.init({{{rawdata}}});
 
-    $('.component-expand').click(function(e) {
+    $('.expand').click(function(e) {
         e.preventDefault();
         e.stopPropagation();
-        var thisnode = $(this);
-        var plugin = thisnode.data('component');
-        var metadata = $('[data-section=\'' + plugin + '\']');
-        ec.expandCollapse(metadata, thisnode);
+        ec.expandCollapse($(this));
     });
 
     $('.tool_dataprivacy-expand-all').click(function(e) {
         e.preventDefault();
         e.stopPropagation();
-        var nextstate = $(this).data('visibilityState');
+        var nextstate = $(this).attr('data-visibility-state');
         ec.expandCollapseAll(nextstate);
     });
 
@@ -115,13 +105,12 @@ require(['jquery', 'tool_dataprivacy/expand_contract'], function($, ec) {
         var type = $(this).attr('data-type');
         if ($(this).attr('data-display') == "show") {
             $('.tool_dataprivacy-filter[data-type="' + type + '"]').attr('data-display', 'hide');
-            $('.tool_dataprivacy-filter[data-type="' + type + '"]').attr('checked', true);
+            $('.tool_dataprivacy-filter[data-type="' + type + '"]').prop('checked', true);
         } else {
             $('.tool_dataprivacy-filter[data-type="' + type + '"]').attr('data-display', 'show');
-            $('.tool_dataprivacy-filter[data-type="' + type + '"]').attr('checked', false);
+            $('.tool_dataprivacy-filter[data-type="' + type + '"]').prop('checked', false);
         }
-        ec.resetAll($(this).data('type'));
-        ec.expandFilter($(this).data('type'));
+        ec.filterList();
     });
 
     $('[data-link]').click(function(e) {

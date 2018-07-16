@@ -60,9 +60,8 @@ function add_to_log($courseid, $module, $action, $url='', $info='', $cm=0, $user
 /**
  * @deprecated since 2.6
  */
-function events_trigger($eventname, $eventdata) {
-    throw new coding_exception('events_trigger() can not be used any more.'.
-        ' Please use new events instead.');
+function events_trigger() {
+    throw new coding_exception('events_trigger() is deprecated, please use new events instead');
 }
 
 /**
@@ -3823,112 +3822,10 @@ function events_cron($eventname='') {
 }
 
 /**
- * Do not call directly, this is intended to be used from new event base only.
- *
- * @private
  * @deprecated since Moodle 3.1
- * @param string $eventname name of the event
- * @param mixed $eventdata event data object
- * @return int number of failed events
  */
-function events_trigger_legacy($eventname, $eventdata) {
-    global $CFG, $USER, $DB;
-
-    $failedcount = 0; // number of failed events.
-
-    // pull out all registered event handlers
-    if ($handlers = events_get_handlers($eventname)) {
-        foreach ($handlers as $handler) {
-            $errormessage = '';
-
-            if ($handler->schedule === 'instant') {
-                if ($handler->status) {
-                    //check if previous pending events processed
-                    if (!$DB->record_exists('events_queue_handlers', array('handlerid'=>$handler->id))) {
-                        // ok, queue is empty, lets reset the status back to 0 == ok
-                        $handler->status = 0;
-                        $DB->set_field('events_handlers', 'status', 0, array('id'=>$handler->id));
-                        // reset static handler cache
-                        events_get_handlers('reset');
-                    }
-                }
-
-                // dispatch the event only if instant schedule and status ok
-                if ($handler->status or (!$handler->internal and $DB->is_transaction_started())) {
-                    // increment the error status counter
-                    $handler->status++;
-                    $DB->set_field('events_handlers', 'status', $handler->status, array('id'=>$handler->id));
-                    // reset static handler cache
-                    events_get_handlers('reset');
-
-                } else {
-                    $errormessage = 'Unknown error';
-                    $result = events_dispatch($handler, $eventdata, $errormessage);
-                    if ($result === true) {
-                        // everything is fine - event dispatched
-                        continue;
-                    } else if ($result === false) {
-                        // retry later - set error count to 1 == send next instant into cron queue
-                        $DB->set_field('events_handlers', 'status', 1, array('id'=>$handler->id));
-                        // reset static handler cache
-                        events_get_handlers('reset');
-                    } else {
-                        // internal problem - ignore the event completely
-                        $failedcount ++;
-                        continue;
-                    }
-                }
-
-                // update the failed counter
-                $failedcount ++;
-
-            } else if ($handler->schedule === 'cron') {
-                //ok - use queueing of events only
-
-            } else {
-                // unknown schedule - ignore event completely
-                debugging("Unknown handler schedule type: $handler->schedule");
-                $failedcount ++;
-                continue;
-            }
-
-            // if even type is not instant, or dispatch asked for retry, queue it
-            $event = new stdClass();
-            $event->userid      = $USER->id;
-            $event->eventdata   = base64_encode(serialize($eventdata));
-            $event->timecreated = time();
-            if (debugging()) {
-                $dump = '';
-                $callers = debug_backtrace();
-                foreach ($callers as $caller) {
-                    if (!isset($caller['line'])) {
-                        $caller['line'] = '?';
-                    }
-                    if (!isset($caller['file'])) {
-                        $caller['file'] = '?';
-                    }
-                    $dump .= 'line ' . $caller['line'] . ' of ' . substr($caller['file'], strlen($CFG->dirroot) + 1);
-                    if (isset($caller['function'])) {
-                        $dump .= ': call to ';
-                        if (isset($caller['class'])) {
-                            $dump .= $caller['class'] . $caller['type'];
-                        }
-                        $dump .= $caller['function'] . '()';
-                    }
-                    $dump .= "\n";
-                }
-                $event->stackdump = $dump;
-            } else {
-                $event->stackdump = '';
-            }
-            $event->id = $DB->insert_record('events_queue', $event);
-            events_queue_handler($handler, $event, $errormessage);
-        }
-    } else {
-        // No handler found for this event name - this is ok!
-    }
-
-    return $failedcount;
+function events_trigger_legacy() {
+    throw new coding_exception('events_trigger_legacy() has been deprecated along with all Events 1 API in favour of Events 2 API.');
 }
 
 /**

@@ -427,7 +427,7 @@ class core_date {
             'West Asia Standard Time' => 'Asia/Tashkent',
             'Ekaterinburg Standard Time' => 'Asia/Yekaterinburg',
             'Pakistan Standard Time' => 'Asia/Karachi',
-            'India Standard Time' => 'Asia/Kolkata', // PHP and Windows differ in spelling.
+            'India Standard Time' => 'Asia/Calcutta',
             'Sri Lanka Standard Time' => 'Asia/Colombo',
             'Nepal Standard Time' => 'Asia/Katmandu',
             'Central Asia Standard Time' => 'Asia/Almaty',

@@ -86,6 +86,40 @@ class moodle_content_writer implements content_writer {
 
         $this->write_data($path, json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 
+        // Quick hack from Adrian.
+
+        // $path = $this->get_context_path();
+        // swag_log("$path\n");
+        // $filepath = implode(DIRECTORY_SEPARATOR, $path);
+
+        // $path = $this->get_path($subcontext, 'index.html');
+
+        // $page = new \core_privacy\local\request\html_page();
+        // $page->htmlize_data($data);
+        // // swag_log($page->out());
+        // $this->write_data($path, $page->out());
+
+        // Add link to index.html the next level down or further if required.
+        // $navigationpath = $this->get_context_path();
+        // $glued = implode(DIRECTORY_SEPARATOR, $navigationpath);
+        // swag_log($subcontext);
+        // swag_log($navigationpath);
+        // swag_log("\n\n");
+        // // swag_log($glued);
+        // $ffile = $this->get_path($navigationpath, 'index.html');
+        // // swag_log("$ffile\n");
+        // $fullfile = $this->path . $ffile;
+        // // swag_log("$fullfile\n");
+        // if (file_exists($fullfile)) {
+        //     // swag_log("Yes!\n");
+        //     $fr = fopen($fullfile, 'w+');
+        //     $content = '';
+        //     while (!feof($fr)) {
+        //         $content .= fread($fr, filesize($fullfile));
+        //     }
+        //     // swag_log("$content\n");
+        // }
+
         return $this;
     }
 
@@ -350,12 +384,124 @@ class moodle_content_writer implements content_writer {
         $this->files[$path] = $targetpath;
     }
 
+    protected function smushem(array $array) : array {
+        if (count($array) === 2) {
+            return [$array[0] => $array[1]];
+        }
+
+        return [$array[0] => $this->smushem(array_slice($array, 1))];
+    }
+
+    protected function new_hope($tree, $newitems, $key) {
+
+        $arraydiff = array_diff_key($tree[$key], $newitems[$key]);
+
+        if (empty($arraydiff)) {
+            if (count($tree[$key]) > 1) {
+                $this->new_hope($tree[$key], $newitems[$key], key($tree[$key]));
+                // return $arraydiff;
+            } else {
+                // swag_log('display what?');
+            }
+        } else {
+            // swag_log($arraydiff);
+            // return $arraydiff;
+            $tree = array_merge($tree, $arraydiff);
+        }
+    }
+
     /**
      * Perform any required finalisation steps and return the location of the finalised export.
      *
      * @return  string
      */
     public function finalise_content() : string {
+
+        // Make the directory tree.
+        $tree = [];
+        foreach ($this->files as $key => $file) {
+            $items = explode(DIRECTORY_SEPARATOR, $key);
+            $newitems = $this->smushem($items);
+            if (!empty($tree)) {
+                // swag_log($tree);
+                // swag_log($newitems);
+                // swag_log("\n");
+
+                foreach ($items as $k => $value) {
+                    swag_log(isset($tree[$k]));
+                    swag_log($tree[$k]);
+
+                    if (!isset($tree[$k])) {
+                        swag_log($tree);
+                        swag_log($k);
+                        swag_log($value);
+                    }
+                }
+
+
+                break;
+            //     $k = key($tree);
+            //     $joy = $this->new_hope($tree, $newitems, $k);
+            //     $tree = array_merge($tree, $joy);
+            } else {
+                $tree = $newitems;
+            }
+        }
+
+        // swag_log($tree);
+
+        // foreach ($this->files as $file) {
+        //     if (gettype($file) == 'string') {
+
+        //         // Find direct descendants.
+        //         $thing = explode(DIRECTORY_SEPARATOR, $file, -1);
+        //         $other = implode(DIRECTORY_SEPARATOR, $thing);
+        //         $newlist = [];
+        //         foreach ($this->files as $mktmep) {
+        //             if (gettype($mktmep) == 'string') {
+        //                 if (stripos($mktmep, $other) !== false) {
+        //                     $length = strlen($other);
+        //                     $newmk = substr($mktmep, $length);
+        //                     $s1 = explode(DIRECTORY_SEPARATOR, $mktmep);
+        //                     $s1name = array_pop($s1);
+        //                     if ($s1name == 'index.html') {
+        //                         $pants = explode(DIRECTORY_SEPARATOR, $newmk);
+        //                         if (empty($pants[0])) {
+        //                             unset($pants[0]);
+        //                         }
+        //                         $newlist[] = $pants;
+        //                     }
+        //                 }
+        //             }
+        //         }
+
+        //         swag_log($newlist);
+        //         break;
+
+
+                // This is useful - Don't delete.
+
+        //         // $newthing = explode(DIRECTORY_SEPARATOR, $file);
+        //         // $filename = array_pop($newthing);
+        //         // $file_size = filesize($file);
+        //         // $content = '';
+        //         // if ($filename == 'index.html') {
+        //         //     // $fr = fopen($file, 'r');
+        //         //     if ($file_size > 0) {
+        //         //         // while (!feof($fr)) {
+        //         //         //     $content .= fread($fr, $file_size);
+        //         //         // }
+        //         //         $doc = new \DOMDocument();
+        //         //         $doc->loadHTMLFile($file);
+        //         //         $navigationnode = $doc->getElementById('export-navigation');
+        //         //         $testnavigationitem = $doc->createElement('div', 'New menu item');
+        //         //         $navigationnode->appendChild($testnavigationitem);
+        //         //         $doc->saveHTMLFile($file);
+        //         //     }
+        //         // }
+            // }
+        // }
+
         $exportfile = make_request_directory() . '/export.zip';
 
         $fp = get_file_packer();

@@ -392,22 +392,34 @@ class moodle_content_writer implements content_writer {
         return [$array[0] => $this->smushem(array_slice($array, 1))];
     }
 
-    protected function new_hope($tree, $newitems, $key) {
+    protected function make_navigation(array $tree) {
+        // Probably needs to be done with templates, not sure how to acheive that at the moment.
+        $html = '<ul>';
+        // print_object(count($tree));
+        foreach ($tree as $key => $value) {
 
-        $arraydiff = array_diff_key($tree[$key], $newitems[$key]);
-
-        if (empty($arraydiff)) {
-            if (count($tree[$key]) > 1) {
-                $this->new_hope($tree[$key], $newitems[$key], key($tree[$key]));
-                // return $arraydiff;
+            $html .= '<li>';
+            if (is_array($value)) {
+                $html .= $key;
+                $html .= $this->make_navigation($value);
             } else {
-                // swag_log('display what?');
+                $fileinfo = explode('.', $value);
+                $extension = array_pop($fileinfo);
+                if ($extension == 'json') {
+                    if ($fileinfo[0] == 'data') {
+                        $html .= (is_numeric($key)) ? 'index.html' : $key . ' index.html';
+                    } else {
+                        $html .= (is_numeric($key)) ? $fileinfo[0] . '.html' : $key . ' ' . $fileinfo[0] . '.html';
+                    }
+                } else {
+                    $html .= (is_numeric($key)) ? $value : $key . ' ' . $value;
+                }
             }
-        } else {
-            // swag_log($arraydiff);
-            // return $arraydiff;
-            $tree = array_merge($tree, $arraydiff);
+            $html .= '</li>';
+
         }
+        $html .= '</ul>';
+        return $html;
     }
 
     /**
@@ -422,33 +434,12 @@ class moodle_content_writer implements content_writer {
         foreach ($this->files as $key => $file) {
             $items = explode(DIRECTORY_SEPARATOR, $key);
             $newitems = $this->smushem($items);
-            if (!empty($tree)) {
-                // swag_log($tree);
-                // swag_log($newitems);
-                // swag_log("\n");
-
-                foreach ($items as $k => $value) {
-                    swag_log(isset($tree[$k]));
-                    swag_log($tree[$k]);
-
-                    if (!isset($tree[$k])) {
-                        swag_log($tree);
-                        swag_log($k);
-                        swag_log($value);
-                    }
-                }
-
-
-                break;
-            //     $k = key($tree);
-            //     $joy = $this->new_hope($tree, $newitems, $k);
-            //     $tree = array_merge($tree, $joy);
-            } else {
-                $tree = $newitems;
-            }
+            $tree = array_merge_recursive($tree, $newitems);
         }
 
-        // swag_log($tree);
+
+        $junk = $this->make_navigation($tree);
+        swag_log($junk);
 
         // foreach ($this->files as $file) {
         //     if (gettype($file) == 'string') {

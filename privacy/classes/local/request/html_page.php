@@ -43,9 +43,9 @@ class html_page {
         $this->set_footer();
     }
 
-    public function set_navigation() {
+    public function set_navigation($navdata = '') {
         $this->navigation = '<div id="export-navigation">';
-        $this->navigation .= '<div>This page.</div>';
+        $this->navigation .= '<div>' . $navdata . '</div>';
         $this->navigation .= '</div>';
     }
 
@@ -68,7 +68,8 @@ class html_page {
         $html .= '<ul>';
         foreach ($data as $key => $value) {
             $html .= '<li>';
-            $html .= $key . ':&nbsp;&nbsp;&nbsp;&nbsp;' . $value;
+            // $html .= $key . ':&nbsp;&nbsp;&nbsp;&nbsp;' . $value;
+            $html .= $key . ':&nbsp;&nbsp;&nbsp;&nbsp;';
             $html .= '</li>';
         }
         $html .= '</ul>';

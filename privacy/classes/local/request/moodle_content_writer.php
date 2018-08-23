@@ -99,27 +99,6 @@ class moodle_content_writer implements content_writer {
         // // swag_log($page->out());
         // $this->write_data($path, $page->out());
 
-        // Add link to index.html the next level down or further if required.
-        // $navigationpath = $this->get_context_path();
-        // $glued = implode(DIRECTORY_SEPARATOR, $navigationpath);
-        // swag_log($subcontext);
-        // swag_log($navigationpath);
-        // swag_log("\n\n");
-        // // swag_log($glued);
-        // $ffile = $this->get_path($navigationpath, 'index.html');
-        // // swag_log("$ffile\n");
-        // $fullfile = $this->path . $ffile;
-        // // swag_log("$fullfile\n");
-        // if (file_exists($fullfile)) {
-        //     // swag_log("Yes!\n");
-        //     $fr = fopen($fullfile, 'w+');
-        //     $content = '';
-        //     while (!feof($fr)) {
-        //         $content .= fread($fr, filesize($fullfile));
-        //     }
-        //     // swag_log("$content\n");
-        // }
-
         return $this;
     }
 
@@ -392,31 +371,56 @@ class moodle_content_writer implements content_writer {
         return [$array[0] => $this->smushem(array_slice($array, 1))];
     }
 
-    protected function make_navigation(array $tree) {
-        // Probably needs to be done with templates, not sure how to acheive that at the moment.
+    protected function make_navigation(array $tree, $keylist = []) {
+        // Probably needs to be done with templates, not sure how to achieve that at the moment.
         $html = '<ul>';
-        // print_object(count($tree));
         foreach ($tree as $key => $value) {
-
             $html .= '<li>';
             if (is_array($value)) {
+                $keylist = is_numeric($key) ? $keylist : array_merge($keylist, [$key]);
                 $html .= $key;
-                $html .= $this->make_navigation($value);
+                $html .= $this->make_navigation($value, $keylist);
+                if (!is_numeric($key)) {
+                    array_pop($keylist);
+                }
             } else {
+
                 $fileinfo = explode('.', $value);
                 $extension = array_pop($fileinfo);
                 if ($extension == 'json') {
-                    if ($fileinfo[0] == 'data') {
-                        $html .= (is_numeric($key)) ? 'index.html' : $key . ' index.html';
-                    } else {
-                        $html .= (is_numeric($key)) ? $fileinfo[0] . '.html' : $key . ' ' . $fileinfo[0] . '.html';
-                    }
+                    // if ($fileinfo[0] == 'data') {
+                    //     $filename = 'index.html';
+                    // } else {
+                        $filename = $fileinfo[0] . '.html';
+                    // }
                 } else {
-                    $html .= (is_numeric($key)) ? $value : $key . ' ' . $value;
+                    $filename = $value;
                 }
+
+                if (!is_numeric($key)) {
+                    array_push($keylist, $key);
+                    $tempdirectory = $keylist;
+                    array_shift($tempdirectory);
+                    $url = implode(DIRECTORY_SEPARATOR, $tempdirectory);
+                    $html .= $key;
+                    $html .= '<ul>';
+                    $html .= '<li>';
+                    $html .= '<a href="' . $url . DIRECTORY_SEPARATOR . $filename . '">' . $filename . '</a>';
+                    // $html .= '<a href="' . DIRECTORY_SEPARATOR . $url . DIRECTORY_SEPARATOR . $filename . '">' . $filename . '</a>';
+                    $html .= '</li>';
+                    $html .= '</ul>';
+                    array_pop($keylist);
+                } else {
+                    $tempdirectory = $keylist;
+                    array_shift($tempdirectory);
+                    $url = implode(DIRECTORY_SEPARATOR, $tempdirectory);
+                    // Normal display.
+                    $html .= '<a href="' . $url . DIRECTORY_SEPARATOR . $filename . '">' . $filename . '</a>';
+                    // $html .= '<a href="' . DIRECTORY_SEPARATOR . $url . DIRECTORY_SEPARATOR . $filename . '">' . $filename . '</a>';
+                }
+
             }
             $html .= '</li>';
-
         }
         $html .= '</ul>';
         return $html;
@@ -437,61 +441,43 @@ class moodle_content_writer implements content_writer {
             $tree = array_merge_recursive($tree, $newitems);
         }
 
+        $navigationhtml = $this->make_navigation($tree);
 
-        $junk = $this->make_navigation($tree);
-        swag_log($junk);
+        foreach ($this->files as $shortpath => $file) {
+            // Strings here means files that we need to create html files for. File objects should not be touched.
+            if (gettype($file) == 'string') {
 
-        // foreach ($this->files as $file) {
-        //     if (gettype($file) == 'string') {
+                $filearray = explode(DIRECTORY_SEPARATOR, $shortpath);
 
-        //         // Find direct descendants.
-        //         $thing = explode(DIRECTORY_SEPARATOR, $file, -1);
-        //         $other = implode(DIRECTORY_SEPARATOR, $thing);
-        //         $newlist = [];
-        //         foreach ($this->files as $mktmep) {
-        //             if (gettype($mktmep) == 'string') {
-        //                 if (stripos($mktmep, $other) !== false) {
-        //                     $length = strlen($other);
-        //                     $newmk = substr($mktmep, $length);
-        //                     $s1 = explode(DIRECTORY_SEPARATOR, $mktmep);
-        //                     $s1name = array_pop($s1);
-        //                     if ($s1name == 'index.html') {
-        //                         $pants = explode(DIRECTORY_SEPARATOR, $newmk);
-        //                         if (empty($pants[0])) {
-        //                             unset($pants[0]);
-        //                         }
-        //                         $newlist[] = $pants;
-        //                     }
-        //                 }
-        //             }
-        //         }
-
-        //         swag_log($newlist);
-        //         break;
+                $filename = array_pop($filearray);
 
 
-                // This is useful - Don't delete.
+                // Use the html creation class from above. Send in the navigation.
+                $page = new \core_privacy\local\request\html_page();
+                $page->set_navigation($navigationhtml);
+                // Open the json file and make it an object.
+                $content = '';
+                $fileresource = fopen($file, 'r');
+                while (!feof($fileresource)) {
+                    $content .= fread($fileresource, filesize($file));
+                }
+                $page->htmlize_data(json_decode($content));
 
-        //         // $newthing = explode(DIRECTORY_SEPARATOR, $file);
-        //         // $filename = array_pop($newthing);
-        //         // $file_size = filesize($file);
-        //         // $content = '';
-        //         // if ($filename == 'index.html') {
-        //         //     // $fr = fopen($file, 'r');
-        //         //     if ($file_size > 0) {
-        //         //         // while (!feof($fr)) {
-        //         //         //     $content .= fread($fr, $file_size);
-        //         //         // }
-        //         //         $doc = new \DOMDocument();
-        //         //         $doc->loadHTMLFile($file);
-        //         //         $navigationnode = $doc->getElementById('export-navigation');
-        //         //         $testnavigationitem = $doc->createElement('div', 'New menu item');
-        //         //         $navigationnode->appendChild($testnavigationitem);
-        //         //         $doc->saveHTMLFile($file);
-        //         //     }
-        //         // }
-            // }
-        // }
+                $thing = explode('.', $filename, -1);
+                $other = implode('.', $thing);
+                $other .= '.html';
+                // array_push($filearray, $other);
+                // $path = implode(DIRECTORY_SEPARATOR, $filearray);
+                array_shift($filearray);
+
+                $path = $this->get_path($filearray, $other);
+
+                swag_log($path);
+                swag_log("\n");
+
+                $this->write_data($path, $page->out());
+            }
+        }
 
         $exportfile = make_request_directory() . '/export.zip';
 

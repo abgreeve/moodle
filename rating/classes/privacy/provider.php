@@ -226,7 +226,8 @@ class provider implements
      * @param   string      $insql The SQL to use in a sub-select for the itemid query.
      * @param   array       $params The params required for the insql.
      */
-    public static function get_users_in_context_from_sql(userlist $userlist, string $alias, string $component, string $area, string $insql, $params) {
+    public static function get_users_in_context_from_sql(
+            userlist $userlist, string $alias, string $component, string $area, string $insql, $params) {
         // Discussion authors.
         $sql = "SELECT {$alias}.userid
                   FROM {rating} {$alias}

@@ -1457,7 +1457,8 @@ class mod_forum_privacy_provider_testcase extends \core_privacy\tests\provider_t
         $this->assertCount(0, $DB->get_records_select('files', "itemid {$postinsql}", $postinparams));
 
         // Files for the other posts should remain.
-        $this->assertCount(18, $DB->get_records_select('files', "filename <> '.' AND itemid {$otherpostinsql}", $otherpostinparams));
+        $this->assertCount(18,
+                $DB->get_records_select('files', "filename <> '.' AND itemid {$otherpostinsql}", $otherpostinparams));
     }
 
     /**

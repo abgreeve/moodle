@@ -282,7 +282,7 @@ class manager {
             $progress->output(get_string('trace:preprocessingcomponent', 'core_privacy', $a), 2);
             $userlist = new local\request\userlist($context, $component);
 
-            $this->handled_component_class_callback($component, local\request\core_userlist_provider::class, 'get_users_in_context', [$userlist]);
+            $this->handled_component_class_callback($component, core_userlist_provider::class, 'get_users_in_context', [$userlist]);
 
             // Add contexts that the component may not know about.
             \core_privacy\local\request\helper::add_shared_users_to_userlist($userlist);

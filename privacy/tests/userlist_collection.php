@@ -138,11 +138,9 @@ class userlist_collection_test extends advanced_testcase {
         $uut->add_userlist($test);
         $testdata['core_tests'] = $test;
 
-
         $another = new userlist($cut, 'privacy_another');
         $uut->add_userlist($another);
         $testdata['privacy_another'] = $another;
-
 
         foreach ($uut as $component => $list) {
             $this->assertEquals($testdata[$component], $list);

@@ -106,8 +106,6 @@ abstract class userlist_base implements
     public function get_users() : array {
         $users = [];
         foreach ($this->userids as $userid) {
-            // TODO Improve performance.
-            // Look at PHP Generators / yield
             if ($user = \core_user::get_user($userid)) {
                 $users[] = $user;
             }

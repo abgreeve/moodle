@@ -100,6 +100,16 @@ class mod_assignment_privacy_testcase extends advanced_testcase {
         $this->assertEquals(2, count($contextids->get_contextids()));
     }
 
+    public function test_get_users_in_context() {
+        global $DB;
+
+        $this->resetAfterTest(true);
+        $this->create_courses_and_assignments();
+
+        $userlist = new \core_privacy\local\request\userlist($context, 'mod_assignment');
+        print_object($this->course1assignments);
+    }
+
     /**
      * Test for provider::export_user_data().
      *

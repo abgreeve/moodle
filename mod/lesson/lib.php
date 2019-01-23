@@ -48,6 +48,7 @@ function lesson_add_instance($data, $mform) {
     $cmid = $data->coursemodule;
     $draftitemid = $data->mediafile;
     $context = context_module::instance($cmid);
+    echo 'this should be in a different commit';
 
     lesson_process_pre_save($data);
 

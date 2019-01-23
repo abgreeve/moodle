@@ -39,6 +39,7 @@ defined('MOODLE_INTERNAL') || die();
 function lesson_import_question_files($field, $data, $answer, $contextid) {
     global $DB;
     if (!isset($data['itemid'])) {
+        echo 'this is it';
         return;
     }
     $text = file_save_draft_area_files($data['itemid'],

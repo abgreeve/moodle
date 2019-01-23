@@ -34,6 +34,7 @@ $qtype  = optional_param('qtype', 0, PARAM_INT);
 $edit   = optional_param('edit', false, PARAM_BOOL);
 $returnto = optional_param('returnto', null, PARAM_URL);
 if (empty($returnto)) {
+    echo 'this is not what we are looking for.';
     $returnto = new moodle_url('/mod/lesson/edit.php', array('id' => $id));
     $returnto->set_anchor('lesson-' . $pageid);
 }
@@ -55,6 +56,7 @@ if ($edit) {
     $qtype = $editpage->qtype;
     $edit = true;
 } else {
+    echo 'this is not what we are looking for';
     $edit = false;
 }
 

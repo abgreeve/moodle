@@ -60,6 +60,7 @@ if (!$lesson->has_pages()) {
 } else {
     switch ($mode) {
         case 'collapsed':
+            echo 'this is it';
             echo $lessonoutput->display_edit_collapsed($lesson, $lesson->firstpageid);
             break;
         case 'single':

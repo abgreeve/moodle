@@ -211,6 +211,8 @@ class mod_lesson_renderer extends plugin_renderer_base {
     public function display_edit_collapsed(lesson $lesson, $pageid) {
         global $DB, $CFG;
 
+        echo 'this is it!';
+
         $manager = lesson_page_type_manager::get($lesson);
         $qtypes = $manager->get_page_type_strings();
         $npages = count($lesson->load_all_pages());

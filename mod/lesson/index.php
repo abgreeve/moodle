@@ -51,6 +51,9 @@ $event->trigger();
 $strlessons = get_string("modulenameplural", "lesson");
 $strlesson  = get_string("modulename", "lesson");
 
+echo 'I want this line in the first commit';
+echo 'but not this line';
+
 
 /// Print the header
 $PAGE->navbar->add($strlessons);
@@ -106,6 +109,8 @@ foreach ($lessons as $lesson) {
     } else {
         $due = "<font color=\"red\">" . userdate($deadline) . "</font>";
     }
+
+    echo 'big fan of this as well.';
 
     if ($usesections) {
         if (has_capability('mod/lesson:manage', $context)) {

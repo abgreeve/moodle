@@ -92,6 +92,7 @@ class mod_lesson_renderer extends plugin_renderer_base {
      */
     public function lesson_inaccessible($message) {
         global $CFG;
+        echo 'this is not what we are looking for';
         $output  =  $this->output->box_start('generalbox boxaligncenter');
         $output .=  $this->output->box_start('center');
         $output .=  $message;
@@ -150,6 +151,7 @@ class mod_lesson_renderer extends plugin_renderer_base {
      * @return string
      */
     public function message($message, single_button $button = null) {
+        echo 'this is not what we are looking for';
         $output  = $this->output->box_start('generalbox boxaligncenter');
         $output .= $message;
         if ($button !== null) {

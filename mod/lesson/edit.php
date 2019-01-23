@@ -64,6 +64,7 @@ if (!$lesson->has_pages()) {
             break;
         case 'single':
             echo 'This is not what we are looking for.';
+            echo 'This is not what we are looking for.';
             $pageid =  required_param('pageid', PARAM_INT);
             $PAGE->url->param('pageid', $pageid);
             $singlepage = $lesson->load_page($pageid);

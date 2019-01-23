@@ -62,7 +62,7 @@ $mform->set_data($data);
     echo $OUTPUT->heading_with_help($strimportquestions, 'importquestions', 'lesson', '', '', 3);
 
 if ($data = $mform->get_data()) {
-
+    echo 'this is not what we are looking for';
     require_sesskey();
 
     $realfilename = $mform->get_new_filename('questionfile');

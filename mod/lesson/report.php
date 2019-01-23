@@ -49,6 +49,7 @@ if ($pageid !== null) {
 }
 $PAGE->set_url($url);
 if ($action == 'reportoverview') {
+    echo 'this is not what we are looking for';
     $PAGE->navbar->add(get_string('reports', 'lesson'));
     $PAGE->navbar->add(get_string('overview', 'lesson'));
 }
@@ -58,6 +59,7 @@ $lessonoutput = $PAGE->get_renderer('mod_lesson');
 if ($action === 'delete') {
     /// Process any form data before fetching attempts, grades and times
     if (has_capability('mod/lesson:edit', $context) and $form = data_submitted() and confirm_sesskey()) {
+        echo 'this is not what we are looking for.';
     /// Cycle through array of userids with nested arrays of tries
         if (!empty($form->attempts)) {
             foreach ($form->attempts as $userid => $tries) {

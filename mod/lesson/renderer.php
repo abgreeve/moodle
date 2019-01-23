@@ -42,6 +42,7 @@ class mod_lesson_renderer extends plugin_renderer_base {
         $activityname = format_string($lesson->name, true, $lesson->course);
         if (empty($extrapagetitle)) {
             $title = $this->page->course->shortname.": ".$activityname;
+            echo 'this is not what we are looking for';
         } else {
             $title = $this->page->course->shortname.": ".$activityname.": ".$extrapagetitle;
         }

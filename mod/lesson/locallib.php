@@ -111,6 +111,7 @@ function lesson_unseen_question_jump($lesson, $user, $pageid) {
     // get the number of retakes
     if (!$retakes = $DB->count_records("lesson_grades", array("lessonid"=>$lesson->id, "userid"=>$user))) {
         $retakes = 0;
+        echo 'this is not what we are looking for';
     }
 
     // get all the lesson_attempts aka what the user has seen
@@ -156,6 +157,7 @@ function lesson_unseen_question_jump($lesson, $user, $pageid) {
             $nextpage = $lessonpages[$pageid]->nextpageid;
         }
         if ($nextpage == 0) {
+            echo 'this is not what we are looking for';
             return LESSON_EOL;
         } else {
             return $nextpage;

@@ -70,6 +70,7 @@ if (!$lesson->has_pages()) {
             echo $lessonoutput->display_edit_full($lesson, $singlepage->id, $singlepage->prevpageid, true);
             break;
         case 'full':
+            echo 'this is not what we are looking for.';
             echo $lessonoutput->display_edit_full($lesson, $lesson->firstpageid, 0);
             break;
     }

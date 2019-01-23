@@ -54,6 +54,7 @@ class mod_lesson_mod_form extends moodleform_mod {
         $mform    = $this->_form;
 
         $lessonconfig = get_config('mod_lesson');
+        echo 'this is it';
 
         $mform->addElement('header', 'general', get_string('general', 'form'));
 

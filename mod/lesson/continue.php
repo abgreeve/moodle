@@ -35,6 +35,7 @@ $lesson = new lesson($DB->get_record('lesson', array('id' => $cm->instance), '*'
 
 require_login($course, false, $cm);
 require_sesskey();
+echo 'this is it';
 
 // Apply overrides.
 $lesson->update_effective_access($USER->id);

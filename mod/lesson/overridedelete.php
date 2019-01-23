@@ -46,6 +46,8 @@ $context = context_module::instance($cm->id);
 
 require_login($course, false, $cm);
 
+echo 'this is it';
+
 // Check the user has the required capabilities to modify an override.
 require_capability('mod/lesson:manageoverrides', $context);
 

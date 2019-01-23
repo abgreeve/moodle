@@ -86,6 +86,8 @@ class lesson_override_form extends moodleform {
         $cm = $this->cm;
         $mform = $this->_form;
 
+        echo 'this is not it';
+
         $mform->addElement('header', 'override', get_string('override', 'lesson'));
 
         if ($this->groupmode) {

@@ -50,7 +50,7 @@ $event->trigger();
 
 $strlessons = get_string("modulenameplural", "lesson");
 $strlesson  = get_string("modulename", "lesson");
-
+echo 'this is it';
 
 /// Print the header
 $PAGE->navbar->add($strlessons);

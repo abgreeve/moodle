@@ -50,6 +50,7 @@ require_capability('mod/lesson:edit', $context);
 require_sesskey();
 
 $lessonoutput = $PAGE->get_renderer('mod_lesson');
+echo 'this is it';
 
 /// Process the action
 switch ($action) {

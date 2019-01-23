@@ -37,6 +37,8 @@ $lesson = new lesson($DB->get_record('lesson', array('id' => $cm->instance), '*'
 
 require_login($course, false, $cm);
 
+echo 'third commit all good';
+
 $currentgroup = groups_get_activity_group($cm, true);
 
 $context = context_module::instance($cm->id);

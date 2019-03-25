@@ -114,6 +114,7 @@ class manager {
         if ($conv->type == \core_message\api::MESSAGE_CONVERSATION_TYPE_SELF) {
             return $savemessage->id;
         }
+        $localisedeventdata->conversationtype = $conv->type;
 
         // We treat individual conversations the same as any direct message with 'userfrom' and 'userto' specified.
         // We know the other user, so set the 'userto' field so that the event code will get access to this field.

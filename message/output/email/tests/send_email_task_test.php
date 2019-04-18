@@ -54,6 +54,7 @@ class core_message_send_email_task_testcase extends advanced_testcase {
 
         $user1 = $this->getDataGenerator()->create_and_enrol($course, 'student');
         $user2 = $this->getDataGenerator()->create_and_enrol($course, 'student');
+        $user3 = $this->getDataGenerator()->create_and_enrol($course, 'student');
 
         // Create two groups in the course.
         $group1 = $this->getDataGenerator()->create_group(array('courseid' => $course->id));
@@ -65,9 +66,12 @@ class core_message_send_email_task_testcase extends advanced_testcase {
         groups_add_member($group1->id, $user2->id);
         groups_add_member($group2->id, $user2->id);
 
+        groups_add_member($group1->id, $user3->id);
+        groups_add_member($group2->id, $user3->id);
+
         $conversation1 = \core_message\api::create_conversation(
             \core_message\api::MESSAGE_CONVERSATION_TYPE_GROUP,
-            [$user1->id, $user2->id],
+            [$user1->id, $user2->id, $user3->id],
             'Group 1', \core_message\api::MESSAGE_CONVERSATION_ENABLED,
             'core_group',
             'groups',
@@ -77,7 +81,7 @@ class core_message_send_email_task_testcase extends advanced_testcase {
 
         $conversation2 = \core_message\api::create_conversation(
             \core_message\api::MESSAGE_CONVERSATION_TYPE_GROUP,
-            [$user1->id, $user2->id],
+            [$user1->id, $user2->id, $user3->id],
             'Group 2',
             \core_message\api::MESSAGE_CONVERSATION_ENABLED,
             'core_group',
@@ -108,13 +112,14 @@ class core_message_send_email_task_testcase extends advanced_testcase {
             }
         }
 
-        $this->assertEquals(2, $DB->count_records('message_email_messages'));
+        $this->assertEquals(4, $DB->count_records('message_email_messages'));
+        print_object('here');
 
         // Only 1 email is sent as the 2 messages are included in it at a digest.
         $sink = $this->redirectEmails();
         $task = new \message_email\task\send_email_task();
         $task->execute();
-        $this->assertEquals(1, $sink->count());
+        $this->assertEquals(2, $sink->count());
 
         // Confirm table was emptied after task was run.
         $this->assertEquals(0, $DB->count_records('message_email_messages'));

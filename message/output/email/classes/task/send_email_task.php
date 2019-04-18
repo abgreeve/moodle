@@ -108,7 +108,7 @@ class send_email_task extends scheduled_task {
     private function get_unique_users() : moodle_recordset {
         global $DB;
 
-        $sql = "SELECT u.*
+        $sql = "SELECT DISTINCT u.*
                   FROM {user} u
                   JOIN {message_email_messages} mem
                     ON mem.useridto = u.id
@@ -138,7 +138,7 @@ class send_email_task extends scheduled_task {
                   JOIN {course} c
                     ON g.courseid = c.id
                   JOIN {message_email_messages} mem
-                    ON mem.conversationid = mc.id  
+                    ON mem.conversationid = mc.id
                  WHERE mem.useridto = ?
                    AND mem.id <= ?";
 

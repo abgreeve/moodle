@@ -239,7 +239,19 @@ class mod_lesson_renderer extends plugin_renderer_base {
                 'mode'   => 'single',
                 'pageid' => $page->id
             ));
-            $data[] = html_writer::link($url, format_string($page->title, true), array('id' => 'lesson-' . $page->id));
+            $link = html_writer::link($url, format_string($page->title, true, ['context' => $lesson->context]),
+                    array('id' => 'lesson-' . $page->id));
+
+            $contextdata = (object) [
+                'displayvalue' => $link,
+                'value' => $page->title,
+                'itemid' => $pageid,
+                'component' => 'mod_lesson',
+                'itemtype' => 'pagetitle',
+                'edithint' => get_string('updatedpagetitle', 'mod_lesson', $page->title)
+            ];
+
+            $data[] = $this->output->render_from_template('core/inplace_editable', $contextdata);
             $data[] = $qtypes[$page->qtype];
             $data[] = implode("<br />\n", $page->jumps);
             if ($canedit) {

@@ -566,6 +566,7 @@ $string['unseenpageinbranch'] = 'Unseen question within a content page';
 $string['unsupportedqtype'] = 'Unsupported question type ({$a})!';
 $string['updatepagenamed'] = 'Update page: {$a}';
 $string['updatedpage'] = 'Updated page';
+$string['updatedpagetitle'] = 'Update the page title: {$a}'; // {title of the page}.
 $string['updatefailed'] = 'Update failed';
 $string['usemaximum'] = 'Use maximum';
 $string['usemean'] = 'Use mean';

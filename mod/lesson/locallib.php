@@ -4430,6 +4430,22 @@ abstract class lesson_page extends lesson_base {
     }
 
     /**
+     * Update the page title.
+     *
+     * @param  string  $title   New title for the lesson page.
+     */
+    public function update_title(string $title) {
+        global $DB;
+        $record = (object) [
+            'id' => $this->properties->id,
+            'title' => $title,
+            'timemodified' => time()
+        ];
+        $DB->update_record('lesson_pages', $record);
+        \mod_lesson\event\page_updated::create_from_lesson_page($this, $this->lesson->context)->trigger();
+    }
+
+    /**
      * Updates a lesson page and its answers within the database
      *
      * @param object $properties

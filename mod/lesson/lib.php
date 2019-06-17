@@ -1883,3 +1883,41 @@ function mod_lesson_core_calendar_event_timestart_updated(\calendar_event $event
         $event->trigger();
     }
 }
+
+/**
+ * Inplace editable code. Currently only updating lesson page titles.
+ *
+ * @param  string $itemtype The type of string being edited
+ * @param  int $itemid   The id used to identify the field being edited
+ * @param  string $newvalue The new string
+ * @return \core\output\inplace_editable Inplace editable object.
+ */
+function mod_lesson_inplace_editable(string $itemtype, int $itemid, string $newvalue) : \core\output\inplace_editable {
+    global $DB, $CFG;
+    if ($itemtype == 'pagetitle') {
+        require_once($CFG->dirroot . '/mod/lesson/locallib.php');
+
+        // Retrieve the lesson page record.
+        $sql = "SELECT l.*
+                  FROM {lesson_pages} lp
+                  JOIN {lesson} l ON lp.lessonid = l.id
+                 WHERE lp.id = :pageid";
+        $lessonrecord = $DB->get_record_sql($sql, ['pageid' => $itemid]);
+        $lesson = new lesson($lessonrecord);
+
+        \external_api::validate_context($lesson->context);
+        require_capability('mod/lesson:edit', $lesson->context);
+        $lessonpage = lesson_page::load($itemid, $lesson);
+
+        if (!empty($CFG->formatstringstriptags)) {
+            $newvalue = clean_param($newvalue, PARAM_TEXT);
+        } else {
+            $newvalue = clean_param($newvalue, PARAM_CLEANHTML);
+        }
+        $lessonpage->update_title($newvalue);
+        $link = html_writer::link(new moodle_url('edit.php', ['id' => $lesson->cm->id, 'mode' => 'single', 'pageid' => $itemid]),
+                format_string($newvalue, true, ['context' => $lesson->context]));
+        return new \core\output\inplace_editable('mod_lesson', 'pagetitle', $itemid, true, $link, $newvalue,
+                get_string('updatedpagetitle', 'mod_lesson', $newvalue));
+    }
+}

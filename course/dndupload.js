@@ -208,10 +208,10 @@ M.course_dndupload = {
      * @param el the element to add events to
      */
     init_events: function(el) {
-        this.Y.on('dragenter', this.drag_enter, el, this);
-        this.Y.on('dragleave', this.drag_leave, el, this);
-        this.Y.on('dragover',  this.drag_over,  el, this);
-        this.Y.on('drop',      this.drop,       el, this);
+        // this.Y.on('dragenter', this.drag_enter, el, this);
+        // this.Y.on('dragleave', this.drag_leave, el, this);
+        // this.Y.on('dragover',  this.drag_over,  el, this);
+        // this.Y.on('drop',      this.drop,       el, this);
     },
 
     /**

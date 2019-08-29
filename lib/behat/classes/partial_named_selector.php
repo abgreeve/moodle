@@ -60,6 +60,7 @@ class behat_partial_named_selector extends \Behat\Mink\Selector\PartialNamedSele
     protected static $allowedtextselectors = array(
         'activity' => 'activity',
         'block' => 'block',
+        'card' => 'card',
         'css_element' => 'css_element',
         'dialogue' => 'dialogue',
         'fieldset' => 'fieldset',
@@ -84,6 +85,7 @@ class behat_partial_named_selector extends \Behat\Mink\Selector\PartialNamedSele
         'activity' => 'activity',
         'block' => 'block',
         'button' => 'button',
+        'card' => 'card',
         'checkbox' => 'checkbox',
         'css_element' => 'css_element',
         'dialogue' => 'dialogue',
@@ -136,6 +138,9 @@ XPATH
 .//*[@data-block][contains(concat(' ', normalize-space(@class), ' '), concat(' ', %locator%, ' ')) or
      descendant::*[self::h2|self::h3|self::h4|self::h5][normalize-space(.) = %locator%]  or
      @aria-label = %locator%]
+XPATH
+        , 'card' => <<<XPATH
+//div[contains(concat(' ', normalize-space(@class), ' '), 'card')][@role='listitem' and contains(., %locator%)]
 XPATH
         , 'dialogue' => <<<XPATH
 .//div[contains(concat(' ', normalize-space(@class), ' '), ' moodle-dialogue ') and

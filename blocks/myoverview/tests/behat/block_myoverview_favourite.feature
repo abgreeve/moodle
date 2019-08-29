@@ -25,8 +25,8 @@ Feature: The my overview block allows users to favourite their courses
 
   Scenario: Favourite a course on a course card
     Given I log in as "student1"
-    When I click on ".coursemenubtn" "css_element" in the "//div[@class='card dashboard-card' and contains(.,'Course 2')]" "xpath_element"
-    And I click on "Star this course" "link" in the "//div[@class='card dashboard-card' and contains(.,'Course 2')]" "xpath_element"
+    When I click on ".coursemenubtn" "css_element" in the "Course 2" "card"
+    And I click on "Star this course" "link" in the "Course 2" "card"
     And I reload the page
     Then "//div[@class='card dashboard-card' and contains(.,'Course 2')]//span[@data-region='is-favourite' and @aria-hidden='false']" "xpath_element" should exist
     And "//div[@class='card dashboard-card' and contains(.,'Course 2')]//span[@data-region='is-favourite' and @aria-hidden='true']" "xpath_element" should not exist
@@ -36,8 +36,8 @@ Feature: The my overview block allows users to favourite their courses
 
   Scenario: Star a course and switch display to list
     Given I log in as "student1"
-    When I click on ".coursemenubtn" "css_element" in the "//div[@class='card dashboard-card' and contains(.,'Course 5')]" "xpath_element"
-    And I click on "Star this course" "link" in the "//div[@class='card dashboard-card' and contains(.,'Course 5')]" "xpath_element"
+    When I click on ".coursemenubtn" "css_element" in the "Course 5" "card"
+    And I click on "Star this course" "link" in the "Course 5" "card"
     And I reload the page
     And I click on "Display drop-down menu" "button" in the "Course overview" "block"
     And I click on "List" "link" in the "Course overview" "block"
@@ -50,8 +50,8 @@ Feature: The my overview block allows users to favourite their courses
 
   Scenario: Star a course and switch display to summary
     Given I log in as "student1"
-    When I click on ".coursemenubtn" "css_element" in the "//div[@class='card dashboard-card' and contains(.,'Course 5')]" "xpath_element"
-    And I click on "Star this course" "link" in the "//div[@class='card dashboard-card' and contains(.,'Course 5')]" "xpath_element"
+    When I click on ".coursemenubtn" "css_element" in the "Course 5" "card"
+    And I click on "Star this course" "link" in the "Course 5" "card"
     And I reload the page
     And I click on "Display drop-down menu" "button" in the "Course overview" "block"
     And I click on "Summary" "link" in the "Course overview" "block"

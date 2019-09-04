@@ -1,7 +1,7 @@
 H5P PHP library
 ---------------
 
-Downloaded from: https://github.com/h5p/h5p-php-library.git
+Downloaded last release from: https://github.com/h5p/h5p-php-library/releases
 
 Import procedure:
 
@@ -9,10 +9,7 @@ Import procedure:
 
 Removed:
  * composer.json
-
-Renamed:
- * README.txt -> readme.txt
- * LICENSE.txt -> license.txt
+ * .gitignore
 
 Added:
  * readme_moodle.txt

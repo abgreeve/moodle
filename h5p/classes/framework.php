@@ -26,6 +26,8 @@ namespace core_h5p;
 
 defined('MOODLE_INTERNAL') || die();
 
+require_once($CFG->libdir . '/filelib.php');
+
 /**
  * Moodle's implementation of the H5P framework interface.
  *
@@ -67,13 +69,28 @@ class framework implements \H5PFrameworkInterface {
     public function fetchExternalData($url, $data = null, $blocking = true, $stream = null) {
         global $CFG;
 
+          // Get the extension of the remote file.
+            $parsedurl = parse_url($url);
+        echo    $ext = pathinfo($parsedurl['path'], PATHINFO_EXTENSION);
+
         if ($stream !== null) {
             // Download file.
             @set_time_limit(0);
 
+            // Get the extension of the remote file.
+            $parsedurl = parse_url($url);
+            $ext = pathinfo($parsedurl['path'], PATHINFO_EXTENSION);
+
             // Generate local tmp file path.
             $localfolder = $CFG->tempdir . uniqid('/h5p-');
-            $stream = $localfolder . '.h5p';
+            $stream = $localfolder;
+
+            // Add the remote file's extension to the temp file.
+            if ($ext) {
+                $stream .= '.' . $ext;
+            }
+
+            echo $stream; die();
 
             // Add folder and file paths to H5P Core.
             $interface = self::instance('interface');
@@ -465,11 +482,6 @@ class framework implements \H5PFrameworkInterface {
         if (!isset($librarydata['hasIcon'])) {
             $librarydata['hasIcon'] = 0;
         }
-        // TODO: Can we move the above code to H5PCore? It's the same for multiple
-        // implementations. Perhaps core can update the data objects before calling
-        // this function?
-        // I think maybe it's best to do this when classes are created for
-        // library, content, etc.
 
         $library = (object) array(
             'title' => $librarydata['title'],
@@ -1175,7 +1187,7 @@ class framework implements \H5PFrameworkInterface {
      * Get the amount of content items associated to a library
      * Implements getLibraryContentCount
      *
-     * return int The number of content items associated to a library
+     * return array The number of content items associated to a library
      */
     public function getLibraryContentCount() {
         global $DB;
@@ -1218,9 +1230,8 @@ class framework implements \H5PFrameworkInterface {
      * Check if user has permissions to an action
      * Implements hasPermission
      *
-     * @param  \H5PPermission $permission
+     * @param  \H5PPermission $permission The action
      * @param  int $cmid context module id
-     * @return boolean
      */
     public function hasPermission($permission, $cmid = null) {
 //        switch ($permission) {
@@ -1260,7 +1271,7 @@ class framework implements \H5PFrameworkInterface {
      *                       - machineName: The library machineName
      *                       - majorVersion: The library's majorVersion
      *                       - minorVersion: The library's minorVersion
-     * @return boolean
+     * @return boolean Whether the library has a higher version
      */
     public function libraryHasUpgrade($library) {
         global $DB;
@@ -1298,7 +1309,8 @@ class framework implements \H5PFrameworkInterface {
 
         if (!isset($interface)) {
             $interface = new \core_h5p\framework();
-            $fs = new \core_h5p\file_storage();
+            //$fs = new \core_h5p\file_storage();
+             $fs = new \stdClass();
             $language = self::get_language();
 
             $context = \context_system::instance();

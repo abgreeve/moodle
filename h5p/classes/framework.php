@@ -26,6 +26,8 @@ namespace core_h5p;
 
 defined('MOODLE_INTERNAL') || die();
 
+global $CFG;
+
 require_once($CFG->libdir . '/filelib.php');
 
 /**
@@ -69,9 +71,6 @@ class framework implements \H5PFrameworkInterface {
     public function fetchExternalData($url, $data = null, $blocking = true, $stream = null) {
         global $CFG;
 
-          // Get the extension of the remote file.
-            $parsedurl = parse_url($url);
-        echo    $ext = pathinfo($parsedurl['path'], PATHINFO_EXTENSION);
 
         if ($stream !== null) {
             // Download file.
@@ -89,8 +88,6 @@ class framework implements \H5PFrameworkInterface {
             if ($ext) {
                 $stream .= '.' . $ext;
             }
-
-            echo $stream; die();
 
             // Add folder and file paths to H5P Core.
             $interface = self::instance('interface');

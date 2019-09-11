@@ -29,6 +29,9 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 require_once($CFG->libdir . '/filelib.php');
+require_once($CFG->libdir . '/adminlib.php');
+
+require_once(__DIR__ . '/../autoloader.php');
 
 /**
  * Moodle's implementation of the H5P framework interface.

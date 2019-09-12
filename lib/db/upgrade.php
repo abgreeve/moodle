@@ -3536,7 +3536,7 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2019083000.04);
     }
 
-    if ($oldversion < 2019081600.01) {
+    if ($oldversion < 2019090500.01) {
 
         // Define table h5p_libraries to be created.
         $table = new xmldb_table('h5p_libraries');
@@ -3605,7 +3605,7 @@ function xmldb_main_upgrade($oldversion) {
         }
 
         // Main savepoint reached.
-        upgrade_main_savepoint(true, 2019081600.01);
+        upgrade_main_savepoint(true, 2019090500.01);
     }
 
     return true;

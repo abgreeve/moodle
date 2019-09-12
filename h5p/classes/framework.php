@@ -286,12 +286,12 @@ class framework implements \H5PFrameworkInterface {
         global $DB;
 
         $results = $DB->get_records('h5p_libraries', [], 'title ASC, majorversion ASC, minorversion ASC',
-                'machinename, majorversion AS major_version, minorversion AS minor_version,
+                'machinename AS machine_name, majorversion AS major_version, minorversion AS minor_version,
                 patchversion AS patch_version');
 
         $libraries = array();
         foreach ($results as $library) {
-            $libraries[$library->machinename][] = $library;
+            $libraries[$library->machine_name][] = $library;
         }
 
         return $libraries;
@@ -440,15 +440,11 @@ class framework implements \H5PFrameworkInterface {
      *                             - libraryId: The id of the library if it is an existing library.
      *                             - title: The library's name
      *                             - machineName: The library machineName
-     *                               - majorVersion: The library's majorVersion
+     *                             - majorVersion: The library's majorVersion
      *                             - minorVersion: The library's minorVersion
      *                             - patchVersion: The library's patchVersion
      *                             - runnable: 1 if the library is a content type, 0 otherwise
-     *                             - metadataSettings: Associative array containing:
-     *                                - disable: 1 if the library should not support setting metadata (copyright etc)
-     *                                - disableExtraTitleField: 1 if the library don't need the extra title field
      *                             - fullscreen(optional): 1 if the library supports fullscreen, 0 otherwise
-     *                             - embedTypes(optional): list of supported embed types
      *                             - preloadedJs(optional): list of associative arrays containing:
      *                               - path: path to a js file relative to the library root folder
      *                             - preloadedCss(optional): list of associative arrays containing:
@@ -456,8 +452,6 @@ class framework implements \H5PFrameworkInterface {
      *                             - dropLibraryCss(optional): list of associative arrays containing:
      *                               - machineName: machine name for the librarys that are to drop their css
      *                             - semantics(optional): Json describing the content structure for the library
-     *                             - language(optional): associative array containing:
-     *                               - languageCode: Translation in json format
      * @param bool $new Whether it is a new or existing library.
      * @return
      */
@@ -469,10 +463,6 @@ class framework implements \H5PFrameworkInterface {
         $preloadedcss = $this->library_parameter_values_to_csv($librarydata, 'preloadedCss', 'path');
         $droplibrarycss = $this->library_parameter_values_to_csv($librarydata, 'dropLibraryCss', 'machineName');
 
-        $embedtypes = '';
-        if (isset($librarydata['embedTypes'])) {
-            $embedtypes = implode(', ', $librarydata['embedTypes']);
-        }
         if (!isset($librarydata['semantics'])) {
             $librarydata['semantics'] = '';
         }
@@ -491,7 +481,6 @@ class framework implements \H5PFrameworkInterface {
             'patchversion' => $librarydata['patchVersion'],
             'runnable' => $librarydata['runnable'],
             'fullscreen' => $librarydata['fullscreen'],
-            'embedtypes' => $embedtypes,
             'preloadedjs' => $preloadedjs,
             'preloadedcss' => $preloadedcss,
             'droplibrarycss' => $droplibrarycss,
@@ -1181,6 +1170,7 @@ class framework implements \H5PFrameworkInterface {
 //        }
 //
 //        return $hashes;
+        return array();
     }
 
     /**
@@ -1309,8 +1299,8 @@ class framework implements \H5PFrameworkInterface {
 
         if (!isset($interface)) {
             $interface = new \core_h5p\framework();
-            //$fs = new \core_h5p\file_storage();
-             $fs = new \stdClass();
+            $fs = new \core_h5p\file_storage();
+            //$fs = new \stdClass();
             $language = self::get_language();
 
             $context = \context_system::instance();
@@ -1415,8 +1405,10 @@ class framework implements \H5PFrameworkInterface {
     private function library_parameter_values_to_csv(array $librarydata, string $key, string $searchparam = 'path') : string {
         if (isset($librarydata[$key])) {
             $parametervalues = array();
-            foreach ($librarydata[$key] as $file) {
-                $parametervalues[] = $file[$searchparam];
+            foreach ($librarydata[$key] as $key => $value) {
+                if ($key === $searchparam) {
+                    $parametervalues[] = $value;
+                }
             }
             return implode(', ', $parametervalues);
         }

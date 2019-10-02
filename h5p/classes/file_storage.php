@@ -49,16 +49,31 @@ class file_storage implements \H5PFileStorage {
     const EXPORT_FILEAREA = 'export';
 
     /**
+     * @var \context $context Currently we use the system context everywhere.
+     * Don't feel forced to keep it this way in the future.
+     */
+    protected $context;
+
+    /** @var \file_storage $fs File storage. */
+    protected $fs;
+
+    /**
+     * Initial setup for file_storage.
+     */
+    public function __construct() {
+        // Currently everything uses the system context.
+        $this->context = \context_system::instance();
+        $this->fs = get_file_storage();
+    }
+
+    /**
      * Stores a H5P library in the Moodle filesystem.
      *
-     * @param array $library
+     * @param array $library Library properties.
      */
     public function saveLibrary($library) {
-        // Libraries are stored in a system context.
-        $context = \context_system::instance();
-
         $options = [
-            'contextid' => $context->id,
+            'contextid' => $this->context->id,
             'component' => self::COMPONENT,
             'filearea' => self::LIBRARY_FILEAREA,
             'filepath' => DIRECTORY_SEPARATOR . \H5PCore::libraryToString($library, true) . DIRECTORY_SEPARATOR,
@@ -77,11 +92,8 @@ class file_storage implements \H5PFileStorage {
      * @param array $content Content properties
      */
     public function saveContent($source, $content) {
-        // Contents are stored in a course context.
-        // TODO: we are planning to use another context.
-        $context = \context_system::instance();
         $options = [
-                'contextid' => $context->id,
+                'contextid' => $this->context->id,
                 'component' => self::COMPONENT,
                 'filearea' => self::CONTENT_FILEAREA,
                 'itemid' => $content['id'],
@@ -99,11 +111,8 @@ class file_storage implements \H5PFileStorage {
      * @param array $content Content properties
      */
     public function deleteContent($content) {
-        // TODO: we are planning to use another context.
-        $context = \context_system::instance();
-
         $options = [
-                'contextid' => $context->id,
+                'contextid' => $this->context->id,
                 'component' => self::COMPONENT,
                 'filearea' => self::CONTENT_FILEAREA,
                 'itemid' => $content['id'],
@@ -140,8 +149,7 @@ class file_storage implements \H5PFileStorage {
      * @param string $target Where the content folder will be saved
      */
     public function exportContent($id, $target) {
-        $context = \context_system::instance();
-        $this->export_file_tree($target, $context->id, self::CONTENT_FILEAREA, '/', $id);
+        $this->export_file_tree($target, $this->context->id, self::CONTENT_FILEAREA, '/', $id);
     }
 
     /**
@@ -152,9 +160,8 @@ class file_storage implements \H5PFileStorage {
      */
     public function exportLibrary($library, $target) {
         $folder = \H5PCore::libraryToString($library, true);
-        $context = \context_system::instance();
-        $this->export_file_tree($target . DIRECTORY_SEPARATOR . $folder, $context->id, self::LIBRARY_FILEAREA, DIRECTORY_SEPARATOR
-                . $folder . DIRECTORY_SEPARATOR, $library['libraryId']);
+        $this->export_file_tree($target . DIRECTORY_SEPARATOR . $folder, $this->context->id, self::LIBRARY_FILEAREA,
+                DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR, $library['libraryId']);
     }
 
     /**
@@ -164,23 +171,21 @@ class file_storage implements \H5PFileStorage {
      * @param string $filename Name of export file.
      */
     public function saveExport($source, $filename) {
-        $context = \context_system::instance();
         $filerecord = [
-            'contextid' => $context->id,
+            'contextid' => $this->context->id,
             'component' => self::COMPONENT,
             'filearea' => self::EXPORT_FILEAREA,
             'itemid' => 0,
             'filepath' => '/',
             'filename' => $filename
         ];
-        $fs = get_file_storage();
-        $fs->create_file_from_pathname($filerecord, $source);
+        $this->fs->create_file_from_pathname($filerecord, $source);
     }
 
     /**
      * Removes given export file
      *
-     * @param string $filename
+     * @param string $filename filename of the export to delete.
      */
     public function deleteExport($filename) {
         $file = $this->get_export_file($filename);
@@ -192,8 +197,8 @@ class file_storage implements \H5PFileStorage {
     /**
      * Check if the given export file exists
      *
-     * @param string $filename
-     * @return boolean
+     * @param string $filename The export file to check.
+     * @return boolean True if the export file exists.
      */
     public function hasExport($filename) {
         return !!$this->get_export_file($filename);
@@ -208,22 +213,19 @@ class file_storage implements \H5PFileStorage {
      */
     public function cacheAssets(&$files, $key) {
 
-        $context = \context_system::instance();
-        $fs = get_file_storage();
-
         foreach ($files as $type => $assets) {
             if (empty($assets)) {
                 continue;
             }
 
             $content = '';
-            $content .= $this->concatenate_files($assets, $type, $context);
+            $content .= $this->concatenate_files($assets, $type, $this->context);
 
             // Create new file for cached assets.
             $ext = ($type === 'scripts' ? 'js' : 'css');
             $filename = $key . '.' . $ext;
             $fileinfo = [
-                'contextid' => $context->id,
+                'contextid' => $this->context->id,
                 'component' => self::COMPONENT,
                 'filearea' => self::CACHED_ASSETS_FILEAREA,
                 'itemid' => 0,
@@ -232,7 +234,7 @@ class file_storage implements \H5PFileStorage {
             ];
 
             // Store concatenated content.
-            $fs->create_file_from_string($fileinfo, $content);
+            $this->fs->create_file_from_string($fileinfo, $content);
             $files[$type] = [
                 (object) [
                     'path' => DIRECTORY_SEPARATOR . self::CACHED_ASSETS_FILEAREA . DIRECTORY_SEPARATOR . $filename,
@@ -249,12 +251,9 @@ class file_storage implements \H5PFileStorage {
      * @return array
      */
     public function getCachedAssets($key) {
-        $context = \context_system::instance();
-        $fs = get_file_storage();
-
         $files = [];
 
-        $js = $fs->get_file($context->id, self::COMPONENT, self::CACHED_ASSETS_FILEAREA, 0, '/', "{$key}.js");
+        $js = $this->fs->get_file($this->context->id, self::COMPONENT, self::CACHED_ASSETS_FILEAREA, 0, '/', "{$key}.js");
         if ($js && $js->get_filesize() > 0) {
             $files['scripts'] = [
                 (object) [
@@ -264,7 +263,7 @@ class file_storage implements \H5PFileStorage {
             ];
         }
 
-        $css = $fs->get_file($context->id, self::COMPONENT, self::CACHED_ASSETS_FILEAREA, 0, '/', "{$key}.css");
+        $css = $this->fs->get_file($this->context->id, self::COMPONENT, self::CACHED_ASSETS_FILEAREA, 0, '/', "{$key}.css");
         if ($css && $css->get_filesize() > 0) {
             $files['styles'] = [
                 (object) [
@@ -288,12 +287,9 @@ class file_storage implements \H5PFileStorage {
             return;
         }
 
-        $context = \context_system::instance();
-        $fs = get_file_storage();
-
         foreach ($keys as $hash) {
             foreach (['js', 'css'] as $type) {
-                $cachedasset = $fs->get_file($context->id, self::COMPONENT, self::CACHED_ASSETS_FILEAREA, 0, '/',
+                $cachedasset = $this->fs->get_file($this->context->id, self::COMPONENT, self::CACHED_ASSETS_FILEAREA, 0, '/',
                         "{$hash}.{$type}");
                 if ($cachedasset) {
                     $cachedasset->delete();
@@ -309,10 +305,6 @@ class file_storage implements \H5PFileStorage {
      * @return string contents
      */
     public function getContent($filepath) {
-        // Grab context and file storage.
-        $context = \context_system::instance();
-        $fs = get_file_storage();
-
         list('filearea' => $filearea, 'filepath' => $filepath, 'filename' => $filename) =
                     $this->get_file_elements_from_filepath($filepath);
 
@@ -322,7 +314,7 @@ class file_storage implements \H5PFileStorage {
         }
 
         // Locate file.
-        $file = $fs->get_file($context->id, self::COMPONENT, $filearea, $itemid, $filepath, $filename);
+        $file = $this->fs->get_file($this->context->id, self::COMPONENT, $filearea, $itemid, $filepath, $filename);
 
         // Return content.
         return $file->get_content();
@@ -418,11 +410,10 @@ class file_storage implements \H5PFileStorage {
      * @return string Relative path
      */
     public function getUpgradeScript($machinename, $majorversion, $minorversion) {
-        $context = \context_system::instance();
-        $fs = get_file_storage();
         $path = DIRECTORY_SEPARATOR . "{$machinename}-{$majorversion}.{$minorversion}" . DIRECTORY_SEPARATOR;
         $file = 'upgrade.js';
-        if ($fs->get_file($context->id, self::COMPONENT, self::LIBRARY_FILEAREA, 0, $path, $file)) {
+        $itemid = $this->get_itemid_for_file(self::LIBRARY_FILEAREA, $path, $file);
+        if ($this->fs->get_file($this->context->id, self::COMPONENT, self::LIBRARY_FILEAREA, $itemid, $path, $file)) {
             return DIRECTORY_SEPARATOR . self::LIBRARY_FILEAREA . $path . $file;
         } else {
             return null;
@@ -461,10 +452,14 @@ class file_storage implements \H5PFileStorage {
      * @param  array $library Library details
      */
     public function delete_library(array $library) {
-        $context = \context_system::instance();
+
+        // A library ID of false would result in all library files being deleted, which we don't want. Return instead.
+        if ($library['libraryId'] === false) {
+            return;
+        }
 
         $options = [
-            'contextid' => $context->id,
+            'contextid' => $this->context->id,
             'component' => self::COMPONENT,
             'filearea' => self::LIBRARY_FILEAREA,
             'itemid' => $library['libraryId']
@@ -483,8 +478,7 @@ class file_storage implements \H5PFileStorage {
             'component' => $component,
             'filearea' => $filearea,
             'itemid' => $itemid) = $options;
-        $fs = get_file_storage();
-        $fs->delete_area_files($contextid, $component, $filearea, $itemid);
+        $this->fs->delete_area_files($contextid, $component, $filearea, $itemid);
     }
 
     /**
@@ -497,7 +491,6 @@ class file_storage implements \H5PFileStorage {
         $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($source, \RecursiveDirectoryIterator::SKIP_DOTS),
                 \RecursiveIteratorIterator::SELF_FIRST);
 
-        $fs = get_file_storage();
         $root = $options['filepath'];
 
         $it->rewind();
@@ -512,7 +505,7 @@ class file_storage implements \H5PFileStorage {
                     $options['filepath'] = $root;
                 }
 
-                $fs->create_file_from_pathname($options, $item->getPathName());
+                $this->fs->create_file_from_pathname($options, $item->getPathName());
             }
             $it->next();
         }
@@ -535,8 +528,7 @@ class file_storage implements \H5PFileStorage {
         }
 
         // Read source files.
-        $fs = get_file_storage();
-        $files = $fs->get_directory_files($contextid, self::COMPONENT, $filearea, $itemid, $filepath, true);
+        $files = $this->fs->get_directory_files($contextid, self::COMPONENT, $filearea, $itemid, $filepath, true);
 
         foreach ($files as $file) {
             // Correct target path for file.
@@ -564,7 +556,6 @@ class file_storage implements \H5PFileStorage {
      * @return string All of the file content in one string.
      */
     private function concatenate_files(array $assets, string $type, \context $context) :string {
-        $fs = get_file_storage();
         $content = '';
         foreach ($assets as $asset) {
             // Find location of asset.
@@ -577,7 +568,7 @@ class file_storage implements \H5PFileStorage {
             }
 
             // Locate file.
-            $file = $fs->get_file($context->id, self::COMPONENT, $filearea, $fileid, $filepath, $filename);
+            $file = $this->fs->get_file($context->id, self::COMPONENT, $filearea, $fileid, $filepath, $filename);
 
             // Get file content and concatenate.
             if ($type === 'scripts') {
@@ -625,9 +616,7 @@ class file_storage implements \H5PFileStorage {
      * @return \stored_file The file for export.
      */
     private function get_export_file(string $filename) {
-        $context = \context_system::instance();
-        $fs = get_file_storage();
-        return $fs->get_file($context->id, self::COMPONENT, self::EXPORT_FILEAREA, 0, '/', $filename);
+        return $this->fs->get_file($this->context->id, self::COMPONENT, self::EXPORT_FILEAREA, 0, '/', $filename);
     }
 
     /**

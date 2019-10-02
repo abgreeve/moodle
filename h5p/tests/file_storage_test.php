@@ -533,7 +533,7 @@ class file_storage_testcase extends advanced_testcase {
             'contextid' => \context_system::instance()->id,
             'component' => file_storage::COMPONENT,
             'filearea' => file_storage::LIBRARY_FILEAREA,
-            'itemid' => 0,
+            'itemid' => 15,
             'filepath' => $filepath,
             'filename' => 'upgrade.js'
         ];
@@ -603,16 +603,36 @@ class file_storage_testcase extends advanced_testcase {
 
         // Now run the API call.
         $filestorage->saveLibrary($lib);
+
+        // Save a second library to ensure we aren't deleting all libraries, but just the one specified.
+        $basedirectory = $temppath . DIRECTORY_SEPARATOR . 'awesomelib-2.1';
+
+        $machinename = 'AwesomeLib';
+        $majorversion = 2;
+        $minorversion = 1;
+        $lib2 = $this->create_library($basedirectory, $machinename, $majorversion, $minorversion);
+
+        // Now run the API call.
+        $filestorage->saveLibrary($lib2);
+
         $records = $DB->get_records('files', ['component' => file_storage::COMPONENT,
-                'filearea' => file_storage::LIBRARY_FILEAREA, 'itemid' => $lib['libraryId']]);
-        $this->assertCount(7, $records);
+                'filearea' => file_storage::LIBRARY_FILEAREA]);
+        $this->assertCount(14, $records);
 
         $filestorage->delete_library($lib);
 
         // Let's look at the records.
         $records = $DB->get_records('files', ['component' => file_storage::COMPONENT,
-                'filearea' => file_storage::LIBRARY_FILEAREA, 'itemid' => $lib['libraryId']]);
-        $this->assertCount(0, $records);
+                'filearea' => file_storage::LIBRARY_FILEAREA]);
+        $this->assertCount(7, $records);
+
+        // Check that the db count is still the same after setting the libraryId to false.
+        $lib['libraryId'] = false;
+        $filestorage->delete_library($lib);
+
+        $records = $DB->get_records('files', ['component' => file_storage::COMPONENT,
+                'filearea' => file_storage::LIBRARY_FILEAREA]);
+        $this->assertCount(7, $records);
     }
 
     /**

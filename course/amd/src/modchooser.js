@@ -29,6 +29,7 @@ import selectors from 'core_course/local/chooser/selectors';
 import * as Templates from 'core/templates';
 import * as ModalFactory from 'core/modal_factory';
 import {get_string as getString} from 'core/str';
+import Pending from 'core/pending';
 
 /**
  * Set up the activity chooser.
@@ -37,6 +38,8 @@ import {get_string as getString} from 'core/str';
  * @param {int} courseid Course ID to use later on in fetchModules()
  */
 export const init = async(courseid) => {
+    // Add a deferred promise, mainly for Behat purposes.
+    let pendingPromise = new Pending();
 
     // Fetch all the modules available for a given course.
     const webserviceData = await fetchModules(courseid);
@@ -53,6 +56,9 @@ export const init = async(courseid) => {
     registerEventHandlers(modalMap, builtModuleData);
 
     enableInteraction(allSections);
+
+    // All of our base setup is done, let's call it done.
+    pendingPromise.resolve();
 };
 
 /**

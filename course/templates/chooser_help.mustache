@@ -33,14 +33,13 @@
     <div class="content text-left mb-5 px-5 py-4" data-region="chooser-option-summary-content-container">
         <div class="heading mb-4">
             <h5 id="optionsummary_label">
-                {{#icon}}
-                    {{>core/pix_icon}}
-                {{/icon}}
-                {{label}}
+                {{{icon}}}
+                {{title}}
             </h5>
         </div>
         <div id="optionsumary_desc" class="description" data-region="summary-description" tabindex="0">
             {{{description}}}
+            {{{help}}}
         </div>
     </div>
     <div class="actions fixed-bottom w-100 d-flex justify-content-between position-absolute py-3 px-4" data-region="chooser-option-summary-actions-container">

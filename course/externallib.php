@@ -4161,7 +4161,7 @@ class core_course_external extends external_api {
      * @param int $contentitemid the id of the content item.
      * @return stdClass the exporter content item.
      */
-    public static function add_content_item_to_user_favourites(string $componentname, int $contentitemid, int $userid) {
+    public static function add_content_item_to_user_favourites(string $componentname, int $contentitemid) {
         global $USER;
 
         [
@@ -4262,16 +4262,15 @@ class core_course_external extends external_api {
     /**
      * Given a course ID fetch all accessible modules for that course
      *
-     * @param int courseid The course we want to fetch the modules for
+     * @param int $courseid The course we want to fetch the modules for
      * @return array Contains array of modules and their metadata
-     * @throws moodle_exception
      */
     public static function get_course_content_items(int $courseid) {
         global $USER;
 
         [
             'courseid' => $courseid,
-        ] = self::validate_parameters(self::fetch_modules_activity_chooser_parameters(), [
+        ] = self::validate_parameters(self::get_course_content_items_parameters(), [
             'courseid' => $courseid,
         ]);
 

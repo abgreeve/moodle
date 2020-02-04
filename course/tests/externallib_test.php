@@ -3072,7 +3072,7 @@ class core_course_externallib_testcase extends externallib_advanced_testcase {
 
         // Using the external API, favourite a content item for the user.
         $assign = $contentitems[array_search('assign', array_column($contentitems, 'name'))];
-        $contentitem = core_course_external::add_content_item_to_user_favourites('mod_assign', $assign->id, $user->id);
+        $contentitem = core_course_external::add_content_item_to_user_favourites('mod_assign', $assign->id);
         $contentitem = external_api::clean_returnvalue(core_course_external::add_content_item_to_user_favourites_returns(),
             $contentitem);
 

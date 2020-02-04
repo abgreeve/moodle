@@ -246,7 +246,7 @@ function lti_get_shortcuts($defaultitem) {
 function lti_get_course_content_items(\core_course\local\entity\content_item $defaultmodulecontentitem, \stdClass $user,
         \stdClass $course) {
 
-    $allitems = mod_lti_get_all_content_items($defaultmodulecontentitem);
+    $allitems = mod_lti_get_content_items($defaultmodulecontentitem, $course->id);
     if ($allitems[0]->get_id() == 1) {
         // We need a cap to view the 'external tool' item in a course.
         if (!has_capability('mod/lti:addmanualinstance', context_course::instance($course->id), $user)) {
@@ -263,6 +263,18 @@ function lti_get_course_content_items(\core_course\local\entity\content_item $de
  * @return array the array of content items.
  */
 function mod_lti_get_all_content_items(\core_course\local\entity\content_item $defaultmodulecontentitem): array {
+    return mod_lti_get_content_items($defaultmodulecontentitem, SITEID);
+}
+
+/**
+ * Return all content items which can be added to any course.
+ *
+ * @param \core_course\local\entity\content_item $defaultmodulecontentitem
+ * @param  int $courseid The course ID to return the content items.
+ * @return array the array of content items.
+ */
+function mod_lti_get_content_items(\core_course\local\entity\content_item $defaultmodulecontentitem,
+        int $courseid): array {
     global $CFG;
     require_once($CFG->dirroot.'/mod/lti/locallib.php');
 
@@ -279,7 +291,7 @@ function mod_lti_get_all_content_items(\core_course\local\entity\content_item $d
     )];
 
     // Other, preconfigured tools take their own id + 1, so we'll never clash with the module's entry.
-    $preconfiguredtools = lti_get_configured_types(SITEID);
+    $preconfiguredtools = lti_get_configured_types($courseid);
     foreach ($preconfiguredtools as $preconfiguredtool) {
         $types[] = new \core_course\local\entity\content_item(
             $preconfiguredtool->id + 1,

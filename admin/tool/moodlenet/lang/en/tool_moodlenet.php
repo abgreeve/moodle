@@ -29,6 +29,10 @@ $string['enablemoodlenet'] = 'Enable the MoodleNet integration';
 $string['enablemoodlenetinfo'] = 'Enabling the integration allows users with the \'xx\' capability to browse MoodleNet from the
 activity chooser and import MoodleNet resources into their course. It also allows users to push backups from MoodleNet into Moodle.
 ';
+$string['errorduringdownload'] = 'An error occurred while downloading the file: {$a}';
+$string['importoptionguidingtext'] = 'In which format would you like the resource "{$a->name}" to be added to your course?';
+$string['importconfirm'] = 'You are about to add the resource "{$a->resourcename}" to the course "{$a->coursename}". Please confirm if this is what you intend to do.';
+$string['importconfirmnocourse'] = 'You are about to add the resource "{$a->resourcename}". Please confirm if this is what you intend to do.';
 $string['missinginvalidpostdata'] = 'The resource information from MoodleNet is either missing, or is in an incorrect format.
 If this happens repeatedly, please contact the site administrator.';
 $string['mnetprofile'] = 'MoodleNet profile';
@@ -37,3 +41,4 @@ $string['moodlenetnotenabled'] = 'The MoodleNet integration must be enabled befo
 To enable this feature, see the \'enablemoodlenet\' setting.';
 $string['pluginname'] = 'MoodleNet';
 $string['privacy:metadata'] = "The MoodleNet tool only facilitates communication with MoodleNet. It stores no data.";
+$string['uploadlimitexceeded'] = 'The file size {$a->filesize} exceeds the user upload limit of {$a->uploadlimit} bytes.';

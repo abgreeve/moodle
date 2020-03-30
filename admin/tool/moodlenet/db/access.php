@@ -15,16 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version file for tool_moodlenet
+ * Plugin capabilities.
  *
  * @package     tool_moodlenet
+ * @category    access
  * @copyright   2020 Jake Dallimore <jrhdallimore@gmail.com>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component  = 'tool_moodlenet';
-$plugin->version    = 2020031102;
-$plugin->requires   = 2020022800.01;
-$plugin->maturity   = MATURITY_ALPHA;
+$capabilities = [
+    // Ability to import files from MoodleNet sites into a course.
+    'tool/moodlenet:importfiles' => [
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => [
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW,
+        ],
+    ],
+];

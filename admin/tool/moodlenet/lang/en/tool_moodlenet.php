@@ -37,6 +37,7 @@ $string['missinginvalidpostdata'] = 'The resource information from MoodleNet is 
 If this happens repeatedly, please contact the site administrator.';
 $string['mnetprofile'] = 'MoodleNet profile';
 $string['mnetprofiledesc'] = '<p>Enter in your MoodleNet profile details here to be redirected to your profile while visiting MoodleNet.</p>';
+$string['moodlenet:importfiles'] = 'Download files from MoodleNet into Moodle courses'.
 $string['moodlenetnotenabled'] = 'The MoodleNet integration must be enabled before resource imports can be processed.
 To enable this feature, see the \'enablemoodlenet\' setting.';
 $string['pluginname'] = 'MoodleNet';

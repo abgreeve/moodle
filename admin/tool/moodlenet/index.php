@@ -96,10 +96,24 @@ echo $OUTPUT->header();
 $renderer = $PAGE->get_renderer('core');
 
 // Relevant confirmation form.
-// TODO: check extension case - might be uppercase.
-if ($extension == 'mbz') {
-    // TODO: Ask the user to confirm, and take them to the restore process.
-    $next = '/admin/tool/moodlenet/index.php'; // Place holder only.
+if ($extension == strtolower('mbz')) {
+
+    $context = [
+        'action' => 'restore_backup.php',
+        'resourceurl' => $resourceurl,
+        'resourcename' => $remoteresource->get_name() . '.' . $remoteresource->get_extension(),
+        'sesskey' => sesskey()
+    ];
+
+    if (isset($course)) {
+        $course = get_course($course);
+        $context['course'] = $course->id;
+        $context['coursename'] = $course->shortname;
+        $context['section'] = isset($section) ? $section : 0;
+    }
+
+    echo $renderer->render_from_template('tool_moodlenet/import_index', $context);
+
 } else if (!is_null($course) && !is_null($section)) {
     // Course and section are provided, so ask the user to confirm, and take them to the 'option select' view.
     $course = get_course($course);

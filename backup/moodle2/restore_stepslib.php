@@ -89,27 +89,37 @@ class restore_gradebook_structure_step extends restore_structure_step {
      protected function execute_condition() {
         global $CFG, $DB;
 
+        error_log('in execute');
+
         if ($this->get_courseid() == SITEID) {
             return false;
         }
+        error_log('passed site id CHECK!!');
 
         // No gradebook info found, don't execute
         $fullpath = $this->task->get_taskbasepath();
+        // error_log('full PATH: ' . $fullpath);
         $fullpath = rtrim($fullpath, '/') . '/' . $this->filename;
+        // $fullpath = rtrim($fullpath, '/') . $this->filename;
+        // error_log('file name: ' . $this->filename);
+        // error_log('full PATH: ' . $fullpath);
         if (!file_exists($fullpath)) {
             return false;
         }
+        error_log('passed grade book infor CHECK!!');
 
         // Some module present in backup file isn't available to restore
         // in this site, don't execute
         if ($this->task->is_missing_modules()) {
             return false;
         }
+        error_log('passed missing module CHECK!!');
 
         // Some activity has been excluded to be restored, don't execute
         if ($this->task->is_excluding_activities()) {
             return false;
         }
+        error_log('passed activities to be restored CHECK!!');
 
         // There should only be one grade category (the 1 associated with the course itself)
         // If other categories already exist we're restoring into an existing course.
@@ -117,9 +127,10 @@ class restore_gradebook_structure_step extends restore_structure_step {
         $category = new stdclass();
         $category->courseid  = $this->get_courseid();
         $catcount = $DB->count_records('grade_categories', (array)$category);
-        if ($catcount>1) {
-            return false;
-        }
+        error_log('I DO GETHERE!');
+        // if ($catcount>1) {
+        //     return false;
+        // }
 
         // Identify the backup we're dealing with.
         $backuprelease = floatval($this->get_task()->get_info()->backup_release); // The major version: 2.9, 3.0, ...
@@ -283,6 +294,8 @@ class restore_gradebook_structure_step extends restore_structure_step {
     protected function process_grade_category($data) {
         global $DB;
 
+        error_log('Please come up and thing');
+
         $data = (object)$data;
         $oldid = $data->id;
 
@@ -318,6 +331,7 @@ class restore_gradebook_structure_step extends restore_structure_step {
         }
         $this->set_mapping('grade_category', $oldid, $newitemid);
     }
+
     protected function process_grade_letter($data) {
         global $DB;
 

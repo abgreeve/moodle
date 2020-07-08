@@ -496,8 +496,8 @@ class restore_gradebook_structure_step extends restore_structure_step {
 
         $basecategory = array_shift($basecategory);
 
-        $recordsiwant = $DB->get_records('grade_categories', $conditions);
-        error_log(json_encode($recordsiwant));
+        // $recordsiwant = $DB->get_records('grade_categories', $conditions);
+        // error_log(json_encode($recordsiwant));
 
         foreach ($rs as $gc) {
             if (!empty($gc->parent)) {
@@ -507,7 +507,8 @@ class restore_gradebook_structure_step extends restore_structure_step {
                 if (isset($othercategories[$parentid])) {
                     $grade_category->parent = $basecategory->id;
                 } else if ($parentid == 0 && $gc->depth > 1) { // This is an existing category. The mapping won't work here due to it being pre-existing.
-                    $grade_category->parent = $basecategory->id;
+                // Noooo this needs expanding (was not initialy designed for this) If this is in a sub category then that needs to work.
+                    $grade_category->parent = $gc->parent;
                 } else {
                     $grade_category->parent = $parentid;
                 }
@@ -519,8 +520,8 @@ class restore_gradebook_structure_step extends restore_structure_step {
         // Clean up other categories that are now orphaned.
         $DB->delete_records_list('grade_categories', 'id', array_keys($othercategories));
 
-        $recordsiwant = $DB->get_records('grade_categories', $conditions);
-        error_log(json_encode($recordsiwant));
+        // $recordsiwant = $DB->get_records('grade_categories', $conditions);
+        // error_log(json_encode($recordsiwant));
 
         // Now we can rebuild all the paths
         $rs = $DB->get_recordset('grade_categories', $conditions);

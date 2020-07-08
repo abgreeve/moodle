@@ -51,7 +51,7 @@ class restore_plan extends base_plan implements loggable {
         }
         $backuptempdir    = make_backup_temp_directory('');
         $this->controller = $controller;
-        $this->basepath   = $backuptempdir . $controller->get_tempdir();
+        $this->basepath   = $backuptempdir . '/' . $controller->get_tempdir();
         $this->preloaded  = false;
         $this->decoder    = new restore_decode_processor($this->get_restoreid(), $this->get_info()->original_wwwroot, $CFG->wwwroot);
         $this->missingmodules = false;
@@ -88,7 +88,6 @@ class restore_plan extends base_plan implements loggable {
     }
 
     public function get_basepath() {
-        // error_log('base path: '. $this->basepath);
         return $this->basepath;
     }
 

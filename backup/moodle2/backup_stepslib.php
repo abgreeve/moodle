@@ -996,7 +996,6 @@ class backup_gradebook_structure_step extends backup_structure_step {
         if ($courseid == SITEID) {
             return false;
         }
-        error_log('EXECTU BACKU');
 
         return backup_plan_dbops::require_gradebook_backup($courseid, $this->get_backupid());
     }

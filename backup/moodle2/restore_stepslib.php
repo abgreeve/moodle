@@ -495,22 +495,19 @@ class restore_gradebook_structure_step extends restore_structure_step {
         });
 
         $basecategory = array_shift($basecategory);
-        // print_object($basecategory);
-        // print_object($othercategories);
-        // die();
 
-        // error_log(json_encode($basecategory));
-        // error_log(json_encode($othercategories));
-        // 
+        $recordsiwant = $DB->get_records('grade_categories', $conditions);
+        error_log(json_encode($recordsiwant));
+
         foreach ($rs as $gc) {
             if (!empty($gc->parent)) {
                 $grade_category = new stdClass();
                 $grade_category->id = $gc->id;
-                if (isset($othercategories[$gc->parent])) {
-                    error_log('MATCH!!!!!!!!!!!!!!!!!');
-                    $grade_category->parent = $basecategory;
+                $parentid = $this->get_mappingid('grade_category', $gc->parent);
+                if (isset($othercategories[$parentid])) {
+                    $grade_category->parent = $basecategory->id;
                 } else {
-                    $grade_category->parent = $this->get_mappingid('grade_category', $gc->parent);
+                    $grade_category->parent = $parentid;
                 }
                 $DB->update_record('grade_categories', $grade_category);
             }
@@ -518,7 +515,7 @@ class restore_gradebook_structure_step extends restore_structure_step {
         $rs->close();
 
         $recordsiwant = $DB->get_records('grade_categories', $conditions);
-        // error_log(json_encode($recordsiwant));
+        error_log(json_encode($recordsiwant));
 
         // Now we can rebuild all the paths
         $rs = $DB->get_recordset('grade_categories', $conditions);

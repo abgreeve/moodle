@@ -506,6 +506,8 @@ class restore_gradebook_structure_step extends restore_structure_step {
                 $parentid = $this->get_mappingid('grade_category', $gc->parent);
                 if (isset($othercategories[$parentid])) {
                     $grade_category->parent = $basecategory->id;
+                } else if ($parentid == 0 && $gc->depth > 1) { // This is an existing category. The mapping won't work here due to it being pre-existing.
+                    $grade_category->parent = $basecategory->id;
                 } else {
                     $grade_category->parent = $parentid;
                 }
@@ -513,6 +515,9 @@ class restore_gradebook_structure_step extends restore_structure_step {
             }
         }
         $rs->close();
+
+        // Clean up other categories that are now orphaned.
+        $DB->delete_records_list('grade_categories', 'id', array_keys($othercategories));
 
         $recordsiwant = $DB->get_records('grade_categories', $conditions);
         error_log(json_encode($recordsiwant));

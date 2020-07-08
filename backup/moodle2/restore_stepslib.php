@@ -294,7 +294,9 @@ class restore_gradebook_structure_step extends restore_structure_step {
     protected function process_grade_category($data) {
         global $DB;
 
-        error_log('Please come up and thing');
+        // error_log('Please come up and thing');
+        $coursecategory = $DB->get_record('grade_categories', ['courseid' => $this->get_courseid(), 'parent' => null]);
+        // error_log(json_encode($coursecategory));
 
         $data = (object)$data;
         $oldid = $data->id;
@@ -305,20 +307,23 @@ class restore_gradebook_structure_step extends restore_structure_step {
         $newitemid = null;
         //no parent means a course level grade category. That may have been created when the course was created
         if(empty($data->parent)) {
-            //parent was being saved as 0 when it should be null
-            $data->parent = null;
+
+            // This is a parent category from the restore file. Set this to -1 to be handled later after execution.
+            $data->parent = 0; // Didn't seem to work.
 
             //get the already created course level grade category
-            $category = new stdclass();
-            $category->courseid = $this->get_courseid();
-            $category->parent = null;
+            // $category = new stdclass();
+            // $category->courseid = $this->get_courseid();
+            // $category->parent = null;
 
-            $coursecategory = $DB->get_record('grade_categories', (array)$category);
-            if (!empty($coursecategory)) {
-                $data->id = $newitemid = $coursecategory->id;
-                $DB->update_record('grade_categories', $data);
-            }
+            // $coursecategory = $DB->get_record('grade_categories', (array)$category);
+            // if (!empty($coursecategory)) {
+            //     $data->id = $newitemid = $coursecategory->id;
+            //     $DB->update_record('grade_categories', $data);
+            // }
         }
+
+        // error_log(json_encode($data));
 
         // Add a warning about a removed setting.
         if (!empty($data->aggregatesubcats)) {
@@ -475,15 +480,45 @@ class restore_gradebook_structure_step extends restore_structure_step {
 
         $rs = $DB->get_recordset('grade_categories', $conditions);
         // Get all the parents correct first as grade_category::build_path() loads category parents from the DB
+        // Oh my god this function is horrible, from the name how are you supposed to know that this creates a course category?
+        // $basecategory = grade_category::fetch_course_category($this->get_courseid());
+        $sql = "SELECT *
+                  FROM {grade_categories}
+                 WHERE courseid = :courseid AND (parent IS NULL OR parent = 0)";
+        $parentcategories = $DB->get_records_sql($sql, ['courseid' => $this->get_courseid()]);
+;
+        $basecategory = array_filter($parentcategories, function($category) {
+            return !isset($category->parent);
+        });
+        $othercategories = array_filter($parentcategories, function($category) {
+            return (isset($category->parent) && empty($category->parent));
+        });
+
+        $basecategory = array_shift($basecategory);
+        // print_object($basecategory);
+        // print_object($othercategories);
+        // die();
+
+        // error_log(json_encode($basecategory));
+        // error_log(json_encode($othercategories));
+        // 
         foreach ($rs as $gc) {
             if (!empty($gc->parent)) {
                 $grade_category = new stdClass();
                 $grade_category->id = $gc->id;
-                $grade_category->parent = $this->get_mappingid('grade_category', $gc->parent);
+                if (isset($othercategories[$gc->parent])) {
+                    error_log('MATCH!!!!!!!!!!!!!!!!!');
+                    $grade_category->parent = $basecategory;
+                } else {
+                    $grade_category->parent = $this->get_mappingid('grade_category', $gc->parent);
+                }
                 $DB->update_record('grade_categories', $grade_category);
             }
         }
         $rs->close();
+
+        $recordsiwant = $DB->get_records('grade_categories', $conditions);
+        // error_log(json_encode($recordsiwant));
 
         // Now we can rebuild all the paths
         $rs = $DB->get_recordset('grade_categories', $conditions);

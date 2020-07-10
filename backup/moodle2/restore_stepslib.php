@@ -349,6 +349,21 @@ class restore_gradebook_structure_step extends restore_structure_step {
     protected function after_execute() {
         global $DB;
 
+        $sql = "SELECT *
+                  FROM {grade_categories}
+                 WHERE courseid = :courseid AND (parent IS NULL OR parent = 0)";
+        $parentcategories = $DB->get_records_sql($sql, ['courseid' => $this->get_courseid()]);
+
+        $basecategory = array_filter($parentcategories, function($category) {
+            return !isset($category->parent);
+        });
+        $othercategories = array_filter($parentcategories, function($category) {
+            return (isset($category->parent) && empty($category->parent));
+        });
+        print_object($othercategories);
+
+        $basecategory = array_shift($basecategory);
+
         $conditions = array(
             'backupid' => $this->get_restoreid(),
             'itemname' => 'grade_item'//,
@@ -372,7 +387,12 @@ class restore_gradebook_structure_step extends restore_structure_step {
                 if (!empty($grade_item_backup->parentitemid)) {
                     $oldcategoryid = $this->get_mappingid('grade_category', $grade_item_backup->parentitemid, null);
                     if (!is_null($oldcategoryid)) {
-                        $updateobj->categoryid = $oldcategoryid;
+                        if (isset($othercategories[$oldcategoryid])) {
+                            $updateobj->categoryid = $basecategory->id;
+                        } else {
+
+                            $updateobj->categoryid = $oldcategoryid;
+                        }
                         $DB->update_record('grade_items', $updateobj);
                     }
                 } else {
@@ -443,22 +463,6 @@ class restore_gradebook_structure_step extends restore_structure_step {
         // Get all the parents correct first as grade_category::build_path() loads category parents from the DB
         // Oh my god this function is horrible, from the name how are you supposed to know that this creates a course category?
         // $basecategory = grade_category::fetch_course_category($this->get_courseid());
-        $sql = "SELECT *
-                  FROM {grade_categories}
-                 WHERE courseid = :courseid AND (parent IS NULL OR parent = 0)";
-        $parentcategories = $DB->get_records_sql($sql, ['courseid' => $this->get_courseid()]);
-;
-        $basecategory = array_filter($parentcategories, function($category) {
-            return !isset($category->parent);
-        });
-        $othercategories = array_filter($parentcategories, function($category) {
-            return (isset($category->parent) && empty($category->parent));
-        });
-
-        $basecategory = array_shift($basecategory);
-
-        // $recordsiwant = $DB->get_records('grade_categories', $conditions);
-        // error_log(json_encode($recordsiwant));
 
         foreach ($rs as $gc) {
             if (!empty($gc->parent)) {
@@ -480,9 +484,6 @@ class restore_gradebook_structure_step extends restore_structure_step {
 
         // Clean up other categories that are now orphaned.
         $DB->delete_records_list('grade_categories', 'id', array_keys($othercategories));
-
-        // $recordsiwant = $DB->get_records('grade_categories', $conditions);
-        // error_log(json_encode($recordsiwant));
 
         // Now we can rebuild all the paths
         $rs = $DB->get_recordset('grade_categories', $conditions);

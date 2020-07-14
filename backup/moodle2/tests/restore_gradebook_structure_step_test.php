@@ -89,4 +89,79 @@ class core_backup_restore_gradebook_structure_step_testcase extends advanced_tes
         // Check the result.
         $this->assertFileEquals($expected, $filepath);
     }
+
+    /**
+     * @dataProvider stuff_provider
+     * @param  [type] $data     [description]
+     * @param  [type] $expected [description]
+     */
+    public function test_my_stuff($data, $expected) {
+        global $DB;
+        $this->resetAfterTest();
+        $restore = $this->getMockBuilder('\restore_gradebook_structure_step')
+            ->setMethods(['get_courseid', 'set_mapping'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $restore->method('get_courseid')
+                ->willReturn(5);
+
+        $restore->method('set_mapping')
+                ->willReturn(0);
+
+        $rc = new \ReflectionClass('\restore_gradebook_structure_step');
+        $rcm = $rc->getMethod('process_grade_category');
+        $rcm->setAccessible(true);
+        $rcm->invoke($restore, $data);
+
+        $records = $DB->get_records('grade_categories');
+        $record = array_shift($records);
+        $this->assertEquals($expected, $record->parent);
+    }
+
+    public function stuff_provider() {
+        $generaldata = [
+            'courseid' => 42,
+            'aggregation' => 13,
+            'keephigh' => 0,
+            'droplow' => 0,
+            'aggregateonlygraded' => 1,
+            'aggregateoutcomes' => 0,
+            'timecreated' => time(),
+            'timemodified' => time(),
+            'hidden' => 0
+        ];
+
+        $cat1 = [
+            'id' => 1,
+            'parent' => null,
+            'depth' => 1,
+            'path' => '/1/',
+            'fullname' => '?'
+        ];
+        $cat1 = array_merge($cat1, $generaldata);
+
+        $cat2 = [
+            'id' => 2,
+            'parent' => 1,
+            'depth' => 2,
+            'path' => '/1/2/',
+            'fullname' => 'test cat 2'
+        ];
+        $cat2 = array_merge($cat2, $generaldata);
+
+        $cat3 = [
+            'id' => 3,
+            'parent' => 2,
+            'depth' => 3,
+            'path' => '/1/2/3/',
+            'fullname' => 'test cat 3'
+        ];
+        $cat3 = array_merge($cat3, $generaldata);
+        return [
+            'parent category' => [(object) $cat1, 0],
+            'sub category' => [(object) $cat2, 1],
+            'sub sub category' => [(object) $cat3, 2],
+        ];
+    }
 }

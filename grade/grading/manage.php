@@ -220,12 +220,24 @@ if (!empty($method)) {
     }
 
     // TODO Check if this grading method supports export. Same for import.
-    if ($manager->get_active_method() == 'rubric') {
+    $functions = get_plugin_list_with_function('gradingform', 'report_export_formats');
+    $grademethodfullname = 'gradingform_' . $method;
+    if (isset($functions[$grademethodfullname])) {
         if (isset($definition)) {
-            $url = new moodle_url('/grade/grading/export.php', ['areaid' => $controller->get_areaid()]);
-            echo $output->management_action_icon($url, get_string('exportgradingform', 'core_grading'), 'i/emojicategorytravelplaces');
+            $result = $functions[$grademethodfullname]();
+            if (count($result) > 1) {
+                // Let's go!
+                $url = new moodle_url('/grade/grading/export.php', ['areaid' => $controller->get_areaid()]);
+                echo $output->management_thingy($url, get_string('exportgradingform', 'core_grading'),
+                    'i/emojicategorytravelplaces', json_encode(['types' => $result]));
+            } else {
+                $url = new moodle_url('/grade/grading/export.php', ['areaid' => $controller->get_areaid()]);
+                echo $output->management_action_icon($url, get_string('exportgradingform', 'core_grading'),
+                    'i/emojicategorytravelplaces');
+            }
         } else {
-            echo $output->management_action_icon(new moodle_url('/grade/grading/import.php', ['areaid' => $controller->get_areaid()]),
+            echo $output->management_action_icon(new moodle_url('/grade/grading/import.php',
+                ['areaid' => $controller->get_areaid(), 'gradingmethod' => $grademethodfullname]),
                 get_string('importgradingform', 'core_grading'), 'i/down');
         }
     }

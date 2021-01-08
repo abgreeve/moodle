@@ -27,19 +27,9 @@ require_once(__DIR__.'/lib.php');
 
 $areaid = optional_param('areaid', null, PARAM_INT);
 $gradingmethod = optional_param('gradingmethod', 'gradingform_rubric', PARAM_PLUGIN);
-$format = optional_param('format', null, PARAM_RAW); // TODO change to a better type.
 
-// echo 'get the download options';
-
-// $pluginlist = get_plugin_list_with_function('gradingform', 'report_export_formats');
-// $options = $pluginlist[$gradingmethod]();
-// print_object($options);
-
-// TODO Add form to select export format.
-$format = 'imsspecification';
-
-
-// print_object($areaid);
+$pluginlist = get_plugin_list_with_function('gradingform', 'report_import_formats');
+$options = $pluginlist[$gradingmethod]();
 
 // get all information about this rubric
 
@@ -53,7 +43,7 @@ $PAGE->set_url(new \moodle_url('/grade/grading/import.php', ['areaid' => $areaid
 $controller = $manager->get_controller('rubric');
 
 // Make a form to upload a file for processing.
-$mform = new \core_grading\form\import_form('', ['areaid' => $areaid]);
+$mform = new \core_grading\form\import_form('', ['areaid' => $areaid, 'importtypes' => $options]);
 
 if ($data = $mform->get_data()) {
 
@@ -72,8 +62,8 @@ if ($data = $mform->get_data()) {
         exit();
     }
 
-    $importmanager = new \gradingform_rubric\local\import\manager($exportstring, $areaid);
-    $translatedobject = $importmanager->translate_data();
+    $formfunctions = get_plugin_list_with_function('gradingform', 'import_from_file');
+    $translatedobject = $formfunctions[$gradingmethod]($exportstring, $areaid, $data->importtype);
     $controller->update_definition($translatedobject);
 
     redirect(new \moodle_url('/grade/grading/manage.php', ['areaid' => $areaid]));

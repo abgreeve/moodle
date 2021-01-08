@@ -50,6 +50,9 @@ class import_form extends \moodleform {
             null, $filemanageroptions);
         $mform->addRule('advancedgradingimport', null, 'required');
 
+        foreach ($this->_customdata['importtypes'] as $key => $value) {
+            $mform->addElement('radio', 'importtype', 'Import type', $value['title'], $key);
+        }
 
         $mform->addElement('submit', 'import stuff', 'Import');
     }

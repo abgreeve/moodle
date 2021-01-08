@@ -1731,6 +1731,28 @@ $capabilities = array(
         ),
     ),
 
+    // Ability to export a grading method to a file, such as a rubric into a JSON format file.
+    'moodle/grade:exportgradingforms' => array(
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW
+        ),
+    ),
+
+    // Ability to import a grading method from a file, such as a rubric from a JSON format file.
+    'moodle/grade:importgradingforms' => array(
+        // 'riskbitmask' => RISK_XSS, // @TODO determine if this is possible.
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW
+        ),
+    ),
+
+
     'moodle/grade:manageoutcomes' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,

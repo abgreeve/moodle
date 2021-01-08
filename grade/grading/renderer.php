@@ -64,9 +64,16 @@ class core_grading_renderer extends plugin_renderer_base {
      */
     public function management_action_icon(moodle_url $url, $text, $icon) {
 
-        $img = $this->output->pix_icon($icon, '');
+        $img = $this->output->pix_icon($icon, '', 'moodle', ['class' => 'iconsize-big']);
         $txt = html_writer::tag('div', $text, array('class' => 'action-text'));
         return html_writer::link($url, $img . $txt, array('class' => 'action btn btn-lg'));
+    }
+
+    public function management_thingy($url, $text, $icon, $datastuff) {
+        $img = $this->output->pix_icon($icon, '', 'moodle', ['class' => 'iconsize-big']);
+        $txt = html_writer::tag('div', $text, ['class' => 'action-text']);
+        $this->page->requires->js_call_amd('core_grades/export_type_selector', 'init');
+        return html_writer::link($url, $img . $txt, ['class' => 'action btn btn-lg', 'data-thing' => 'true', 'data-export-types' => $datastuff]);
     }
 
     /**

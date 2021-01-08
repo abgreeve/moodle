@@ -462,6 +462,7 @@ $string['itemname'] = 'Item name';
 $string['itemnamehelp'] = 'The name of this item, pushed in by the module.';
 $string['items'] = 'Items';
 $string['itemsedit'] = 'Edit grade item';
+$string['jsonimporterror'] = 'There was a problem importing the JSON file. Please double check the content of the file to ensure that it is a valid JSON string.';
 $string['keephigh'] = 'Keep the highest';
 $string['keephighestvalues'] = 'Keep the {$a} highest values';
 $string['keephigh_help'] = 'If set, this option will only keep the X highest grades, X being the selected value for this option.';

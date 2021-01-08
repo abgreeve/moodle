@@ -224,6 +224,41 @@ if (!empty($method)) {
         echo $output->management_action_icon($pickurl,
             get_string('manageactionclone', 'core_grading'), 'b/edit-copy');
     }
+
+    $grademethodfullname = 'gradingform_' . $method;
+    $exportdefinitiontypes = \core_grading\transfer_factory::get_export_definition_types($method);
+
+    if (isset($exportdefinitiontypes)) {
+        if (isset($definition)) {
+            if (has_capability('moodle/grade:exportgradingforms', $context)) {
+                if (count($exportdefinitiontypes) > 1) {
+                    $typedata = \core_grading\transfer_factory::get_definition_and_extension_data($method);
+                    $url = new moodle_url(
+                        '/grade/grading/export.php',
+                        ['gradingmethod' => $grademethodfullname,
+                        'areaid' => $controller->get_areaid()]
+                    );
+                    echo $output->management_thingy($url, get_string('exportgradingform', 'core_grading'),
+                        'i/emojicategorytravelplaces', json_encode($typedata));
+                } else {
+
+                    // We have one or less results. Try and send back the details of the one.
+                    $format = $exportdefinitiontypes[0];
+
+                    $params = ['gradingmethod' => $grademethodfullname, 'areaid' => $controller->get_areaid(), 'format' => $format];
+                    $url = new moodle_url('/grade/grading/export.php', $params);
+                    echo $output->management_action_icon($url, get_string('exportgradingform', 'core_grading'),
+                        'i/emojicategorytravelplaces');
+                }
+            }
+        } else {
+            if (has_capability('moodle/grade:importgradingforms', $context)) {
+                echo $output->management_action_icon(new moodle_url('/grade/grading/import.php',
+                    ['areaid' => $controller->get_areaid(), 'gradingmethod' => $grademethodfullname]),
+                    get_string('importgradingform', 'core_grading'), 'i/down');
+            }
+        }
+    }
     echo $output->container_end();
 
     // display the message if the form is currently not available (if applicable)
@@ -241,6 +276,5 @@ if (!empty($method)) {
         echo $output->box($controller->render_preview($PAGE), 'definition-preview');
     }
 }
-
 
 echo $output->footer();

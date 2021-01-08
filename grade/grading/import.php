@@ -1,0 +1,88 @@
+<?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Export of advanced grading method to XML.
+ *
+ * @package    core_grading
+ * @copyright  2020 Adrian Greeve <adrian@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+require(__DIR__.'/../../config.php');
+require_once(__DIR__.'/lib.php');
+
+$areaid = optional_param('areaid', null, PARAM_INT);
+$gradingmethod = optional_param('gradingmethod', 'gradingform_rubric', PARAM_PLUGIN);
+$format = optional_param('format', null, PARAM_RAW); // TODO change to a better type.
+
+// echo 'get the download options';
+
+// $pluginlist = get_plugin_list_with_function('gradingform', 'report_export_formats');
+// $options = $pluginlist[$gradingmethod]();
+// print_object($options);
+
+// TODO Add form to select export format.
+$format = 'imsspecification';
+
+
+// print_object($areaid);
+
+// get all information about this rubric
+
+$manager = get_grading_manager($areaid);
+
+list($context, $course, $cm) = get_context_info_array($manager->get_context()->id);
+require_login($course, true, $cm);
+
+$PAGE->set_url(new \moodle_url('/grade/grading/import.php', ['areaid' => $areaid]));
+
+$controller = $manager->get_controller('rubric');
+
+// Make a form to upload a file for processing.
+$mform = new \core_grading\form\import_form('', ['areaid' => $areaid]);
+
+if ($data = $mform->get_data()) {
+
+    require_sesskey();
+
+    // Get the file from the users draft area.
+    $usercontext = context_user::instance($USER->id);
+    $fs = get_file_storage();
+    $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data->advancedgradingimport, 'id', false);
+    $file = reset($files);
+    $stufftouse = $file->get_content();
+
+    $exportstring = json_decode($stufftouse);
+    if (is_null($exportstring)) {
+        print_error('jsonimporterror', 'grades', new \moodle_url('/grade/grading/manage.php', ['areaid' => $areaid]));
+        exit();
+    }
+
+    $importmanager = new \gradingform_rubric\local\import\manager($exportstring, $areaid);
+    $translatedobject = $importmanager->translate_data();
+    $controller->update_definition($translatedobject);
+
+    redirect(new \moodle_url('/grade/grading/manage.php', ['areaid' => $areaid]));
+
+    exit();
+}
+
+echo $OUTPUT->header();
+echo $OUTPUT->box_start();
+$mform->display();
+echo $OUTPUT->box_end();
+echo $OUTPUT->footer();

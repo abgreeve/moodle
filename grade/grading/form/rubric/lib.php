@@ -983,3 +983,22 @@ class gradingform_rubric_instance extends gradingform_instance {
         return $html;
     }
 }
+
+function gradingform_rubric_report_export_formats(): array {
+    return [
+        'imsspecification' => [
+            'title' => 'IMS specification json file',
+            'help' => 'This json file is in a format that adheres to the IMS specification. It can be imported back into Moodle or other places that also follow the specification.'
+        ],
+        'moodlebasic' => [
+            'title' => 'Moodle basic export format',
+            'help' => 'Very basic export'
+        ]
+    ];
+}
+
+function gradingform_rubric_convert_to_export_format(stdClass $data, string $format): stdClass {
+    // Call our own internal stuff.
+    $manager = new \gradingform_rubric\local\export\manager($data);
+    return $manager->translate_data();
+}

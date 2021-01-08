@@ -218,7 +218,19 @@ if (!empty($method)) {
         echo $output->management_action_icon($pickurl,
             get_string('manageactionclone', 'core_grading'), 'b/edit-copy');
     }
+
+    // TODO Check if this grading method supports export. Same for import.
+    if ($manager->get_active_method() == 'rubric') {
+        if (isset($definition)) {
+            $url = new moodle_url('/grade/grading/export.php', ['areaid' => $controller->get_areaid()]);
+            echo $output->management_action_icon($url, get_string('exportgradingform', 'core_grading'), 'i/emojicategorytravelplaces');
+        } else {
+            echo $output->management_action_icon(new moodle_url('/grade/grading/import.php', ['areaid' => $controller->get_areaid()]),
+                get_string('importgradingform', 'core_grading'), 'i/down');
+        }
+    }
     echo $output->container_end();
+
 
     // display the message if the form is currently not available (if applicable)
     if ($message = $controller->form_unavailable_notification()) {

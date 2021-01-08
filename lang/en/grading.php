@@ -30,6 +30,7 @@ $string['activemethodinfonone'] = 'There is no advanced grading method selected 
 $string['changeactivemethod'] = 'Change active grading method to';
 $string['clicktoclose'] = 'click to close';
 $string['exc_gradingformelement'] = 'Unable to instantiate grading form element';
+$string['exportgradingform'] = 'Export this form definition';
 $string['formnotavailable'] = 'An advanced grading method was selected to use but the grading form is not available yet. You may need to define it first via a link in the actions menu or administration block.';
 $string['gradingformunavailable'] = 'Please note: the advanced grading form is not ready at the moment. Simple grading method will be used until the form has a valid status.';
 $string['gradingmanagement'] = 'Advanced grading';
@@ -40,6 +41,7 @@ $string['gradingmethod_help'] = 'Choose the advanced grading method that should 
 To disable advanced grading and switch back to the default grading mechanism, choose \'Simple direct grading\'.';
 $string['gradingmethodnone'] = 'Simple direct grading';
 $string['gradingmethods'] = 'Grading methods';
+$string['importgradingform'] = 'Import form definition';
 $string['manageactionclone'] = 'Create new grading form from a template';
 $string['manageactiondelete'] = 'Delete the currently defined form';
 $string['manageactiondeleteconfirm'] = 'You are going to delete the grading form \'{$a->formname}\' and all the associated information from \'{$a->component} ({$a->area})\'. Please make sure you understand the following consequences:

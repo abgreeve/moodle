@@ -111,16 +111,6 @@ class restore_gradebook_structure_step extends restore_structure_step {
             return false;
         }
 
-        // There should only be one grade category (the 1 associated with the course itself)
-        // If other categories already exist we're restoring into an existing course.
-        // Restoring categories into a course with an existing category structure is unlikely to go well
-        $category = new stdclass();
-        $category->courseid  = $this->get_courseid();
-        $catcount = $DB->count_records('grade_categories', (array)$category);
-        if ($catcount>1) {
-            return false;
-        }
-
         // Identify the backup we're dealing with.
         $backuprelease = $this->get_task()->get_info()->backup_release; // The major version: 2.9, 3.0, 3.10...
         $backupbuild = 0;
@@ -293,22 +283,10 @@ class restore_gradebook_structure_step extends restore_structure_step {
         $data->course = $this->get_courseid();
         $data->courseid = $data->course;
 
-        $newitemid = null;
         //no parent means a course level grade category. That may have been created when the course was created
         if(empty($data->parent)) {
-            //parent was being saved as 0 when it should be null
-            $data->parent = null;
-
-            //get the already created course level grade category
-            $category = new stdclass();
-            $category->courseid = $this->get_courseid();
-            $category->parent = null;
-
-            $coursecategory = $DB->get_record('grade_categories', (array)$category);
-            if (!empty($coursecategory)) {
-                $data->id = $newitemid = $coursecategory->id;
-                $DB->update_record('grade_categories', $data);
-            }
+            // This is a parent category from the restore file. Set this to 0 to be handled later after execution.
+            $data->parent = 0;
         }
 
         // Add a warning about a removed setting.
@@ -317,11 +295,11 @@ class restore_gradebook_structure_step extends restore_structure_step {
         }
 
         //need to insert a course category
-        if (empty($newitemid)) {
-            $newitemid = $DB->insert_record('grade_categories', $data);
-        }
+        $newitemid = $DB->insert_record('grade_categories', $data);
+
         $this->set_mapping('grade_category', $oldid, $newitemid);
     }
+
     protected function process_grade_letter($data) {
         global $DB;
 
@@ -373,40 +351,18 @@ class restore_gradebook_structure_step extends restore_structure_step {
     protected function after_execute() {
         global $DB;
 
-        $conditions = array(
-            'backupid' => $this->get_restoreid(),
-            'itemname' => 'grade_item'//,
-            //'itemid'   => $itemid
-        );
-        $rs = $DB->get_recordset('backup_ids_temp', $conditions);
+        $select = 'courseid = :courseid AND (parent IS NULL OR parent = 0)';
+        $parentcategories = $DB->get_records_select('grade_categories', $select, ['courseid' => $this->get_courseid()]);
 
-        // We need this for calculation magic later on.
-        $mappings = array();
+        $basecategory = array_filter($parentcategories, function($category) {
+            return !isset($category->parent);
+        });
+        $othercategories = array_filter($parentcategories, function($category) {
+            return (isset($category->parent) && $category->parent == 0);
+        });
 
-        if (!empty($rs)) {
-            foreach($rs as $grade_item_backup) {
-
-                // Store the oldid with the new id.
-                $mappings[$grade_item_backup->itemid] = $grade_item_backup->newitemid;
-
-                $updateobj = new stdclass();
-                $updateobj->id = $grade_item_backup->newitemid;
-
-                //if this is an activity grade item that needs to be put back in its correct category
-                if (!empty($grade_item_backup->parentitemid)) {
-                    $oldcategoryid = $this->get_mappingid('grade_category', $grade_item_backup->parentitemid, null);
-                    if (!is_null($oldcategoryid)) {
-                        $updateobj->categoryid = $oldcategoryid;
-                        $DB->update_record('grade_items', $updateobj);
-                    }
-                } else {
-                    //mark course and category items as needing to be recalculated
-                    $updateobj->needsupdate=1;
-                    $DB->update_record('grade_items', $updateobj);
-                }
-            }
-        }
-        $rs->close();
+        $basecategory = array_shift($basecategory);
+        $mappings = $this->update_grade_items($basecategory, $othercategories);
 
         // We need to update the calculations for calculated grade items that may reference old
         // grade item ids using ##gi\d+##.
@@ -458,23 +414,17 @@ class restore_gradebook_structure_step extends restore_structure_step {
         }
         $rs->close();
 
-        // Need to correct the grade category path and parent
+        // Need to correct the grade category parent.
+        $orphanedcategories = $this->set_grade_category_parents($basecategory, $othercategories);
+        // Array_merge will reindex the array keys which we need.
+        $categoiestodelete = $othercategories + $orphanedcategories;
+
+        // Need to clean up everything associated with the orphaned categories.
+        $this->delete_categories_and_related_items_and_grades(array_keys($categoiestodelete));
+
         $conditions = array(
             'courseid' => $this->get_courseid()
         );
-
-        $rs = $DB->get_recordset('grade_categories', $conditions);
-        // Get all the parents correct first as grade_category::build_path() loads category parents from the DB
-        foreach ($rs as $gc) {
-            if (!empty($gc->parent)) {
-                $grade_category = new stdClass();
-                $grade_category->id = $gc->id;
-                $grade_category->parent = $this->get_mappingid('grade_category', $gc->parent);
-                $DB->update_record('grade_categories', $grade_category);
-            }
-        }
-        $rs->close();
-
         // Now we can rebuild all the paths
         $rs = $DB->get_recordset('grade_categories', $conditions);
         foreach ($rs as $gc) {
@@ -497,6 +447,121 @@ class restore_gradebook_structure_step extends restore_structure_step {
 
         // Restore marks items as needing update. Update everything now.
         grade_regrade_final_grades($this->get_courseid());
+    }
+
+    /**
+     * Updates grade items and puts them into the correct category.
+     *
+     * @param stdClass $basecategory The first category that all other categories and grade items stem from.
+     * @param stdClass[] $othercategories Other categories that have been marked to have the parent updated.
+     * @return array mappings to be used for updating grade item calculations.
+     */
+    protected function update_grade_items(?stdClass $basecategory, array $othercategories): array {
+        global $DB;
+
+        $conditions = [
+            'backupid' => $this->get_restoreid(),
+            'itemname' => 'grade_item'
+        ];
+        $recordset = $DB->get_recordset('backup_ids_temp', $conditions);
+
+        // We need this for calculation magic later on.
+        $mappings = [];
+
+        if (!empty($recordset)) {
+            foreach ($recordset as $gradeitembackup) {
+
+                // Store the oldid with the new id.
+                $mappings[$gradeitembackup->itemid] = $gradeitembackup->newitemid;
+
+                $updateobject = new stdclass();
+                $updateobject->id = $gradeitembackup->newitemid;
+
+                // If this is an activity grade item that needs to be put back in its correct category.
+                if (!empty($gradeitembackup->parentitemid)) {
+                    $oldcategoryid = $this->get_mappingid('grade_category', $gradeitembackup->parentitemid, null);
+                    if (!is_null($oldcategoryid)) {
+                        $updateobject->categoryid = isset($othercategories[$oldcategoryid]) ? $basecategory->id : $oldcategoryid;
+                    }
+                } else {
+                    // Mark course and category items as needing to be recalculated.
+                    $updateobject->needsupdate = 1;
+                }
+                $DB->update_record('grade_items', $updateobject);
+            }
+        }
+        $recordset->close();
+        return $mappings;
+    }
+
+    /**
+     * Sets the category parent for grade categories in this course.
+     *
+     * @param stdClass $basecategory The first category that all other categories and grade items stem from.
+     * @param stdClass[] $othercategories Other categories that have been marked to have the parent updated.
+     * @return array Orphaned categories that should be deleted.
+     */
+    protected function set_grade_category_parents(?stdClass $basecategory, array $othercategories): array {
+        global $DB;
+
+        $recordset = $DB->get_recordset('grade_categories', ['courseid' => $this->get_courseid()]);
+
+        $orphanedcategories = [];
+
+        foreach ($recordset as $category) {
+            if (!empty($category->parent)) {
+                $gradecategory = new stdClass();
+                $gradecategory->id = $category->id;
+                $parentid = $this->get_mappingid('grade_category', $category->parent);
+                if (isset($othercategories[$parentid])) {
+                    $gradecategory->parent = $basecategory->id;
+                } else if ($parentid == 0 && $category->depth > 1) {
+
+                    $pathitems = explode('/', $category->path);
+                    $baseparent = $pathitems[1];
+
+                    // If the base path does not match the new base category, then we are in a situation where we are
+                    // deleting the existing course data and replacing it with restored course data.
+                    // Flag for deletion.
+                    if ($baseparent != $basecategory->id) {
+                        $orphanedcategories[$category->id] = $category;
+                        continue;
+                    }
+                    // This is an existing category. The mapping won't work here due to it being pre-existing.
+                    $gradecategory->parent = $category->parent;
+                } else {
+                    $gradecategory->parent = $parentid;
+                }
+                $DB->update_record('grade_categories', $gradecategory);
+            }
+        }
+        $recordset->close();
+        return $orphanedcategories;
+    }
+
+    /**
+     * Deletes grade categories and their related grade items and grade grades.
+     *
+     * @param  array  $categoryids A list of category IDs to delete
+     */
+    protected function delete_categories_and_related_items_and_grades(array $categoryids): void {
+        global $DB;
+
+        if (!empty($categoryids)) {
+            list($sql, $params) = $DB->get_in_or_equal($categoryids, SQL_PARAMS_NAMED);
+            $params['courseid'] = $this->get_courseid();
+
+            $gradegradesql = "SELECT gg.id
+                                FROM {grade_grades} gg
+                                JOIN {grade_items} gi ON gg.itemid = gi.id
+                               WHERE gi.categoryid $sql AND gi.courseid = :courseid";
+
+            $gradegradestodelete = $DB->get_records_sql($gradegradesql, $params);
+
+            $DB->delete_records_list('grade_grades', 'id', $gradegradestodelete);
+            $DB->delete_records_select('grade_items', 'categoryid ' . $sql . 'AND courseid = :courseid', $params);
+            $DB->delete_records_list('grade_categories', 'id', $categoryids);
+        }
     }
 
     /**

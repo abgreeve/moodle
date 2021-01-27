@@ -89,4 +89,639 @@ class core_backup_restore_gradebook_structure_step_testcase extends advanced_tes
         // Check the result.
         $this->assertFileEquals($expected, $filepath);
     }
+
+    /**
+     * Test processing a grade category on import.
+     *
+     * @dataProvider basic_category_provider
+     * @param  stdClass $data A category to process
+     * @param  int $expected The expected parent id for the category.
+     */
+    public function test_process_grade_category(stdClass $data, int $expected): void {
+        global $DB;
+        $this->resetAfterTest();
+        $restore = $this->getMockBuilder('\restore_gradebook_structure_step')
+            ->setMethods(['get_courseid', 'set_mapping'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $restore->method('get_courseid')
+            ->willReturn(5);
+
+        $restore->method('set_mapping')
+            ->willReturn(0);
+
+        $rc = new \ReflectionClass('\restore_gradebook_structure_step');
+        $rcm = $rc->getMethod('process_grade_category');
+        $rcm->setAccessible(true);
+        $rcm->invoke($restore, $data);
+
+        $records = $DB->get_records('grade_categories');
+        $record = array_shift($records);
+        $this->assertEquals($expected, $record->parent);
+    }
+
+    /**
+     * A data provider to test the process_grade_category method.
+     *
+     * @return array basic category information and the expected result.
+     */
+    public function basic_category_provider(): array {
+        $generaldata = [
+            'courseid' => 42,
+            'aggregation' => 13,
+            'keephigh' => 0,
+            'droplow' => 0,
+            'aggregateonlygraded' => 1,
+            'aggregateoutcomes' => 0,
+            'timecreated' => time(),
+            'timemodified' => time(),
+            'hidden' => 0
+        ];
+
+        $cat1 = [
+            'id' => 1,
+            'parent' => null,
+            'depth' => 1,
+            'path' => '/1/',
+            'fullname' => '?'
+        ];
+        $cat1 = array_merge($cat1, $generaldata);
+
+        $cat2 = [
+            'id' => 2,
+            'parent' => 1,
+            'depth' => 2,
+            'path' => '/1/2/',
+            'fullname' => 'test cat 2'
+        ];
+        $cat2 = array_merge($cat2, $generaldata);
+
+        $cat3 = [
+            'id' => 3,
+            'parent' => 2,
+            'depth' => 3,
+            'path' => '/1/2/3/',
+            'fullname' => 'test cat 3'
+        ];
+        $cat3 = array_merge($cat3, $generaldata);
+        return [
+            'parent category' => [(object) $cat1, 0],
+            'sub category' => [(object) $cat2, 1],
+            'sub sub category' => [(object) $cat3, 2],
+        ];
+    }
+
+    /**
+     * Test updating grade items when importing a gradebook with categories.
+     *
+     * @dataProvider grade_item_provider
+     * @param array $importgradeitems
+     * @param array $categories
+     * @param array $expected
+     */
+    public function test_update_grade_items(array $importgradeitems, array $categories, array $expected): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+
+        $this->initial_grade_items($course->id);
+
+        backup_controller_dbops::create_backup_ids_temp_table('testingid');
+
+        $categorymapping = $this->create_categories($categories, $course);
+        $this->create_grade_items($importgradeitems);
+
+        $restore = $this->getMockBuilder('\restore_gradebook_structure_step')
+            ->setMethods(['get_restoreid', 'get_mappingid'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $restore->method('get_restoreid')
+            ->willReturn(99);
+
+        $restore->method('get_mappingid')
+            ->willReturnCallback(function($name, $itemid, $other) use ($categorymapping) {
+                return $categorymapping[$itemid]->id;
+            });
+
+        $rc = new \ReflectionClass('\restore_gradebook_structure_step');
+        $rcm = $rc->getMethod('update_grade_items');
+        $rcm->setAccessible(true);
+        list($basecategory, $othercategories) = $this->get_grade_categories($course->id);
+        $mappings = $rcm->invoke($restore, $basecategory, $othercategories);
+
+        foreach ($expected as $key => $value) {
+            $params = [
+                'itemname' => $key,
+                'categoryid' => ($value == 'basecategory') ? $basecategory->id : $categorymapping[$value]->id
+            ];
+            $sql = "SELECT gi.*, gc.*
+                      FROM {grade_items} gi
+                 LEFT JOIN {grade_categories} gc ON gi.categoryid = gc.id
+                     WHERE gi.itemname = :itemname AND gc.id = :categoryid";
+            $records = $DB->get_records_sql($sql, $params);
+            $this->assertCount(1, $records);
+        }
+        // Clean up. Remove the backup ids temp table.
+        backup_controller_dbops::drop_backup_ids_temp_table('testingid');
+    }
+
+    /**
+     * Structure for this gradebook is:
+     * COURSE
+     *    L GRADE CATEGORY
+     *    |     L test quiz in category
+     *    L test assignment
+     *
+     * @param int $courseid The id of the course we are creating grade items in.
+     */
+    public function initial_grade_items(int $courseid): void {
+        $data = (object) [
+            'courseid' => $courseid,
+            'itemname' => 'test assignment',
+            'itemtype' => 'mod',
+            'itemmodule' => 'assign',
+            'iteminstance' => 1
+        ];
+
+        $gi = new grade_item($data);
+        $gi->insert();
+
+        list($basecategory, $othercategories) = $this->get_grade_categories($courseid);
+
+        $data = (object) [
+            'courseid' => $courseid,
+            'parent' => $basecategory->id,
+            'fullname' => 'first grade category',
+            'aggregation' => 13
+        ];
+        $newgradecategory = new grade_category($data, false);
+        $newgradecategory->insert();
+
+        $data = (object) [
+            'courseid' => $courseid,
+            'itemname' => 'test quiz in category',
+            'itemtype' => 'mod',
+            'itemmodule' => 'assign',
+            'iteminstance' => 1,
+            'categoryid' => $newgradecategory->id
+        ];
+
+        $gi = new grade_item($data);
+        $gi->insert();
+    }
+
+    /**
+     * Returns more complex category and grade item structures to test.
+     *
+     * @return array Gradebook data and the expected result.
+     */
+    public function grade_item_provider(): array {
+        return [
+            'Import of grades no categories' => [
+                [
+                    (object) [
+                        'categoryid' => null,
+                        'itemname' => null,
+                        'itemtype' => 'course',
+                        'itemmodule' => null,
+                        'iteminstance' => 3
+                    ],
+                    (object) [
+                        'categoryid' => 3,
+                        'itemname' => 'import assignment',
+                        'itemtype' => 'mod',
+                        'itemmodule' => 'assign',
+                        'iteminstance' => 1
+                    ],
+                    (object) [
+                        'categoryid' => 3,
+                        'itemname' => 'import quiz',
+                        'itemtype' => 'mod',
+                        'itemmodule' => 'quiz',
+                        'iteminstance' => 1
+                    ]
+                ],
+                [
+                    (object) [
+                        'id' => 3,
+                        'courseid' => 3,
+                        'parent' => 0,
+                        'depth' => 1,
+                        'path' => '/3/',
+                        'fullname' => '?',
+                        'aggregation' => 13,
+                        'timecreated' => time(),
+                        'timemodified' => time()
+                    ]
+                ],
+                ['import assignment' => 'basecategory', 'import quiz' => 'basecategory']
+            ],
+            'Import of grades one category' => [
+                [
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => null,
+                        'itemname' => null,
+                        'itemtype' => 'course',
+                        'itemmodule' => null,
+                        'iteminstance' => 3
+                    ],
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => null,
+                        'itemname' => '',
+                        'itemtype' => 'category',
+                        'itemmodule' => null,
+                        'iteminstance' => 4
+                    ],
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => 4,
+                        'itemname' => 'import assignment in category',
+                        'itemtype' => 'mod',
+                        'itemmodule' => 'assign',
+                        'iteminstance' => 1
+                    ],
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => 3,
+                        'itemname' => 'import quiz',
+                        'itemtype' => 'mod',
+                        'itemmodule' => 'quiz',
+                        'iteminstance' => 1
+                    ]
+                ],
+                [
+                    (object) [
+                        'id' => 3,
+                        'courseid' => 3,
+                        'parent' => 0,
+                        'depth' => 1,
+                        'path' => '/3/',
+                        'fullname' => '?',
+                        'aggregation' => 13,
+                        'timecreated' => time(),
+                        'timemodified' => time()
+                    ],
+                    (object) [
+                        'id' => 4,
+                        'courseid' => 3,
+                        'parent' => 3,
+                        'depth' => 2,
+                        'path' => '/3/4/',
+                        'fullname' => 'import category',
+                        'aggregation' => 13,
+                        'timecreated' => time(),
+                        'timemodified' => time()
+                    ]
+                ],
+                ['import assignment in category' => 4, 'import quiz' => 'basecategory']
+            ],
+            'Import of grades duplicate category name' => [
+                [
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => null,
+                        'itemname' => null,
+                        'itemtype' => 'course',
+                        'itemmodule' => null,
+                        'iteminstance' => 3
+                    ],
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => null,
+                        'itemname' => '',
+                        'itemtype' => 'category',
+                        'itemmodule' => null,
+                        'iteminstance' => 4
+                    ],
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => 4,
+                        'itemname' => 'import assignment in category',
+                        'itemtype' => 'mod',
+                        'itemmodule' => 'assign',
+                        'iteminstance' => 1
+                    ],
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => 3,
+                        'itemname' => 'import quiz',
+                        'itemtype' => 'mod',
+                        'itemmodule' => 'quiz',
+                        'iteminstance' => 1
+                    ]
+                ],
+                [
+                    (object) [
+                        'id' => 3,
+                        'courseid' => 3,
+                        'parent' => 0,
+                        'depth' => 1,
+                        'path' => '/3/',
+                        'fullname' => '?',
+                        'aggregation' => 13,
+                        'timecreated' => time(),
+                        'timemodified' => time()
+                    ],
+                    (object) [
+                        'id' => 4,
+                        'courseid' => 3,
+                        'parent' => 3,
+                        'depth' => 2,
+                        'path' => '/3/4/',
+                        'fullname' => 'first grade category',
+                        'aggregation' => 13,
+                        'timecreated' => time(),
+                        'timemodified' => time()
+                    ]
+                ],
+                ['import assignment in category' => 4, 'import quiz' => 'basecategory']
+            ]
+        ];
+    }
+
+    /**
+     * Returns the grade categories that need import processing for a course.
+     *
+     * @param  int    $courseid The course id to return the categories for.
+     * @return array Returns the basecategory that everything belongs to and other categories that need processing.
+     */
+    public function get_grade_categories(int $courseid): array {
+        global $DB;
+
+        $select = 'courseid = :courseid AND (parent IS NULL OR parent = 0)';
+        $parentcategories = $DB->get_records_select('grade_categories', $select, ['courseid' => $courseid]);
+
+        $basecategory = array_filter($parentcategories, function($category) {
+            return !isset($category->parent);
+        });
+        $othercategories = array_filter($parentcategories, function($category) {
+            return (isset($category->parent) && empty($category->parent));
+        });
+
+        $basecategory = array_shift($basecategory);
+        return [$basecategory, $othercategories];
+    }
+
+    /**
+     * @dataProvider grade_category_provider
+     * @param  [type] $importgradeitems [description]
+     * @param  [type] $categories       [description]
+     * @return [type]                   [description]
+     */
+    public function test_set_grade_category_parents($importgradeitems, $categories, $expected): void {
+        global $DB;
+        $this->resetAfterTest();
+
+        $course = $this->getDataGenerator()->create_course();
+        $this->initial_grade_items($course->id);
+
+
+        // Current working on this.
+        $categorymapping = $this->create_categories($categories, $course);
+        $this->create_grade_items($importgradeitems, false);
+
+        $records = $DB->get_records('grade_categories');
+        print_object($records);
+
+        print_object($categorymapping);
+
+        $gradebookmethods = ['get_mappingid', 'get_courseid'];
+
+        $restore = $this->getMockBuilder('\restore_gradebook_structure_step')
+            ->setMethods($gradebookmethods)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $restore->method('get_mappingid')
+            ->willReturnCallback(function($name, $itemid, $other) use ($categorymapping) {
+                return $categorymapping[$itemid]->id;
+            });
+
+        $restore->method('get_mappingid')
+            ->willReturn($course->id);
+
+        $rc = new \ReflectionClass('\restore_gradebook_structure_step');
+        $rcm = $rc->getMethod('set_grade_category_parents');
+        $rcm->setAccessible(true);
+        list($basecategory, $othercategories) = $this->get_grade_categories($course->id);
+        // print_object($basecategory);
+        // print_object($othercategories);
+        $things = $rcm->invoke($restore, $basecategory, $othercategories);
+        // print_object($things);
+
+        $records = $DB->get_records('grade_categories');
+        print_object($records);
+        // $record = array_shift($records);
+        // $this->assertEquals($expected, $record->parent);
+    }
+
+    /**
+     * Returns more complex category and grade item structures to test.
+     *
+     * @return array Gradebook data and the expected result.
+     */
+    public function grade_category_provider(): array {
+        return [
+            'Import of grades no categories' => [
+                [
+                    (object) [
+                        'categoryid' => null,
+                        'itemname' => null,
+                        'itemtype' => 'course',
+                        'itemmodule' => null,
+                        'iteminstance' => 3
+                    ],
+                    (object) [
+                        'categoryid' => 3,
+                        'itemname' => 'import assignment',
+                        'itemtype' => 'mod',
+                        'itemmodule' => 'assign',
+                        'iteminstance' => 1
+                    ],
+                    (object) [
+                        'categoryid' => 3,
+                        'itemname' => 'import quiz',
+                        'itemtype' => 'mod',
+                        'itemmodule' => 'quiz',
+                        'iteminstance' => 1
+                    ]
+                ],
+                [
+                    (object) [
+                        'id' => 3,
+                        'courseid' => 3,
+                        'parent' => 0,
+                        'depth' => 1,
+                        'path' => '/3/',
+                        'fullname' => '?',
+                        'aggregation' => 13,
+                        'timecreated' => time(),
+                        'timemodified' => time()
+                    ]
+                ],
+                ['import assignment' => 'basecategory', 'import quiz' => 'basecategory']
+            ],
+            'Import of grades one category' => [
+                [
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => null,
+                        'itemname' => null,
+                        'itemtype' => 'course',
+                        'itemmodule' => null,
+                        'iteminstance' => 3
+                    ],
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => null,
+                        'itemname' => '',
+                        'itemtype' => 'category',
+                        'itemmodule' => null,
+                        'iteminstance' => 4
+                    ],
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => 4,
+                        'itemname' => 'import assignment in category',
+                        'itemtype' => 'mod',
+                        'itemmodule' => 'assign',
+                        'iteminstance' => 1
+                    ],
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => 3,
+                        'itemname' => 'import quiz',
+                        'itemtype' => 'mod',
+                        'itemmodule' => 'quiz',
+                        'iteminstance' => 1
+                    ]
+                ],
+                [
+                    (object) [
+                        'id' => 3,
+                        'courseid' => 3,
+                        'parent' => 0,
+                        'depth' => 1,
+                        'path' => '/3/',
+                        'fullname' => '?',
+                        'aggregation' => 13,
+                        'timecreated' => time(),
+                        'timemodified' => time()
+                    ],
+                    (object) [
+                        'id' => 4,
+                        'courseid' => 3,
+                        'parent' => 0,
+                        'depth' => 2,
+                        'path' => '/3/4/',
+                        'fullname' => 'import category',
+                        'aggregation' => 13,
+                        'timecreated' => time(),
+                        'timemodified' => time()
+                    ]
+                ],
+                ['import assignment in category' => 4, 'import quiz' => 'basecategory']
+            ],
+            'Import of grades duplicate category name' => [
+                [
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => null,
+                        'itemname' => null,
+                        'itemtype' => 'course',
+                        'itemmodule' => null,
+                        'iteminstance' => 3
+                    ],
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => null,
+                        'itemname' => '',
+                        'itemtype' => 'category',
+                        'itemmodule' => null,
+                        'iteminstance' => 4
+                    ],
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => 4,
+                        'itemname' => 'import assignment in category',
+                        'itemtype' => 'mod',
+                        'itemmodule' => 'assign',
+                        'iteminstance' => 1
+                    ],
+                    (object) [
+                        'courseid' => 3,
+                        'categoryid' => 3,
+                        'itemname' => 'import quiz',
+                        'itemtype' => 'mod',
+                        'itemmodule' => 'quiz',
+                        'iteminstance' => 1
+                    ]
+                ],
+                [
+                    (object) [
+                        'id' => 3,
+                        'courseid' => 3,
+                        'parent' => 0,
+                        'depth' => 1,
+                        'path' => '/3/',
+                        'fullname' => '?',
+                        'aggregation' => 13,
+                        'timecreated' => time(),
+                        'timemodified' => time()
+                    ],
+                    (object) [
+                        'id' => 4,
+                        'courseid' => 3,
+                        'parent' => 3,
+                        'depth' => 2,
+                        'path' => '/3/4/',
+                        'fullname' => 'first grade category',
+                        'aggregation' => 13,
+                        'timecreated' => time(),
+                        'timemodified' => time()
+                    ]
+                ],
+                ['import assignment in category' => 4, 'import quiz' => 'basecategory']
+            ]
+        ];
+    }
+
+    protected function create_grade_items($gradeitems, $usetempidstable = true) {
+        global $DB;
+
+        foreach ($gradeitems as $gradeitem) {
+            $insertid = $DB->insert_record('grade_items', $gradeitem);
+
+            $temprecorddata = (object) [
+                'backupid' => 99,
+                'itemname' => 'grade_item',
+                'itemid' => $insertid,
+                'newitemid' => $insertid,
+                'parentitemid' => $gradeitem->categoryid
+            ];
+
+            if ($usetempidstable) {
+                $DB->insert_record('backup_ids_temp', $temprecorddata);
+            }
+        }
+    }
+
+    protected function create_categories($categories, $course) {
+        global $DB;
+
+        $categorymapping = [];
+        foreach ($categories as $category) {
+            $oldid = $category->id;
+            unset($category->id);
+            $category->courseid = $course->id;
+            $insertid = $DB->insert_record('grade_categories', $category);
+            $categorymapping[$oldid] = (object) ['id' => $insertid, 'fullname' => $category->fullname];
+        }
+        return $categorymapping;
+    }
 }

@@ -984,12 +984,11 @@ class gradingform_rubric_instance extends gradingform_instance {
     }
 }
 
-// TODO these need to be language strings.
 function gradingform_rubric_report_export_formats(): array {
     return [
         'imsspecification' => [
-            'title' => 'IMS specification json file',
-            'help' => 'This json file is in a format that adheres to the IMS specification. It can be imported back into Moodle or other places that also follow the specification.'
+            'title' => new lang_string('imsspectitle', 'gradingform_rubric'),
+            'help' => new lang_string('imsspechelp', 'gradingform_rubric')
         ],
         'moodlebasic' => [
             'title' => 'Moodle basic export format',
@@ -998,17 +997,18 @@ function gradingform_rubric_report_export_formats(): array {
     ];
 }
 
-// TODO these need to be language strings.
 function gradingform_rubric_report_import_formats(): array {
     return [
         'imsspecification' => [
-            'title' => 'IMS specification json file',
-            'help' => 'This json file is in a format that adheres to the IMS specification. It can be imported back into Moodle or other places that also follow the specification.'
+            'title' => new lang_string('imsspectitle', 'gradingform_rubric'),
+            'help' => new lang_string('imsspechelp', 'gradingform_rubric'),
+            'acceptedfiletypes' => ['.json']
         ],
-        'moodlebasic' => [
-            'title' => 'Moodle basic export format',
-            'help' => 'Very basic export'
-        ]
+        // 'moodlebasic' => [
+        //     'title' => 'Moodle basic export format',
+        //     'help' => 'Very basic export',
+        //     'acceptedfiletypes' => ['.json', '.csv']
+        // ]
     ];
 }
 

@@ -97,3 +97,6 @@ $string['sortlevelsasc0'] = 'Descending by number of points';
 $string['sortlevelsasc1'] = 'Ascending by number of points';
 $string['zerolevelsabsent'] = 'Warning: The minimum possible score for this rubric is not 0; this can result in unexpected grades for the activity. To avoid this, each criterion should have a level with 0 points.<br>
 This warning may be ignored if a scale is used for grading, and the minimum levels in the rubric correspond to the minimum value of the scale.';
+
+$string['imsspectitle'] = 'IMS specification json file';
+$string['imsspechelp'] = 'This json file is in a format that adheres to the IMS specification. It can be imported back into Moodle or other places that also follow the specification.';

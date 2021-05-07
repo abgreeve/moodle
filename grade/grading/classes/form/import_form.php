@@ -37,23 +37,50 @@ class import_form extends \moodleform {
         $mform->addElement('hidden', 'areaid', $this->_customdata['areaid']);
         $mform->setType('areaid', PARAM_INT);
 
-        $mform->addElement('header', 'settingsheader', 'Import JSON file.');
+        $mform->addElement('header', 'settingsheader', 'Import JSON file.'); // @TODO Change this heading!
+
+        $filetypes = $this->get_all_accepted_file_types();
 
         $filemanageroptions = [
-            'accepted_types' => ['.json'],
+            'accepted_types' => $filetypes,
             'maxbytes' => 0,
             'maxfiles' => 1,
             'subdirs' => 0
         ];
 
-        $mform->addElement('filepicker', 'advancedgradingimport', 'Rubric json file upload',
+        $mform->addElement('filepicker', 'advancedgradingimport', 'Rubric json file upload', // @TODO lang string + may not be a json file nor a rubric.
             null, $filemanageroptions);
         $mform->addRule('advancedgradingimport', null, 'required');
 
-        foreach ($this->_customdata['importtypes'] as $key => $value) {
-            $mform->addElement('radio', 'importtype', 'Import type', $value['title'], $key);
+        $typecount = count($this->_customdata['importtypes']);
+
+        if ($typecount == 1) {
+            $mform->addElement('hidden', 'importtype', array_keys($this->_customdata['importtypes'])[0]);
+            $mform->setType('importtype', PARAM_RAW); // @TODO Needs to be changed for what is appropriate for an import type string.
+        } else {
+            // @TODO put this into a group so that the title isn't double upped.
+            foreach ($this->_customdata['importtypes'] as $key => $value) {
+                $mform->addElement('radio', 'importtype', 'Import type', $value['title'], $key);
+            }
+            $mform->setDefault('importtype', array_keys($this->_customdata['importtypes'])[0]);
         }
 
         $mform->addElement('submit', 'import stuff', 'Import');
+    }
+
+    /**
+     * Get all of the combined file types accepted by the available import services.
+     *
+     * @return array An array of accepted file types.
+     */
+    private function get_all_accepted_file_types(): array {
+        $filetypes = [];
+        foreach ($this->_customdata['importtypes'] as $key => $value) {
+            if (!isset($value['acceptedfiletypes'])) {
+                throw new \moodle_exception('error:importfiletyperequired', 'grading', '', $key);
+            }
+            $filetypes = array_unique(array_merge($filetypes, $value['acceptedfiletypes']));
+        }
+        return $filetypes;
     }
 }

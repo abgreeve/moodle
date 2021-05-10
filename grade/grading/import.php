@@ -40,10 +40,11 @@ require_login($course, true, $cm);
 
 $PAGE->set_url(new \moodle_url('/grade/grading/import.php', ['areaid' => $areaid]));
 
-$controller = $manager->get_controller('rubric');
+$control = substr($gradingmethod, 12);
+$controller = $manager->get_controller($control);
 
 // Make a form to upload a file for processing.
-$mform = new \core_grading\form\import_form('', ['areaid' => $areaid, 'importtypes' => $options]);
+$mform = new \core_grading\form\import_form('', ['areaid' => $areaid, 'importtypes' => $options, 'gradingmethod' => $gradingmethod]);
 
 if ($data = $mform->get_data()) {
 

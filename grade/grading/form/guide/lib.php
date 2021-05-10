@@ -1015,3 +1015,47 @@ function gradingform_guide_get_fontawesome_icon_map(): array {
         'gradingform_guide:plus' => 'fa-plus',
     ];
 }
+
+
+function gradingform_guide_report_export_formats(): array {
+    return [
+        'moodlebasic' => [
+            'title' => 'Moodle basic export format',
+            'help' => 'Very basic export'
+        ]
+    ];
+}
+
+function gradingform_guide_report_import_formats(): array {
+    return [
+        'moodlebasic' => [
+            'title' => 'Moodle basic import format',
+            'help' => 'Very basic import',
+            'acceptedfiletypes' => ['.json']
+        ]
+    ];
+}
+
+function gradingform_guide_convert_to_export_format(stdClass $data, string $format): stdClass {
+    unset($data->id);
+    return $data;
+}
+
+function gradingform_guide_import_from_file($datastring, $areaid, $format) {
+    // TODO Move into a class perhaps?
+    $datastring->areaid = $areaid;
+    $datastring->description_editor = [
+        'text' => $datastring->description,
+        'format' => $datastring->descriptionformat,
+        'itemid' => file_get_unused_draft_itemid()
+    ];
+    $datastring->guide = ['criteria' => [], 'comments' => [], 'options' => (array) json_decode($datastring->options)];
+    foreach ($datastring->guide_criteria as $key => $value) {
+        $datastring->guide['criteria']['NEWID' . $key] = (array) $value;
+    }
+    foreach ($datastring->guide_comments as $key => $value) {
+        $datastring->guide['comments']['NEWID' . $key] = (array) $value;
+    }
+
+    return $datastring;
+}

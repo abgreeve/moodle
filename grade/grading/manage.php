@@ -233,11 +233,11 @@ if (!empty($method)) {
 
 
                 // Let's go!
-                $url = new moodle_url('/grade/grading/export.php', ['areaid' => $controller->get_areaid()]);
+                $url = new moodle_url('/grade/grading/export.php', ['gradingmethod' => $grademethodfullname, 'areaid' => $controller->get_areaid()]);
                 echo $output->management_thingy($url, get_string('exportgradingform', 'core_grading'),
                     'i/emojicategorytravelplaces', json_encode($typedata));
             } else {
-                $url = new moodle_url('/grade/grading/export.php', ['areaid' => $controller->get_areaid()]);
+                $url = new moodle_url('/grade/grading/export.php', ['gradingmethod' => $grademethodfullname, 'areaid' => $controller->get_areaid()]);
                 echo $output->management_action_icon($url, get_string('exportgradingform', 'core_grading'),
                     'i/emojicategorytravelplaces');
             }

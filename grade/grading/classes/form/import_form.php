@@ -36,6 +36,8 @@ class import_form extends \moodleform {
 
         $mform->addElement('hidden', 'areaid', $this->_customdata['areaid']);
         $mform->setType('areaid', PARAM_INT);
+        $mform->addElement('hidden', 'gradingmethod', $this->_customdata['gradingmethod']);
+        $mform->setType('gradingmethod', PARAM_RAW); // @TODO get off raw!
 
         $mform->addElement('header', 'settingsheader', 'Import JSON file.'); // @TODO Change this heading!
 

@@ -29,19 +29,23 @@ $areaid = optional_param('areaid', null, PARAM_INT);
 $gradingmethod = optional_param('gradingmethod', 'gradingform_rubric', PARAM_PLUGIN);
 $format = optional_param('format', null, PARAM_RAW); // TODO change to a better type.
 
-
 // echo 'get the download options';
 
 // $pluginlist = get_plugin_list_with_function('gradingform', 'report_export_formats');
 // $options = $pluginlist[$gradingmethod]();
 
 // TODO Add form to select export format.
-$format = 'imsspecification';
+// $format = 'imsspecification';
+$format = 'moodlebasic';
+
+$control = substr($gradingmethod, 12);
+
+// @TODO - this can't be rubric specific.
 
 // get all information about this rubric
 
 $manager = get_grading_manager($areaid);
-$controller = $manager->get_controller('rubric');
+$controller = $manager->get_controller($control);
 $definition = $controller->get_definition();
 $data = clone($definition);
 
@@ -51,7 +55,8 @@ if (!isset($functions[$gradingmethod])) {
     die();
 }
 $exportstring = $functions[$gradingmethod]($data, $format);
+// @TODO encoding like this is to be done in the function.
 $jsonstring = json_encode($exportstring, JSON_PRETTY_PRINT);
 
 // TODO create a better name for the export file.
-send_temp_file($jsonstring, 'rubricexport-' . $format . '.json', true);
+send_temp_file($jsonstring, $control . 'export-' . $format . '.json', true);

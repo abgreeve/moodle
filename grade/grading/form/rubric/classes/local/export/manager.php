@@ -53,9 +53,9 @@ class manager {
     /**
      * Translates our Moodle rubric into an object that conforms with IMS.
      *
-     * @return \stdClass The translated data.
+     * @return string The translated data formatted as a json string.
      */
-    public function translate_data(): \stdClass {
+    public function translate_data(): string {
         $imsmapper = new ims_mapper();
 
         $basemap = $imsmapper->map_base();
@@ -69,7 +69,7 @@ class manager {
         foreach ($basedata->CFRubricCriterion as $index => $criterion) {
             $imsmapper->set_datetime($this->timemodified);
             $basedata->CFRubricCriterion[$index] = (object) $this->convert_data_section($criterion, $criteriamap, $imsmapper);
-              // Let's do levels as well.
+            // Let's do levels as well.
             $i = 0; // Position number for our levels.
             foreach ($criterion['levels'] as $ckey => $level) {
                 // Set the position for this level.
@@ -87,7 +87,9 @@ class manager {
 
         $basedata->CFRubricCriterion = $tmpe;
 
-        return $basedata;
+        $datastring = json_encode($basedata, JSON_PRETTY_PRINT);
+
+        return $datastring;
     }
 
     /**

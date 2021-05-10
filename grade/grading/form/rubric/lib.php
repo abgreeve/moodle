@@ -984,11 +984,15 @@ class gradingform_rubric_instance extends gradingform_instance {
     }
 }
 
+/**
+ * Note that the export format name (e.g. imsspecification) can only be PARAM_ALPHANUMEXT.
+ */
 function gradingform_rubric_report_export_formats(): array {
     return [
         'imsspecification' => [
             'title' => new lang_string('imsspectitle', 'gradingform_rubric'),
-            'help' => new lang_string('imsspechelp', 'gradingform_rubric')
+            'help' => new lang_string('imsspechelp', 'gradingform_rubric'),
+            'fileextention' => '.json'
         ],
         'moodlebasic' => [
             'title' => 'Moodle basic export format',
@@ -997,6 +1001,9 @@ function gradingform_rubric_report_export_formats(): array {
     ];
 }
 
+/**
+ * Note that the import format name (e.g. imsspecification) can only be PARAM_ALPHANUMEXT.
+ */
 function gradingform_rubric_report_import_formats(): array {
     return [
         'imsspecification' => [
@@ -1012,13 +1019,21 @@ function gradingform_rubric_report_import_formats(): array {
     ];
 }
 
-function gradingform_rubric_convert_to_export_format(stdClass $data, string $format): stdClass {
+function gradingform_rubric_convert_to_export_format(stdClass $data, string $format): string {
     // Call our own internal stuff.
     $manager = new \gradingform_rubric\local\export\manager($data);
     return $manager->translate_data();
 }
 
-function gradingform_rubric_import_from_file($datastring, $areaid, $format) {
-    $importmanager = new \gradingform_rubric\local\import\manager($datastring, $areaid);
+function gradingform_rubric_import_from_file(string $datastring, int $areaid, string $format): stdClass {
+
+    // Currently we only have imsspecification, but if we have more then we need to check the format to decide on what to do.
+    $dataobject = json_decode($datastring);
+    if (is_null($dataobject)) {
+        print_error('jsonimporterror', 'grades', new \moodle_url('/grade/grading/manage.php', ['areaid' => $areaid]));
+        exit();
+    }
+
+    $importmanager = new \gradingform_rubric\local\import\manager($dataobject, $areaid);
     return $importmanager->translate_data();
 }

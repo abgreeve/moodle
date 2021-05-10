@@ -99,4 +99,9 @@ $string['templatesource'] = 'Location: {$a->component} ({$a->area})';
 $string['error:notinrange'] = 'Invalid grade \'{$a->grade}\' provided. Grades must be between 0 and {$a->maxgrade}.';
 $string['error:gradingunavailable'] = 'The advanced grading method is not correctly set. Please check the whole forum grading options in the forum settings.';
 $string['error:importfiletyperequired'] = 'The {$a} import type must specify accepted file types.';
+$string['error:exportfileextensionrequired'] = 'The {$a} export type must specify a file extension';
 
+$string['gradingmethodimportfile'] = 'Grading method import file';
+$string['gradingmethodfileimport'] = 'Import a grading method from a file';
+$string['importfile'] = 'Import file';
+$string['importtypes'] = 'Import type';

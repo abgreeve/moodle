@@ -1021,7 +1021,8 @@ function gradingform_guide_report_export_formats(): array {
     return [
         'moodlebasic' => [
             'title' => 'Moodle basic export format',
-            'help' => 'Very basic export'
+            'help' => 'Very basic export',
+            'fileextention' => '.json'
         ]
     ];
 }
@@ -1032,30 +1033,43 @@ function gradingform_guide_report_import_formats(): array {
             'title' => 'Moodle basic import format',
             'help' => 'Very basic import',
             'acceptedfiletypes' => ['.json']
-        ]
+        ],
+        // 'test' => [
+        //     'title' => 'test import format',
+        //     'help' => 'Very basic import',
+        //     'acceptedfiletypes' => ['.csv', 'all']
+        // ]
     ];
 }
 
-function gradingform_guide_convert_to_export_format(stdClass $data, string $format): stdClass {
+function gradingform_guide_convert_to_export_format(stdClass $data, string $format): string {
     unset($data->id);
-    return $data;
+    $datastring = json_encode($data, JSON_PRETTY_PRINT);
+    return $datastring;
 }
 
-function gradingform_guide_import_from_file($datastring, $areaid, $format) {
+function gradingform_guide_import_from_file(string $datastring, int $areaid, string $format): stdClass {
+
     // TODO Move into a class perhaps?
-    $datastring->areaid = $areaid;
-    $datastring->description_editor = [
-        'text' => $datastring->description,
-        'format' => $datastring->descriptionformat,
+    $dataobject = json_decode($datastring);
+    if (is_null($dataobject)) {
+        print_error('jsonimporterror', 'grades', new \moodle_url('/grade/grading/manage.php', ['areaid' => $areaid]));
+        exit();
+    }
+
+    $dataobject->areaid = $areaid;
+    $dataobject->description_editor = [
+        'text' => $dataobject->description,
+        'format' => $dataobject->descriptionformat,
         'itemid' => file_get_unused_draft_itemid()
     ];
-    $datastring->guide = ['criteria' => [], 'comments' => [], 'options' => (array) json_decode($datastring->options)];
-    foreach ($datastring->guide_criteria as $key => $value) {
-        $datastring->guide['criteria']['NEWID' . $key] = (array) $value;
+    $dataobject->guide = ['criteria' => [], 'comments' => [], 'options' => (array) json_decode($dataobject->options)];
+    foreach ($dataobject->guide_criteria as $key => $value) {
+        $dataobject->guide['criteria']['NEWID' . $key] = (array) $value;
     }
-    foreach ($datastring->guide_comments as $key => $value) {
-        $datastring->guide['comments']['NEWID' . $key] = (array) $value;
+    foreach ($dataobject->guide_comments as $key => $value) {
+        $dataobject->guide['comments']['NEWID' . $key] = (array) $value;
     }
 
-    return $datastring;
+    return $dataobject;
 }

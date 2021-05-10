@@ -55,16 +55,10 @@ if ($data = $mform->get_data()) {
     $fs = get_file_storage();
     $files = $fs->get_area_files($usercontext->id, 'user', 'draft', $data->advancedgradingimport, 'id', false);
     $file = reset($files);
-    $stufftouse = $file->get_content();
-
-    $exportstring = json_decode($stufftouse);
-    if (is_null($exportstring)) {
-        print_error('jsonimporterror', 'grades', new \moodle_url('/grade/grading/manage.php', ['areaid' => $areaid]));
-        exit();
-    }
+    $importstring = $file->get_content();
 
     $formfunctions = get_plugin_list_with_function('gradingform', 'import_from_file');
-    $translatedobject = $formfunctions[$gradingmethod]($exportstring, $areaid, $data->importtype);
+    $translatedobject = $formfunctions[$gradingmethod]($importstring, $areaid, $data->importtype);
     $controller->update_definition($translatedobject);
 
     redirect(new \moodle_url('/grade/grading/manage.php', ['areaid' => $areaid]));

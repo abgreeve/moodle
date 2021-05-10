@@ -27,22 +27,24 @@ require_once(__DIR__.'/lib.php');
 
 $areaid = optional_param('areaid', null, PARAM_INT);
 $gradingmethod = optional_param('gradingmethod', 'gradingform_rubric', PARAM_PLUGIN);
-$format = optional_param('format', null, PARAM_RAW); // TODO change to a better type.
+$format = optional_param('format', null, PARAM_ALPHANUMEXT);
 
 // echo 'get the download options';
 
-// $pluginlist = get_plugin_list_with_function('gradingform', 'report_export_formats');
-// $options = $pluginlist[$gradingmethod]();
+$pluginlist = get_plugin_list_with_function('gradingform', 'report_export_formats');
+$options = $pluginlist[$gradingmethod]();
 
 // TODO Add form to select export format.
-// $format = 'imsspecification';
-$format = 'moodlebasic';
+$format = 'imsspecification';
+// $format = 'moodlebasic';
+
+if (!isset($options[$format]['fileextention'])) {
+    throw new moodle_exception('error:exportfileextensionrequired', 'grading', '', $format);
+}
 
 $control = substr($gradingmethod, 12);
 
-// @TODO - this can't be rubric specific.
-
-// get all information about this rubric
+// get all information about this grading method.
 
 $manager = get_grading_manager($areaid);
 $controller = $manager->get_controller($control);
@@ -55,8 +57,6 @@ if (!isset($functions[$gradingmethod])) {
     die();
 }
 $exportstring = $functions[$gradingmethod]($data, $format);
-// @TODO encoding like this is to be done in the function.
-$jsonstring = json_encode($exportstring, JSON_PRETTY_PRINT);
 
 // TODO create a better name for the export file.
-send_temp_file($jsonstring, $control . 'export-' . $format . '.json', true);
+send_temp_file($exportstring, $control . 'export-' . $format . $options[$format]['fileextention'], true);

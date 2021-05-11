@@ -226,10 +226,16 @@ if (!empty($method)) {
         if (isset($definition)) {
             $result = $functions[$grademethodfullname]();
             if (count($result) > 1) {
+
+                // Do somewhere else
+                // but here now will do.
+                $typedata = transform_for_export($result);
+
+
                 // Let's go!
                 $url = new moodle_url('/grade/grading/export.php', ['areaid' => $controller->get_areaid()]);
                 echo $output->management_thingy($url, get_string('exportgradingform', 'core_grading'),
-                    'i/emojicategorytravelplaces', json_encode(['types' => $result]));
+                    'i/emojicategorytravelplaces', json_encode($typedata));
             } else {
                 $url = new moodle_url('/grade/grading/export.php', ['areaid' => $controller->get_areaid()]);
                 echo $output->management_action_icon($url, get_string('exportgradingform', 'core_grading'),
@@ -262,3 +268,12 @@ if (!empty($method)) {
 
 
 echo $output->footer();
+
+function transform_for_export($data) {
+    $thing = [];
+    foreach ($data as $key => $value) {
+        $value['type'] = $key;
+        $thing['types'][] = $value;
+    }
+    return $thing;
+}

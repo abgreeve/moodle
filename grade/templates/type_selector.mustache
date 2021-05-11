@@ -18,5 +18,8 @@
     @template core_grades/type_selector
 }}
 {{#types}}
-    <input type="radio" name="type" value="imsspecstuff" />
+    <div class="custom-control custom-radio">
+        <input class="custom-control-input" type="radio" name="export-type" id="id-export-type-{{type}}" value="{{type}}">
+        <label class="custom-control-label" for="id-export-type-{{type}}">{{title}}</label>
+    </div>
 {{/types}}

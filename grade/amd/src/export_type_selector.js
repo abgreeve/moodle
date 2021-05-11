@@ -29,13 +29,8 @@ import Templates from 'core/templates';
 const showthing = async(e) => {
     e.preventDefault();
     let link = e.currentTarget;
-
-    let rawdata = link.getAttribute('data-stuff');
+    let rawdata = link.getAttribute('data-export-types');
     let interthing = JSON.parse(rawdata);
-    window.console.log(interthing);
-    // let awesomedata = {"types": interthing};
-    // window.console.log(awesomedata);
-
     const modal = await buildModal(interthing);
 
     displayModal(modal, link);
@@ -48,7 +43,6 @@ const buildModal = async(templatecontext) => {
         // title: await getString('delexternalbackpack', 'core_badges'),
         title: 'Add title here',
         body: await Templates.render('core_grades/type_selector', templatecontext),
-        // body: 'Add body here',
         type: ModalFactory.types.SAVE_CANCEL,
     });
 
@@ -56,6 +50,7 @@ const buildModal = async(templatecontext) => {
 
 const displayModal = async(modal, link) => {
     // modal.setSaveButtonText(await getString('delete', 'core'));
+    modal.setSaveButtonText('Download');
 
     modal.getRoot().on(ModalEvents.save, function() {
         let format = 'imsspecification';

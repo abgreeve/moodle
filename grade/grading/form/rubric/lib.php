@@ -991,10 +991,10 @@ function gradingform_rubric_report_export_formats(): array {
             'title' => 'IMS specification json file',
             'help' => 'This json file is in a format that adheres to the IMS specification. It can be imported back into Moodle or other places that also follow the specification.'
         ],
-        // 'moodlebasic' => [
-        //     'title' => 'Moodle basic export format',
-        //     'help' => 'Very basic export'
-        // ]
+        'moodlebasic' => [
+            'title' => 'Moodle basic export format',
+            'help' => 'Very basic export'
+        ]
     ];
 }
 
@@ -1005,10 +1005,10 @@ function gradingform_rubric_report_import_formats(): array {
             'title' => 'IMS specification json file',
             'help' => 'This json file is in a format that adheres to the IMS specification. It can be imported back into Moodle or other places that also follow the specification.'
         ],
-        // 'moodlebasic' => [
-        //     'title' => 'Moodle basic export format',
-        //     'help' => 'Very basic export'
-        // ]
+        'moodlebasic' => [
+            'title' => 'Moodle basic export format',
+            'help' => 'Very basic export'
+        ]
     ];
 }
 

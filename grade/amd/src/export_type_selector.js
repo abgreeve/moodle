@@ -54,9 +54,23 @@ const displayModal = async(modal, link) => {
 
     modal.getRoot().on(ModalEvents.save, function() {
         let format = 'imsspecification';
-        let url = link.getAttribute('href');
-        link.setAttribute('href', url + '&format=' + format);
-        window.location.href = link.getAttribute('href');
+        let thing = modal.getRoot().find('.custom-radio').find('input');
+        if (typeof thing !== 'undefined') {
+
+            window.console.log(Object.entries(thing));
+            // thing.forEach((inputnode) => {
+            //     window.console.log(inputnode);
+            // });
+
+
+
+            let brown = thing[0];
+            // window.console.log(brown.getAttribute('value'));
+            format = brown.getAttribute('value');
+            let url = link.getAttribute('href');
+            link.setAttribute('href', url + '&format=' + format);
+            // window.location.href = link.getAttribute('href');
+        }
     });
 
     modal.getRoot().on(ModalEvents.hidden, function() {

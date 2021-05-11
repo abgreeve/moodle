@@ -30,13 +30,16 @@ $gradingmethod = optional_param('gradingmethod', 'gradingform_rubric', PARAM_PLU
 $format = optional_param('format', null, PARAM_ALPHANUMEXT);
 
 // echo 'get the download options';
+// @TODO add access restrictions to this page.
 
 $pluginlist = get_plugin_list_with_function('gradingform', 'report_export_formats');
 $options = $pluginlist[$gradingmethod]();
 
 // TODO Add form to select export format.
-$format = 'imsspecification';
 // $format = 'moodlebasic';
+if (!isset($format)) {
+    $format = 'imsspecification';
+}
 
 if (!isset($options[$format]['fileextention'])) {
     throw new moodle_exception('error:exportfileextensionrequired', 'grading', '', $format);
@@ -57,6 +60,7 @@ if (!isset($functions[$gradingmethod])) {
     die();
 }
 $exportstring = $functions[$gradingmethod]($data, $format);
+die();
 
 // TODO create a better name for the export file.
-send_temp_file($exportstring, $control . 'export-' . $format . $options[$format]['fileextention'], true);
+// send_temp_file($exportstring, $control . 'export-' . $format . $options[$format]['fileextention'], true);

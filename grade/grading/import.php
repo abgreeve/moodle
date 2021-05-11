@@ -33,6 +33,8 @@ $options = $pluginlist[$gradingmethod]();
 
 // get all information about this rubric
 
+// @TODO add access restrictions to this page.
+
 $manager = get_grading_manager($areaid);
 
 list($context, $course, $cm) = get_context_info_array($manager->get_context()->id);

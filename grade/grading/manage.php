@@ -237,7 +237,12 @@ if (!empty($method)) {
                 echo $output->management_thingy($url, get_string('exportgradingform', 'core_grading'),
                     'i/emojicategorytravelplaces', json_encode($typedata));
             } else {
-                $url = new moodle_url('/grade/grading/export.php', ['gradingmethod' => $grademethodfullname, 'areaid' => $controller->get_areaid()]);
+
+                // We have one or less results. Try and send back the details of the one.
+                $format = array_keys($result)[0];
+
+                $params = ['gradingmethod' => $grademethodfullname, 'areaid' => $controller->get_areaid(), 'format' => $format];
+                $url = new moodle_url('/grade/grading/export.php', $params);
                 echo $output->management_action_icon($url, get_string('exportgradingform', 'core_grading'),
                     'i/emojicategorytravelplaces');
             }

@@ -990,13 +990,14 @@ class gradingform_rubric_instance extends gradingform_instance {
 function gradingform_rubric_report_export_formats(): array {
     return [
         'imsspecification' => [
-            'title' => new lang_string('imsspectitle', 'gradingform_rubric'),
-            'help' => new lang_string('imsspechelp', 'gradingform_rubric'),
+            'title' => get_string('imsspectitle', 'gradingform_rubric'),
+            'help' => get_string('imsspechelp', 'gradingform_rubric'),
             'fileextention' => '.json'
         ],
         'moodlebasic' => [
             'title' => 'Moodle basic export format',
-            'help' => 'Very basic export'
+            'help' => 'Very basic export',
+            'fileextention' => '.json'
         ]
     ];
 }

@@ -105,3 +105,5 @@ $string['gradingmethodimportfile'] = 'Grading method import file';
 $string['gradingmethodfileimport'] = 'Import a grading method from a file';
 $string['importfile'] = 'Import file';
 $string['importtypes'] = 'Import type';
+$string['exportgradingmethod'] = 'Export grading method to a file';
+$string['download'] = 'Download';

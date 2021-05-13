@@ -25,18 +25,18 @@
 require(__DIR__.'/../../config.php');
 require_once(__DIR__.'/lib.php');
 
-$areaid = optional_param('areaid', null, PARAM_INT);
+$areaid = required_param('areaid', PARAM_INT);
 $gradingmethod = optional_param('gradingmethod', 'gradingform_rubric', PARAM_PLUGIN);
 $format = optional_param('format', null, PARAM_ALPHANUMEXT);
 
-// echo 'get the download options';
-// @TODO add access restrictions to this page.
+$manager = get_grading_manager($areaid);
+list($context, $course, $cm) = get_context_info_array($manager->get_context()->id);
+require_login($course, true, $cm);
+require_capability('moodle/grade:exportgradingforms', $context);
 
 $pluginlist = get_plugin_list_with_function('gradingform', 'report_export_formats');
 $options = $pluginlist[$gradingmethod]();
 
-// TODO Add form to select export format.
-// $format = 'moodlebasic';
 if (!isset($format)) {
     $format = 'imsspecification';
 }
@@ -49,7 +49,6 @@ $control = substr($gradingmethod, 12);
 
 // get all information about this grading method.
 
-$manager = get_grading_manager($areaid);
 $controller = $manager->get_controller($control);
 $definition = $controller->get_definition();
 $data = clone($definition);
@@ -60,7 +59,6 @@ if (!isset($functions[$gradingmethod])) {
     die();
 }
 $exportstring = $functions[$gradingmethod]($data, $format);
-die();
 
 // TODO create a better name for the export file.
-// send_temp_file($exportstring, $control . 'export-' . $format . $options[$format]['fileextention'], true);
+send_temp_file($exportstring, $control . 'export-' . $format . $options[$format]['fileextention'], true);

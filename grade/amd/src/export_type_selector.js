@@ -25,8 +25,12 @@
 import ModalFactory from 'core/modal_factory';
 import ModalEvents from 'core/modal_events';
 import Templates from 'core/templates';
+import {get_string as getString} from 'core/str';
 
-const showthing = async(e) => {
+/**
+ * Shows the Grading method export Modal.
+ */
+const showModal = async(e) => {
     e.preventDefault();
     let link = e.currentTarget;
     let rawdata = link.getAttribute('data-export-types');
@@ -36,44 +40,42 @@ const showthing = async(e) => {
     displayModal(modal, link);
 };
 
-
+/**
+ * @param {object} templatecontext The context data to be sent to the template.
+ */
 const buildModal = async(templatecontext) => {
 
     return ModalFactory.create({
-        // title: await getString('delexternalbackpack', 'core_badges'),
-        title: 'Add title here',
+        title: await getString('exportgradingmethod', 'grading'),
         body: await Templates.render('core_grades/type_selector', templatecontext),
         type: ModalFactory.types.SAVE_CANCEL,
     });
 
 };
 
+/**
+ * { function_description }
+ *
+ * @param      {<type>}  modal   The modal
+ * @param      {<type>}  link    The link
+ */
 const displayModal = async(modal, link) => {
-    // modal.setSaveButtonText(await getString('delete', 'core'));
-    modal.setSaveButtonText('Download');
-
-    modal.getRoot().on(ModalEvents.save, function() {
-        let format = 'imsspecification';
-        let thing = modal.getRoot().find('.custom-radio').find('input');
-        if (typeof thing !== 'undefined') {
-
-            window.console.log(Object.entries(thing));
-            // thing.forEach((inputnode) => {
-            //     window.console.log(inputnode);
-            // });
-
-
-
-            let brown = thing[0];
-            // window.console.log(brown.getAttribute('value'));
-            format = brown.getAttribute('value');
-            let url = link.getAttribute('href');
-            link.setAttribute('href', url + '&format=' + format);
-            // window.location.href = link.getAttribute('href');
+    modal.setSaveButtonText(await getString('download', 'grading'));
+    modal.getRoot().on(ModalEvents.save, () => {
+        let radiobuttonnodes = document.querySelectorAll('[data-grading-method-export-type]');
+        if (typeof radiobuttonnodes !== 'undefined') {
+            radiobuttonnodes.forEach((nodeitem) => {
+                if (nodeitem.checked == true) {
+                    let format = nodeitem.getAttribute('value');
+                    let url = link.getAttribute('href');
+                    link.setAttribute('href', url + '&format=' + format);
+                    window.location.href = link.getAttribute('href');
+                }
+            });
         }
     });
 
-    modal.getRoot().on(ModalEvents.hidden, function() {
+    modal.getRoot().on(ModalEvents.hidden, () => {
         modal.destroy();
     });
 
@@ -82,5 +84,5 @@ const displayModal = async(modal, link) => {
 
 export const init = () => {
     let thing = document.querySelector('[data-thing]');
-    thing.addEventListener('click', showthing);
+    thing.addEventListener('click', showModal);
 };

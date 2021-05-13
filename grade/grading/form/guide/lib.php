@@ -1023,7 +1023,12 @@ function gradingform_guide_report_export_formats(): array {
             'title' => 'Moodle basic export format',
             'help' => 'Very basic export',
             'fileextention' => '.json'
-        ]
+        ],
+        // 'tester-mctest' => [
+        //     'title' => 'Moodle tester McTest export format',
+        //     'help' => 'Very basic export',
+        //     'fileextention' => '.json'
+        // ]
     ];
 }
 

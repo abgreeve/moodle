@@ -224,32 +224,36 @@ if (!empty($method)) {
     $grademethodfullname = 'gradingform_' . $method;
     if (isset($functions[$grademethodfullname])) {
         if (isset($definition)) {
-            $result = $functions[$grademethodfullname]();
-            if (count($result) > 1) {
+            if (has_capability('moodle/grade:exportgradingforms', $context)) {
+                $result = $functions[$grademethodfullname]();
+                if (count($result) > 1) {
 
-                // Do somewhere else
-                // but here now will do.
-                $typedata = transform_for_export($result);
+                    // Do somewhere else
+                    // but here now will do.
+                    $typedata = transform_for_export($result);
 
 
-                // Let's go!
-                $url = new moodle_url('/grade/grading/export.php', ['gradingmethod' => $grademethodfullname, 'areaid' => $controller->get_areaid()]);
-                echo $output->management_thingy($url, get_string('exportgradingform', 'core_grading'),
-                    'i/emojicategorytravelplaces', json_encode($typedata));
-            } else {
+                    // Let's go!
+                    $url = new moodle_url('/grade/grading/export.php', ['gradingmethod' => $grademethodfullname, 'areaid' => $controller->get_areaid()]);
+                    echo $output->management_thingy($url, get_string('exportgradingform', 'core_grading'),
+                        'i/emojicategorytravelplaces', json_encode($typedata));
+                } else {
 
-                // We have one or less results. Try and send back the details of the one.
-                $format = array_keys($result)[0];
+                    // We have one or less results. Try and send back the details of the one.
+                    $format = array_keys($result)[0];
 
-                $params = ['gradingmethod' => $grademethodfullname, 'areaid' => $controller->get_areaid(), 'format' => $format];
-                $url = new moodle_url('/grade/grading/export.php', $params);
-                echo $output->management_action_icon($url, get_string('exportgradingform', 'core_grading'),
-                    'i/emojicategorytravelplaces');
+                    $params = ['gradingmethod' => $grademethodfullname, 'areaid' => $controller->get_areaid(), 'format' => $format];
+                    $url = new moodle_url('/grade/grading/export.php', $params);
+                    echo $output->management_action_icon($url, get_string('exportgradingform', 'core_grading'),
+                        'i/emojicategorytravelplaces');
+                }
             }
         } else {
-            echo $output->management_action_icon(new moodle_url('/grade/grading/import.php',
-                ['areaid' => $controller->get_areaid(), 'gradingmethod' => $grademethodfullname]),
-                get_string('importgradingform', 'core_grading'), 'i/down');
+            if (has_capability('moodle/grade:importgradingforms', $context)) {
+                echo $output->management_action_icon(new moodle_url('/grade/grading/import.php',
+                    ['areaid' => $controller->get_areaid(), 'gradingmethod' => $grademethodfullname]),
+                    get_string('importgradingform', 'core_grading'), 'i/down');
+            }
         }
     }
     echo $output->container_end();

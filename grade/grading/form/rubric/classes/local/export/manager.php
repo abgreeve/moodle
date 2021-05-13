@@ -17,7 +17,7 @@
 /**
  * Export of advanced grading method to an IMS standard format.
  *
- * @package    core_grading
+ * @package    gradingform_rubric
  * @copyright  2020 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,7 +29,7 @@ use gradingform_rubric\local\export\ims_mapper;
 /**
  * Export of advanced grading method to an IMS standard format.
  *
- * @package    core_grading
+ * @package    gradingform_rubric
  * @copyright  2020 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

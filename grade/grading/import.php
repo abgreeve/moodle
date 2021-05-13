@@ -25,20 +25,16 @@
 require(__DIR__.'/../../config.php');
 require_once(__DIR__.'/lib.php');
 
-$areaid = optional_param('areaid', null, PARAM_INT);
+$areaid = required_param('areaid', PARAM_INT);
 $gradingmethod = optional_param('gradingmethod', 'gradingform_rubric', PARAM_PLUGIN);
+
+$manager = get_grading_manager($areaid);
+list($context, $course, $cm) = get_context_info_array($manager->get_context()->id);
+require_login($course, true, $cm);
+require_capability('moodle/grade:importgradingforms', $context);
 
 $pluginlist = get_plugin_list_with_function('gradingform', 'report_import_formats');
 $options = $pluginlist[$gradingmethod]();
-
-// get all information about this rubric
-
-// @TODO add access restrictions to this page.
-
-$manager = get_grading_manager($areaid);
-
-list($context, $course, $cm) = get_context_info_array($manager->get_context()->id);
-require_login($course, true, $cm);
 
 $PAGE->set_url(new \moodle_url('/grade/grading/import.php', ['areaid' => $areaid]));
 

@@ -102,3 +102,5 @@ $string['score_help'] = 'Enter a score for {$a->criterion} between 0 and {$a->ma
 $string['showmarkerdesc'] = 'Show marker criterion descriptions';
 $string['showmarkspercriterionstudents'] = 'Show marks per criterion to students';
 $string['showstudentdesc'] = 'Show student criterion descriptions';
+
+$string['notmoodlebasicfile'] = 'This does not appear to be a moodle basic format marking guide file. Please double check the file you are importing.';

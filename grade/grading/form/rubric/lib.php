@@ -1045,7 +1045,7 @@ function gradingform_rubric_convert_to_export_format(stdClass $data, string $for
  * @param  string    $format      The format to convert. Currently we only accept imsspecification.
  * @return stdClass  The data in a format that the rubric API can handle.
  */
-function gradingform_rubric_import_from_file(string $datastring, int $areaid, string $format): stdClass {
+function gradingform_rubric_import_from_file(string $datastring, int $areaid, string $format, context $context): stdClass {
 
     // Currently we only have imsspecification, but if we have more then we need to check the format to decide on what to do.
     $dataobject = json_decode($datastring);
@@ -1055,5 +1055,6 @@ function gradingform_rubric_import_from_file(string $datastring, int $areaid, st
     }
 
     $importmanager = new \gradingform_rubric\local\import\manager($dataobject, $areaid);
+    $importmanager->check_file_contents();
     return $importmanager->translate_data();
 }

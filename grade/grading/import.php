@@ -56,7 +56,7 @@ if ($data = $mform->get_data()) {
     $importstring = $file->get_content();
 
     $formfunctions = get_plugin_list_with_function('gradingform', 'import_from_file');
-    $translatedobject = $formfunctions[$gradingmethod]($importstring, $areaid, $data->importtype);
+    $translatedobject = $formfunctions[$gradingmethod]($importstring, $areaid, $data->importtype, $context);
     $controller->update_definition($translatedobject);
 
     redirect(new \moodle_url('/grade/grading/manage.php', ['areaid' => $areaid]));

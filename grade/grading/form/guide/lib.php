@@ -1053,12 +1053,19 @@ function gradingform_guide_convert_to_export_format(stdClass $data, string $form
     return $datastring;
 }
 
-function gradingform_guide_import_from_file(string $datastring, int $areaid, string $format): stdClass {
+function gradingform_guide_import_from_file(string $datastring, int $areaid, string $format, context $context): stdClass {
 
     // TODO Move into a class perhaps?
     $dataobject = json_decode($datastring);
+    $url = new moodle_url('/grade/grading/manage.php', ['areaid' => $areaid]);
     if (is_null($dataobject)) {
-        print_error('jsonimporterror', 'grades', new \moodle_url('/grade/grading/manage.php', ['areaid' => $areaid]));
+        print_error('jsonimporterror', 'grades', $url);
+        exit();
+    }
+
+    // Check that this is the file type we are looking for.
+    if (!isset($dataobject->method) && $dataobject->method !== "guide") {
+        print_error('notmoodlebasicfile', 'gradingform_guide', $url);
         exit();
     }
 

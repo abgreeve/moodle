@@ -275,7 +275,6 @@ if (!empty($method)) {
     }
 }
 
-
 echo $output->footer();
 
 function transform_for_export($data) {

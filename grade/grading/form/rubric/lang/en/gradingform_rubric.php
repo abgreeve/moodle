@@ -100,3 +100,4 @@ This warning may be ignored if a scale is used for grading, and the minimum leve
 
 $string['imsspectitle'] = 'IMS specification json file';
 $string['imsspechelp'] = 'This json file is in a format that adheres to the IMS specification. It can be imported back into Moodle or other places that also follow the specification.';
+$string['notimsspecfile'] = 'This does not appear to be an IMS specification JSON file. Please check the file that you are importing.';

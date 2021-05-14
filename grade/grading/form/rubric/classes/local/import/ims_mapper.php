@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Export of advanced grading method to XML.
+ * Export of an internal rubric ultimately to JSON.
  *
  * @package    gradingform_rubric
  * @copyright  2020 Adrian Greeve <adrian@moodle.com>
@@ -24,11 +24,21 @@
 
 namespace gradingform_rubric\local\import;
 
+/**
+ * Export of an internal rubric ultimately to JSON.
+ *
+ * @package    gradingform_rubric
+ * @copyright  2020 Adrian Greeve <adrian@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class ims_mapper {
 
+    /** A constant to signify that this item is not imported. */
     const NOT_IMPORTED = 1;
 
+    /** int A number used for numeric values when importing. */
     protected $number = null;
+    /** int The area ID that we are importing into. */
     protected $areaid = null;
 
     /**
@@ -63,6 +73,12 @@ class ims_mapper {
         ];
     }
 
+    /**
+     * This is a list of the possible fields in the criteria section of the file. This outlines what is not imported, and for
+     * other elements, the function required to translate the values.
+     *
+     * @return array A mapping for data translation.
+     */
     public function map_criteria(): array {
         return [
             'base' => [
@@ -91,6 +107,12 @@ class ims_mapper {
         ];
     }
 
+    /**
+     * This is a list of the possible fields in the levels section of the file. This outlines what is not imported, and for
+     * other elements, the function required to translate the values.
+     *
+     * @return array A mapping for data translation.
+     */
     public function map_levels(): array {
         return [
             'base' => [
@@ -116,16 +138,15 @@ class ims_mapper {
     }
 
     public function get_text(string $value): string {
-        return clean_param($value, PARAM_TEXT);
+        return $value;
     }
 
     public function set_number(int $value): void {
         $this->number = $value;
     }
 
-    public function get_number(int $value = null): int {
-        $value = $value ?? $this->number;
-        return clean_param($value, PARAM_INT);
+    public function get_number(float $value = null): float {
+        return $value ?? $this->number;
     }
 
     public function get_criteria($value): array {
@@ -149,10 +170,9 @@ class ims_mapper {
     }
 
     public function get_editor(string $value): array {
-        // array with 'text', 'format', and 'itemid'
         return [
             'text' => $value,
-            'format' => 1,
+            'format' => FORMAT_MOODLE,
             'itemid' => file_get_unused_draft_itemid()
         ];
     }
@@ -174,9 +194,7 @@ class ims_mapper {
         $newlevelid = 1;
         $newarray = [];
         foreach ($data as $key => $value) {
-
             $levelarray = [];
-
             $valuearray = (array) $value;
 
             foreach ($valuearray['CFRubricCriterionLevels'] as $lkey => $level) {
@@ -185,9 +203,8 @@ class ims_mapper {
                 $newlevelid++;
                 $levelarray[$index] = $larray;
             }
+
             $valuearray['CFRubricCriterionLevels'] = $levelarray;
-
-
             $index = 'NEWID' . $newidnumber;
             $newidnumber++;
             $newarray[$index] = $valuearray;

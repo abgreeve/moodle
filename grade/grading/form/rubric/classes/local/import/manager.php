@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Export of advanced grading method to an IMS standard format.
+ * Import of an IMS standard JSON file to our advanced grading method - Rubric.
  *
- * @package    core_grading
+ * @package    gradingform_rubric
  * @copyright  2020 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,17 +26,47 @@ namespace gradingform_rubric\local\import;
 
 use gradingform_rubric\local\import\ims_mapper;
 
+/**
+ * Import of an IMS standard JSON file to our advanced grading method - Rubric.
+ *
+ * @package    gradingform_rubric
+ * @copyright  2020 Adrian Greeve <adrian@moodle.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class manager {
 
+    /** stdClass The file data in object form to be converted. */
     public $data;
+    /** int The area id that we are importing this rubric into. */
     public $areaid;
 
-    public function __construct($data, $areaid) {
+    /**
+     * Constructs a new instance.
+     *
+     * @param stdClass  $data    File data.
+     * @param int  $areaid  The areaid for this grading method.
+     */
+    public function __construct(\stdClass $data, int $areaid) {
         $this->data = $data;
         $this->areaid = $areaid;
     }
 
-    public function translate_data() {
+    /**
+     * Check that the data coming in contains rubric criterion. If not then it might be the wrong format.
+     */
+    public function check_file_contents(): void {
+        if (!isset($this->data->CFRubricCriterion)) {
+            $url = new \moodle_url('/grade/grading/manage.php', ['areaid' => $this->areaid]);
+            print_error('notimsspecfile', 'gradingform_rubric', $url);
+        }
+    }
+
+    /**
+     * Translate the IMS spec file into a format that our API recognises.
+     *
+     * @return \stdClass A converted object similar to what a form returns.
+     */
+    public function translate_data(): \stdClass {
         $imsmapper = new ims_mapper();
 
         $basemap = $imsmapper->map_base();
@@ -44,40 +74,50 @@ class manager {
         $imsmapper->set_number(20);
         $imsmapper->set_areaid($this->areaid);
 
-        $tmepthing = (array) $this->data;
+        $dataarray = (array) $this->data;
 
-        $good = $this->convert_data_section($tmepthing, $basemap, $imsmapper);
+        $converteddata = $this->convert_data_section($dataarray, $basemap, $imsmapper);
 
         $criteriamap = $imsmapper->map_criteria();
         $levelmap = $imsmapper->map_levels();
-        foreach ($good['rubric']['criteria'] as $key => $criteria) {
+        foreach ($converteddata['rubric']['criteria'] as $key => $criteria) {
 
             foreach ($criteria['CFRubricCriterionLevels'] as $levelkey => $level) {
                 $criteria['CFRubricCriterionLevels'][$levelkey] = $this->convert_data_section($level, $levelmap, $imsmapper);
             }
 
-            $good['rubric']['criteria'][$key] = $this->convert_data_section($criteria, $criteriamap, $imsmapper);
+            $converteddata['rubric']['criteria'][$key] = $this->convert_data_section($criteria, $criteriamap, $imsmapper);
         }
 
-        return (object) $good;
+        return (object) $converteddata;
     }
 
-    protected function convert_data_section($datasection, $mapper, $imsthing) {
+    /**
+     * Convert this section of data with the use of the mapped criteria.
+     *
+     * @param  array      $datasection The section of data we are converting.
+     * @param  array      $mappedsection The mapped section we are dealing with.
+     * @param  ims_mapper $imsmapper The ims_mapper class for running the required functions.
+     * @return array      The datasection with the translated data.
+     */
+    protected function convert_data_section(array $datasection, array $mappedsection, ims_mapper $imsmapper): array {
+
         $mappercheck = array_map(function($value) {
             if ($value == ims_mapper::NOT_IMPORTED) {
                 return $value = true;
             }
             return $value = false;
-        }, $mapper['base']);
+        }, $mappedsection['base']);
+
         foreach ($datasection as $key => $value) {
-            if (isset($mapper['base'][$key])) {
-                if ($mapper['base'][$key] == ims_mapper::NOT_IMPORTED) {
+            if (isset($mappedsection['base'][$key])) {
+                if ($mappedsection['base'][$key] == ims_mapper::NOT_IMPORTED) {
                     $mappercheck[$key] = true;
                     unset($datasection[$key]);
                 } else {
-                    $function = $mapper['base'][$key]['function'];
-                    $fieldname = $mapper['base'][$key]['field'];
-                    $datasection[$fieldname] = call_user_func([$imsthing, $function], $value);
+                    $function = $mappedsection['base'][$key]['function'];
+                    $fieldname = $mappedsection['base'][$key]['field'];
+                    $datasection[$fieldname] = call_user_func([$imsmapper, $function], $value);
                     if ($key != $fieldname) {
                         unset($datasection[$key]);
                     }
@@ -85,20 +125,20 @@ class manager {
                 }
             }
             // Add target fields.
-            foreach ($mapper['target'] as $index => $function) {
-                $datasection[$index] = call_user_func([$imsthing, $function]);
+            foreach ($mappedsection['target'] as $index => $function) {
+                $datasection[$index] = call_user_func([$imsmapper, $function]);
             }
         }
+
         // Find the required fields in Moodle that need to be filled in, that are optional in the IMS spec.
         foreach ($mappercheck as $key => $value) {
             if (!$value) {
-                $function = $mapper['base'][$key]['function'];
-                $fieldname = $mapper['base'][$key]['field'];
-                $datasection[$fieldname] = call_user_func([$imsthing, $function], '');
+                $function = $mappedsection['base'][$key]['function'];
+                $fieldname = $mappedsection['base'][$key]['field'];
+                $datasection[$fieldname] = call_user_func([$imsmapper, $function], '');
             }
         }
 
         return $datasection;
     }
-
 }

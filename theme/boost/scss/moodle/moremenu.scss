@@ -1,14 +1,16 @@
 .moremenu {
     opacity: 0;
-    height: $navbar-height;
-    box-shadow: none;
+    height: $moremenu-height;
     &.observed {
         opacity: 1;
     }
     .nav-link {
-        height: $navbar-height !important; /* stylelint-disable-line declaration-no-important */
+        height: $moremenu-height;
         display: flex;
         align-items: center;
+    }
+    .nav-tabs {
+        margin-left: 0;
     }
     // Styling for dropdown menus inside the MoreButton.
     .dropdownmoremenu > .dropdown-menu {

@@ -3816,7 +3816,15 @@ EOD;
      * @return string
      */
     public function more_menu($content, $navbarstyle) {
-        $template = (object) ['nodearray' => $content];
+        if (is_object($content)) {
+            if (!isset($content->children) || count($content->children) == 0) {
+                return false;
+            }
+            $template = (object) ['nodecollection' => $content];
+        }
+        if (is_array($content)) {
+            $template = (object) ['nodearray' => $content];
+        }
         $template->navbarstyle = $navbarstyle;
         return $this->render_from_template('core/moremenu', $template);
     }

@@ -19781,15 +19781,15 @@ div.editor_atto_toolbar button .icon {
 
 .moremenu {
   opacity: 0;
-  height: 50px;
-  box-shadow: none; }
+  height: 40px; }
   .moremenu.observed {
     opacity: 1; }
   .moremenu .nav-link {
-    height: 50px !important;
-    /* stylelint-disable-line declaration-no-important */
+    height: 40px;
     display: flex;
     align-items: center; }
+  .moremenu .nav-tabs {
+    margin-left: 0; }
   .moremenu .dropdownmoremenu > .dropdown-menu > .dropdown-item {
     padding: 0; }
   .moremenu .dropdownmoremenu > .dropdown-menu .dropdown-menu {
@@ -19806,12 +19806,15 @@ div.editor_atto_toolbar button .icon {
     .moremenu .dropdownmoremenu > .dropdown-menu .dropdown-menu .dropdown-divider {
       display: none; }
 
-.topnavbar .moremenu {
-  margin-top: 0;
-  height: 50px;
-  flex: 1 1 auto; }
-  .topnavbar .moremenu .navbar-nav .nav-link {
+.navbar.fixed-top .moremenu {
+  height: 50px; }
+  .navbar.fixed-top .moremenu .nav-link {
     height: 50px; }
+
+.secondarynavigation {
+  z-index: 1; }
+  .secondarynavigation .moremenu {
+    margin-bottom: -1px; }
 
 body {
   -webkit-font-smoothing: antialiased;

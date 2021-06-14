@@ -66,6 +66,10 @@ $PAGE->set_url($url);
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('overrides', 'lesson'));
 $PAGE->set_heading($course->fullname);
+
+$actionbar = new \mod_lesson\output\actionbar($cm->id, $url);
+$PAGE->set_page_action($actionbar->get_override_bar());
+
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($lesson->name, true, array('context' => $context)));
 
@@ -290,11 +294,7 @@ if ($groupmode) {
     if (empty($groups)) {
         // There are no groups.
         echo $OUTPUT->notification(get_string('groupsnone', 'lesson'), 'error');
-        $options['disabled'] = true;
     }
-    echo $OUTPUT->single_button($overrideediturl->out(true,
-            array('action' => 'addgroup', 'cmid' => $cm->id)),
-            get_string('addnewgroupoverride', 'lesson'), 'post', $options);
 } else {
     $users = array();
     // See if there are any users in the lesson.
@@ -323,11 +323,7 @@ if ($groupmode) {
     if (empty($users)) {
         // There are no users.
         echo $OUTPUT->notification($nousermessage, 'error');
-        $options['disabled'] = true;
     }
-    echo $OUTPUT->single_button($overrideediturl->out(true,
-            array('action' => 'adduser', 'cmid' => $cm->id)),
-            get_string('addnewuseroverride', 'lesson'), 'get', $options);
 }
 echo html_writer::end_tag('div');
 echo html_writer::end_tag('div');

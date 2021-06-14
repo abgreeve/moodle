@@ -46,6 +46,9 @@ if ($mode !== 'display') {
 }
 $PAGE->set_url($url);
 
+$actionbar = new \mod_lesson\output\actionbar($id, $url);
+$PAGE->set_page_action($actionbar->get_main_select_menu());
+
 $currentgroup = groups_get_activity_group($cm, true);
 
 $attempt = new stdClass();

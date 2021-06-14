@@ -51,6 +51,8 @@ require_course_login($course, true, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/book:read', $context);
 
+
+
 $allowedit  = has_capability('mod/book:edit', $context);
 $viewhidden = has_capability('mod/book:viewhiddenchapters', $context);
 
@@ -122,6 +124,11 @@ $PAGE->set_title($pagetitle);
 $PAGE->set_heading($course->fullname);
 
 book_add_fake_block($chapters, $chapter, $book, $cm, $edit);
+
+$renderer = $PAGE->get_renderer('mod_book');
+$actionmenu = new \mod_book\output\main_actionbar($cm->id, $chapters, $chapter, $book);
+$renderedmneu = $renderer->main_action_menu($actionmenu);
+$PAGE->set_page_action($renderedmneu);
 
 // prepare chapter navigation icons
 $previd = null;

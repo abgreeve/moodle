@@ -59,19 +59,19 @@ class mod_lesson_renderer extends plugin_renderer_base {
         $completiondetails = \core_completion\cm_completion_details::get_instance($cminfo, $USER->id);
         $activitydates = \core\activity_dates::get_dates_for_module($cminfo, $USER->id);
         if (has_capability('mod/lesson:manage', $context)) {
-            $output .= $this->output->heading_with_help($activityname, 'overview', 'lesson');
-            $output .= $this->output->activity_information($cminfo, $completiondetails, $activitydates);
+            // $output .= $this->output->heading_with_help($activityname, 'overview', 'lesson');
+            // $output .= $this->output->activity_information($cminfo, $completiondetails, $activitydates);
 
-            // Info box.
-            if ($lesson->intro) {
-                $output .= $this->output->box(format_module_intro('lesson', $lesson, $cm->id), 'generalbox', 'intro');
-            }
-            if (!empty($currenttab)) {
-                ob_start();
-                include($CFG->dirroot.'/mod/lesson/tabs.php');
-                $output .= ob_get_contents();
-                ob_end_clean();
-            }
+            // // Info box.
+            // if ($lesson->intro) {
+            //     $output .= $this->output->box(format_module_intro('lesson', $lesson, $cm->id), 'generalbox', 'intro');
+            // }
+            // if (!empty($currenttab)) {
+            //     ob_start();
+            //     include($CFG->dirroot.'/mod/lesson/tabs.php');
+            //     $output .= ob_get_contents();
+            //     ob_end_clean();
+            // }
         } else {
             $output .= $this->output->heading($activityname);
             $output .= $this->output->activity_information($cminfo, $completiondetails, $activitydates);
@@ -649,5 +649,10 @@ class mod_lesson_renderer extends plugin_renderer_base {
                 array('class' => 'centerpadded lessonbutton standardbutton pr-3'));
         }
         return $output;
+    }
+
+    public function override_actionbar($overridething) {
+        $context = $overridething->export_for_template($this);
+        return $this->render_from_template('mod_lesson/override_action_menu', $context);
     }
 }

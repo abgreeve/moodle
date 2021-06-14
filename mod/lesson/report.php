@@ -53,6 +53,9 @@ if ($action == 'reportoverview') {
     $PAGE->navbar->add(get_string('overview', 'lesson'));
 }
 
+$actionbar = new \mod_lesson\output\actionbar($id, $url);
+$PAGE->set_page_action($actionbar->get_main_select_menu());
+
 $lessonoutput = $PAGE->get_renderer('mod_lesson');
 
 if ($action === 'delete') {

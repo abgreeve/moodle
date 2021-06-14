@@ -58,6 +58,11 @@ $PAGE->force_settings_menu();
 $context = $lesson->context;
 $canmanage = $lesson->can_manage();
 
+if ($canmanage) {
+    $actionbar = new \mod_lesson\output\actionbar($id, $url);
+    $PAGE->set_page_action($actionbar->get_main_select_menu());
+}
+
 $lessonoutput = $PAGE->get_renderer('mod_lesson');
 
 $reviewmode = $lesson->is_in_review_mode();

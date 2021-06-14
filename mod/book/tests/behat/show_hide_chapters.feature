@@ -57,23 +57,21 @@ Feature: Book activity chapter visibility management
     And I turn editing mode off
     Then the "class" attribute of "a[title='Second chapter']" "css_element" should contain "dimmed_text"
     And the "class" attribute of "a[title='Third chapter']" "css_element" should contain "dimmed_text"
+    And I am on "Course 1" course homepage
     And I turn editing mode on
+    And I follow "Test book"
     And I follow "Next"
     And I should see "Second chapter" in the ".book_content" "css_element"
-    And I should not see "Exit book"
     And I follow "Next"
     And I should see "Sub chapter" in the ".book_content" "css_element"
     And I follow "Next"
     And I should see "Third chapter" in the ".book_content" "css_element"
     And I follow "Next"
     And I should see "Fourth chapter" in the ".book_content" "css_element"
-    And I follow "Exit book"
     And I log out
     And I am on the "Test book" "book activity" page logged in as student1
     And I should not see "Second chapter" in the "Table of contents" "block"
     And I should not see "Third chapter" in the "Table of contents" "block"
     And I follow "Next"
     And I should see "Fourth chapter" in the ".book_content" "css_element"
-    And I follow "Exit book"
-    And I am on the "Test book" "book activity" page
-    And I should see "First chapter" in the ".book_content" "css_element"
+

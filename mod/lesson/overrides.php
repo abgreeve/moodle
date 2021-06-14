@@ -66,8 +66,15 @@ $PAGE->set_url($url);
 $PAGE->set_pagelayout('admin');
 $PAGE->set_title(get_string('overrides', 'lesson'));
 $PAGE->set_heading($course->fullname);
+
+$overrideselect = new \mod_lesson\output\override_action_menu($cm->id, $url);
+$renderer = $PAGE->get_renderer('mod_lesson');
+
 echo $OUTPUT->header();
-echo $OUTPUT->heading(format_string($lesson->name, true, array('context' => $context)));
+if (!$PAGE->include_secondary_navigation()) {
+    echo $OUTPUT->heading(format_string($lesson->name, true, array('context' => $context)));
+}
+echo $renderer->render($overrideselect);
 
 // Delete orphaned group overrides.
 $sql = 'SELECT o.id
@@ -290,11 +297,7 @@ if ($groupmode) {
     if (empty($groups)) {
         // There are no groups.
         echo $OUTPUT->notification(get_string('groupsnone', 'lesson'), 'error');
-        $options['disabled'] = true;
     }
-    echo $OUTPUT->single_button($overrideediturl->out(true,
-            array('action' => 'addgroup', 'cmid' => $cm->id)),
-            get_string('addnewgroupoverride', 'lesson'), 'post', $options);
 } else {
     $users = array();
     // See if there are any users in the lesson.
@@ -323,11 +326,7 @@ if ($groupmode) {
     if (empty($users)) {
         // There are no users.
         echo $OUTPUT->notification($nousermessage, 'error');
-        $options['disabled'] = true;
     }
-    echo $OUTPUT->single_button($overrideediturl->out(true,
-            array('action' => 'adduser', 'cmid' => $cm->id)),
-            get_string('addnewuseroverride', 'lesson'), 'get', $options);
 }
 echo html_writer::end_tag('div');
 echo html_writer::end_tag('div');

@@ -1,4 +1,5 @@
 <?php
+
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -15,16 +16,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Book plugin version info
+ * Moodle renderer used to display special elements of the book module
  *
- * @package    mod_book
- * @copyright  2004-2012 Petr Skoda {@link http://skodak.org}
+ * @package mod_book
+ * @copyright  2021 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+ **/
 
-defined('MOODLE_INTERNAL') || die;
+namespace mod_book\output;
 
-$plugin->component = 'mod_book'; // Full name of the plugin (used for diagnostics)
-$plugin->version   = 2021052504; // The current module version (Date: YYYYMMDDXX).
-$plugin->requires  = 2021052500; // Requires this Moodle version.
-$plugin->cron      = 0;          // Period for cron to check this module (secs)
+class renderer extends \plugin_renderer_base {
+
+    public function main_action_menu($actionmenu) {
+        $context = $actionmenu->export_for_template($this);
+        // return '';
+        return $this->render_from_template('mod_book/main_action_menu', $context);
+    }
+
+}

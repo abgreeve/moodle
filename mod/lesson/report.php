@@ -55,6 +55,16 @@ if ($action == 'reportoverview') {
 
 $lessonoutput = $PAGE->get_renderer('mod_lesson');
 
+
+$overviewlink = new moodle_url('/mod/lesson/report.php', ['id' => $id, 'action' => 'reportoverview']);
+$fulllink = new moodle_url('/mod/lesson/report.php', ['id' => $id, 'action' => 'reportdetail']);
+$menu = [
+    $overviewlink->out(false) => get_string('overview', 'mod_lesson'),
+    $fulllink->out(false) => get_string('detailedstats', 'mod_lesson')
+];
+$reportselect = new url_select($menu, $url->out(false), null, 'lesson-report-select');
+
+
 if ($action === 'delete') {
     /// Process any form data before fetching attempts, grades and times
     if (has_capability('mod/lesson:edit', $context) and $form = data_submitted() and confirm_sesskey()) {
@@ -118,6 +128,9 @@ if ($action === 'delete') {
 
     if ($table === false) {
         echo $lessonoutput->header($lesson, $cm, $action, false, null, get_string('nolessonattempts', 'lesson'));
+        if ($PAGE->has_secondary_navigation()) {
+            echo $OUTPUT->render($reportselect);
+        }
         if (!empty($currentgroup)) {
             $groupname = groups_get_group_name($currentgroup);
             echo $OUTPUT->notification(get_string('nolessonattemptsgroup', 'lesson', $groupname));
@@ -130,6 +143,9 @@ if ($action === 'delete') {
     }
 
     echo $lessonoutput->header($lesson, $cm, $action, false, null, get_string('overview', 'lesson'));
+    if ($PAGE->has_secondary_navigation()) {
+        echo $OUTPUT->render($reportselect);
+    }
     groups_print_activity_menu($cm, $url);
 
     $course_context = context_course::instance($course->id);
@@ -259,6 +275,9 @@ if ($action === 'delete') {
 
 **************************************************************************/
     echo $lessonoutput->header($lesson, $cm, $action, false, null, get_string('detailedstats', 'lesson'));
+    if ($PAGE->has_secondary_navigation()) {
+        echo $OUTPUT->render($reportselect);
+    }
     groups_print_activity_menu($cm, $url);
 
     $course_context = context_course::instance($course->id);

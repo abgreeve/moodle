@@ -96,6 +96,18 @@ if (data_submitted() && !empty($action) && confirm_sesskey()) {
 
 // Completion and trigger events.
 choice_view($choice, $course, $cm, $context);
+$groupmode = groups_get_activity_groupmode($cm);
+// Check if we want to include responses from inactive users.
+$onlyactive = $choice->includeinactive ? false : true;
+
+$allresponses = choice_get_response_data($choice, $cm, $groupmode, $onlyactive);   // Big function, approx 6 SQL calls per user.
+
+$renderer = $PAGE->get_renderer('mod_choice');
+if (has_capability('mod/choice:readresponses', $context)) {
+    $responsedata = new \mod_choice\output\actionmenu($cm->id, $allresponses);
+    $rendereddata = $renderer->main_actionbar($responsedata);
+    $PAGE->set_page_action($rendereddata);
+}
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($choice->name), 2, null);
@@ -119,21 +131,10 @@ $eventdata['objectid'] = $choice->id;
 $eventdata['context'] = $context;
 
 /// Check to see if groups are being used in this choice
-$groupmode = groups_get_activity_groupmode($cm);
 
 if ($groupmode) {
     groups_get_activity_group($cm, true);
     groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/choice/view.php?id='.$id);
-}
-
-// Check if we want to include responses from inactive users.
-$onlyactive = $choice->includeinactive ? false : true;
-
-$allresponses = choice_get_response_data($choice, $cm, $groupmode, $onlyactive);   // Big function, approx 6 SQL calls per user.
-
-
-if (has_capability('mod/choice:readresponses', $context)) {
-    choice_show_reportlink($allresponses, $cm);
 }
 
 echo '<div class="clearer"></div>';
@@ -205,7 +206,6 @@ if ( (!$current or $choice->allowupdate) and $choiceopen and is_enrolled($contex
 
     // They haven't made their choice yet or updates allowed and choice is open.
     $options = choice_prepare_options($choice, $USER, $cm, $allresponses);
-    $renderer = $PAGE->get_renderer('mod_choice');
     echo $renderer->display_options($options, $cm->id, $choice->display, $choice->allowmultiple);
     $choiceformshown = true;
 } else {
@@ -240,7 +240,6 @@ if (!$choiceformshown) {
 // print the results at the bottom of the screen
 if (choice_can_view_results($choice, $current, $choiceopen)) {
     $results = prepare_choice_show_results($choice, $course, $cm, $allresponses);
-    $renderer = $PAGE->get_renderer('mod_choice');
     $resultstable = $renderer->display_result($results);
     echo $OUTPUT->box($resultstable);
 

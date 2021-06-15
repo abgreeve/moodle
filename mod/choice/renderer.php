@@ -409,5 +409,10 @@ class mod_choice_renderer extends plugin_renderer_base {
         $yaxis->set_stepsize(max(1, round(max($data['series']) / 10)));
         return $this->output->render($chart);
     }
+
+    public function main_actionbar($actionmenu) {
+        $context = $actionmenu->export_for_template($this);
+        return $this->render_from_template('mod_choice/main_actionbar', $context);
+    }
 }
 

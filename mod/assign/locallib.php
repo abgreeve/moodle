@@ -4150,7 +4150,7 @@ class assign {
      * @return string
      */
     protected function view_single_grade_page($mform) {
-        global $DB, $CFG, $SESSION;
+        global $DB, $CFG, $SESSION, $PAGE;
 
         $o = '';
         $instance = $this->get_instance();
@@ -5781,6 +5781,30 @@ class assign {
         if ($this->has_visible_attachments()) {
             $postfix = $this->render_area_files('mod_assign', ASSIGN_INTROATTACHMENT_FILEAREA, 0);
         }
+
+        // Add grading buttons to the action menu.
+        if ($this->can_view_grades()) {
+            $actionbuttons = new \mod_assign\output\actionmenu($this->get_course_module()->id);
+            $renderedbuttons = $this->get_renderer()->submission_actionmenu($actionbuttons);
+            $PAGE->set_page_action($renderedbuttons);
+        }
+        if ($this->can_view_submission($USER->id)) {
+
+            // Figure out if we are team or solitary submission.
+            $submission = $this->get_user_submission($USER->id, false);
+            $teamsubmission = null;
+            if ($instance->teamsubmission) {
+                $teamsubmission = $this->get_group_submission($USER->id, 0, false);
+            }
+
+            $showsubmit = ($this->submissions_open($USER->id) && $this->show_submit_button($submission, $teamsubmission, $USER->id));
+            $showedit = ($this->is_any_submission_plugin_enabled()) && $this->can_edit_submission($USER->id);
+
+            $actionbuttons = new \mod_assign\output\user_submission_actionmenu($this->get_course_module()->id, $showsubmit, $showedit, $submission, $teamsubmission);
+            $renderedbuttons = $this->get_renderer()->render($actionbuttons);
+            $PAGE->set_page_action($renderedbuttons);
+        }
+
         $o .= $this->get_renderer()->render(new assign_header($instance,
                                                       $this->get_context(),
                                                       $this->show_intro(),

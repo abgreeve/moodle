@@ -46,7 +46,7 @@ Feature: Remove a submission
       | Test assignment name  | student1  | I'm the student submission  |
 
     And I am on the "Test assignment name" Activity page logged in as teacher1
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
     And I open the action menu in "Student 1" "table_row"
     When I follow "Remove submission"
     And I click on "Continue" "button"
@@ -72,7 +72,7 @@ Feature: Remove a submission
       | Test assignment name  | student1  | I'm the student submission  |
 
     And I am on the "Test assignment name" Activity page logged in as teacher1
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
     And I open the action menu in "Student 1" "table_row"
     When I follow "Remove submission"
     And I click on "Continue" "button"
@@ -102,7 +102,7 @@ Feature: Remove a submission
     And I log out
 
     When I am on the "Test assignment name" Activity page logged in as teacher1
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
     Then I should not see "I'm the student submission"
     And I log out
 

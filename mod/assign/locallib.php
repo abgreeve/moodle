@@ -4563,7 +4563,9 @@ class assign {
         $gradingoptionsdata->workflowfilter = $workflowfilter;
         $gradingoptionsform->set_data($gradingoptionsdata);
 
-        $actionformtext = $this->get_renderer()->render($gradingactions);
+        $buttons = new \mod_assign\output\grading_actionmenu($this->get_course_module()->id);
+        $actionformtext = $this->get_renderer()->render($buttons);
+        $actionformtext .= $this->get_renderer()->render($gradingactions);
 
         $currenturl = new moodle_url('/mod/assign/view.php', ['id' => $this->get_course_module()->id, 'action' => 'grading']);
 
@@ -5796,6 +5798,9 @@ class assign {
         }
 
         if ($this->can_view_grades()) {
+            $actionbuttons = new \mod_assign\output\actionmenu($this->get_course_module()->id);
+            $o .= $this->get_renderer()->submission_actionmenu($actionbuttons);
+
             // Group selector will only be displayed if necessary.
             $currenturl = new moodle_url('/mod/assign/view.php', array('id' => $this->get_course_module()->id));
             $o .= groups_print_activity_menu($this->get_course_module(), $currenturl->out(), true);
@@ -5807,6 +5812,24 @@ class assign {
         $submission = $this->get_user_submission($USER->id, false);
 
         if ($this->can_view_submission($USER->id)) {
+            // Figure out if we are team or solitary submission.
+            $teamsubmission = null;
+            if ($instance->teamsubmission) {
+                $teamsubmission = $this->get_group_submission($USER->id, 0, false);
+            }
+
+            $showsubmit = ($this->submissions_open($USER->id)
+                && $this->show_submit_button($submission, $teamsubmission, $USER->id));
+            $showedit = ($this->is_any_submission_plugin_enabled()) && $this->can_edit_submission($USER->id);
+
+            $actionbuttons = new \mod_assign\output\user_submission_actionmenu(
+                $this->get_course_module()->id,
+                $showsubmit,
+                $showedit,
+                $submission,
+                $teamsubmission
+            );
+            $o .= $this->get_renderer()->render($actionbuttons);
             $o .= $this->view_student_summary($USER, true);
         }
 

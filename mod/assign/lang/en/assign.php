@@ -630,6 +630,8 @@ $string['viewrevealidentitiesconfirm'] = 'View reveal student identities confirm
 $string['workflowfilter'] = 'Workflow filter';
 $string['xofy'] = '{$a->x} of {$a->y}';
 
+$string['back'] = 'Back';
+
 // Deprecated since Moodle 3.8.
 $string['duedateno'] = 'No due date';
 $string['mysubmission'] = 'My submission: ';

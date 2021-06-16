@@ -128,7 +128,6 @@ $string['editcomment'] = 'Edit comment';
 $string['editentry'] = 'Edit entry';
 $string['editordisable'] = 'Disable editor';
 $string['editorenable'] = 'Enable editor';
-$string['edittemplate'] = 'Edit template';
 $string['emptyadd'] = 'The Add template is empty, generating a default form...';
 $string['emptyaddform'] = 'You did not fill out any fields!';
 $string['enabletemplateeditorcheck'] = 'Are you sure you want to enable the editor? This may result in content being altered when the template is saved.';
@@ -410,7 +409,6 @@ $string['uploadrecords_help'] = 'Entries may be uploaded via text file. The form
 
 The field enclosure is a character that surrounds each field in each record. It can normally be left unset.';
 $string['uploadrecords_link'] = 'mod/data/import';
-$string['updatetemplate'] = 'Update template';
 $string['url'] = 'URL';
 $string['usedate'] = 'Include in search.';
 $string['usepredefinedset'] = 'Use predefined set';

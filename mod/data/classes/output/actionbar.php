@@ -71,7 +71,7 @@ class actionbar {
      * @param bool $hasentries Whether entries exist
      * @return string The HTML code for the action selector.
      */
-    public function get_view_action_bar(bool $hasrecords): string {
+    public function get_view_action_bar(bool $hasentries): string {
         global $PAGE;
 
         $viewlistlink = new \moodle_url('/mod/data/view.php', ['d' => $this->id]);
@@ -90,7 +90,7 @@ class actionbar {
 
         $urlselect = new \url_select($menu, $activeurl->out(false), null, 'viewactionselect');
         $renderer = $PAGE->get_renderer('mod_data');
-        $viewactionbar = new \mod_data\output\view_action_bar($this->id, $urlselect, $hasrecords);
+        $viewactionbar = new \mod_data\output\view_action_bar($this->id, $urlselect, $hasentries);
 
         return $renderer->render_view_action_bar($viewactionbar);
     }

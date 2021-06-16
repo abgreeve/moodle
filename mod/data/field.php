@@ -90,6 +90,7 @@ require_login($course, true, $cm);
 
 $context = context_module::instance($cm->id);
 require_capability('mod/data:managetemplates', $context);
+
 /************************************
  *        Data Processing           *
  ***********************************/

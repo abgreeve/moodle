@@ -75,8 +75,8 @@ $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST)
 
 $context = context_module::instance($cm->id);
 
-
-$PAGE->set_url('/mod/wiki/files.php', array('pageid'=>$pageid));
+$url = new moodle_url('/mod/wiki/files.php', ['pageid' => $pageid]);
+$PAGE->set_url($url);
 require_course_login($course, true, $cm);
 
 if (!wiki_user_can_view($subwiki, $wiki)) {
@@ -86,6 +86,10 @@ if (!wiki_user_can_view($subwiki, $wiki)) {
 $PAGE->set_title(get_string('wikifiles', 'wiki'));
 $PAGE->set_heading($course->fullname);
 $PAGE->navbar->add(format_string(get_string('wikifiles', 'wiki')));
+
+$actionbar = new \mod_wiki\output\actionbar($pageid, $url);
+$PAGE->set_page_action($actionbar->get_action_bar());
+
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($wiki->name));
 
@@ -99,11 +103,10 @@ echo $OUTPUT->box(format_module_intro('wiki', $wiki, $PAGE->cm->id), 'generalbox
 
 $renderer = $PAGE->get_renderer('mod_wiki');
 
-$tabitems = array('view' => 'view', 'edit' => 'edit', 'comments' => 'comments', 'history' => 'history', 'map' => 'map', 'files' => 'files', 'admin' => 'admin');
-
-$options = array('activetab'=>'files');
-echo $renderer->tabs($page, $tabitems, $options);
-
+//$tabitems = array('view' => 'view', 'edit' => 'edit', 'comments' => 'comments', 'history' => 'history', 'map' => 'map', 'files' => 'files', 'admin' => 'admin');
+//
+//$options = array('activetab'=>'files');
+//echo $renderer->tabs($page, $tabitems, $options);
 
 echo $OUTPUT->box_start('generalbox');
 echo $renderer->wiki_print_subwiki_selector($PAGE->activityrecord, $subwiki, $page, 'files');

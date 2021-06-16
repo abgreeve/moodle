@@ -127,13 +127,18 @@ abstract class page_wiki {
 
         $this->set_url();
 
+        if (!empty($this->page)) {
+            $actionbar = new \mod_wiki\output\actionbar($this->page->id, $PAGE->url);
+            $PAGE->set_page_action($actionbar->get_action_bar());
+        }
+
         if (isset($SESSION->wikipreviousurl) && is_array($SESSION->wikipreviousurl)) {
             $this->process_session_url();
         }
         $this->set_session_url();
 
         $this->create_navbar();
-        $this->setup_tabs();
+        //$this->setup_tabs();
 
         echo $OUTPUT->header();
         $wiki = $PAGE->activityrecord;
@@ -142,9 +147,9 @@ abstract class page_wiki {
         echo $this->wikioutput->wiki_info();
 
         // tabs are associated with pageid, so if page is empty, tabs should be disabled
-        if (!empty($this->page) && !empty($this->tabs)) {
-            echo $this->wikioutput->tabs($this->page, $this->tabs, $this->tabs_options);
-        }
+//        if (!empty($this->page) && !empty($this->tabs)) {
+//            echo $this->wikioutput->tabs($this->page, $this->tabs, $this->tabs_options);
+//        }
     }
 
     /**

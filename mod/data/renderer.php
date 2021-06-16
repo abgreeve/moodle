@@ -85,4 +85,25 @@ class mod_data_renderer extends plugin_renderer_base {
         return $html;
     }
 
+    /**
+     * Renders the action bar for the view page.
+     *
+     * @param \mod_data\output\view_action_bar $actionbar
+     * @return string The HTML output
+     */
+    function render_view_action_bar(\mod_data\output\view_action_bar $actionbar): string {
+        $data = $actionbar->export_for_template($this);
+        return $this->render_from_template('mod_data/view_action_bar', $data);
+    }
+
+    /**
+     * Renders the action bar for the template pages.
+     *
+     * @param \mod_data\output\templates_action_bar $actionbar
+     * @return string The HTML output
+     */
+    function render_templates_action_bar(\mod_data\output\templates_action_bar $actionbar): string {
+        $data = $actionbar->export_for_template($this);
+        return $this->render_from_template('mod_data/templates_action_bar', $data);
+    }
 }

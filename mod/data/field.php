@@ -90,7 +90,6 @@ require_login($course, true, $cm);
 
 $context = context_module::instance($cm->id);
 require_capability('mod/data:managetemplates', $context);
-
 /************************************
  *        Data Processing           *
  ***********************************/
@@ -242,6 +241,9 @@ asort($menufield);    //sort in alphabetical order
 $PAGE->set_title(get_string('course') . ': ' . $course->fullname);
 $PAGE->set_heading($course->fullname);
 $PAGE->force_settings_menu(true);
+
+$actionbar = new \mod_data\output\actionbar($data->id, $url);
+$PAGE->set_page_action($actionbar->get_fields_action_bar());
 
 $PAGE->set_pagetype('mod-data-field-' . $newtype);
 if (($mode == 'new') && (!empty($newtype)) && confirm_sesskey()) {          ///  Adding a new field

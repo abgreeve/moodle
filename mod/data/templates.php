@@ -32,9 +32,6 @@ $mode  = optional_param('mode', 'singletemplate', PARAM_ALPHA);
 $useeditor = optional_param('useeditor', null, PARAM_BOOL);
 
 $url = new moodle_url('/mod/data/templates.php');
-if ($mode !== 'singletemplate') {
-    $url->param('mode', $mode);
-}
 
 if ($id) {
     $url->param('id', $id);
@@ -62,6 +59,8 @@ if ($id) {
         print_error('invalidcoursemodule');
     }
 }
+
+$url->param('mode', $mode);
 
 require_login($course, false, $cm);
 
@@ -104,6 +103,10 @@ $PAGE->set_title($data->name);
 $PAGE->set_heading($course->fullname);
 $PAGE->set_pagelayout('admin');
 $PAGE->force_settings_menu(true);
+
+$actionbar = new \mod_data\output\actionbar($data->id, $url);
+$PAGE->set_page_action($actionbar->get_templates_action_bar());
+
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($data->name), 2);
 
@@ -120,8 +123,8 @@ $currentgroup = groups_get_activity_group($cm);
 $groupmode = groups_get_activity_groupmode($cm);
 
 /// Print the tabs.
-$currenttab = 'templates';
-include('tabs.php');
+//$currenttab = 'templates';
+//include('tabs.php');
 
 /// Processing submitted data, i.e updating form.
 $resettemplate = false;

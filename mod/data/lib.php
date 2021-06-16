@@ -1372,7 +1372,7 @@ function data_grade_item_delete($data) {
  * @return mixed
  */
 function data_print_template($template, $records, $data, $search='', $page=0, $return=false, moodle_url $jumpurl=null) {
-    global $CFG, $DB, $OUTPUT;
+    global $CFG, $DB, $OUTPUT, $PAGE;
 
     $cm = get_coursemodule_from_instance('data', $data->id);
     $context = context_module::instance($cm->id);
@@ -1421,7 +1421,8 @@ function data_print_template($template, $records, $data, $search='', $page=0, $r
         $patterns[]='##delete##';
         if (data_user_can_manage_entry($record, $data, $context)) {
             $replacement[] = '<a href="'.$CFG->wwwroot.'/mod/data/edit.php?d='
-                             .$data->id.'&amp;rid='.$record->id.'&amp;sesskey='.sesskey().'">' .
+                             .$data->id.'&amp;rid='.$record->id.'&amp;sesskey='.sesskey().'&amp;backto='
+                             . urlencode($PAGE->url->out(false)) .'">' .
                              $OUTPUT->pix_icon('t/edit', get_string('edit')) . '</a>';
             $replacement[] = '<a href="'.$CFG->wwwroot.'/mod/data/view.php?d='
                              .$data->id.'&amp;delete='.$record->id.'&amp;sesskey='.sesskey().'">' .
@@ -2325,9 +2326,9 @@ function data_print_header($course, $cm, $data, $currenttab='') {
 
     // Print the tabs
 
-    if ($currenttab) {
-        include('tabs.php');
-    }
+//    if ($currenttab) {
+//        include('tabs.php');
+//    }
 
     // Print any notices
 

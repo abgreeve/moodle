@@ -33,6 +33,7 @@ $d               = optional_param('d', 0, PARAM_INT);   // database id
 $rid             = optional_param('rid', 0, PARAM_INT); // record id
 $fielddelimiter  = optional_param('fielddelimiter', ',', PARAM_CLEANHTML); // characters used as field delimiters for csv file import
 $fieldenclosure = optional_param('fieldenclosure', '', PARAM_CLEANHTML);   // characters used as record delimiters for csv file import
+$redirectbackto  = optional_param('backto', '', PARAM_LOCALURL); // The location to redirect back to upon form cancellation.
 
 $url = new moodle_url('/mod/data/import.php');
 if ($rid !== 0) {
@@ -65,6 +66,17 @@ require_login($course, false, $cm);
 $context = context_module::instance($cm->id);
 require_capability('mod/data:manageentries', $context);
 
+$form = new mod_data_import_form(new moodle_url('/mod/data/import.php'), ['dataid' => $data->id,
+    'backtourl' => $redirectbackto]);
+if ($form->is_cancelled()) {
+    $redirectbackto = !empty($redirectbackto) ? $redirectbackto :
+        new \moodle_url('/mod/data/view.php', ['d' => $data->id]);
+    redirect($redirectbackto);
+} else if ($formdata = $form->get_data()) {
+    $filecontent = $form->get_file_content('recordsfile');
+    $recordsadded = data_import_csv($cm, $data, $filecontent, $formdata->encoding, $formdata->fielddelimiter);
+}
+
 /// Print the page header
 $PAGE->navbar->add(get_string('add', 'data'));
 $PAGE->set_title($data->name);
@@ -77,18 +89,12 @@ echo $OUTPUT->heading_with_help(get_string('uploadrecords', 'mod_data'), 'upload
 $currentgroup = groups_get_activity_group($cm);
 $groupmode = groups_get_activity_groupmode($cm);
 
-$form = new mod_data_import_form(new moodle_url('/mod/data/import.php'), ['dataid' => $data->id]);
-if (!$formdata = $form->get_data()) {
-    /// Upload records section. Only for teachers and the admin.
-    echo $OUTPUT->box_start('generalbox boxaligncenter boxwidthwide');
-    $form->display();
-    echo $OUTPUT->box_end();
-    echo $OUTPUT->footer();
-    die;
-} else {
-    $filecontent = $form->get_file_content('recordsfile');
-    $recordsadded = data_import_csv($cm, $data, $filecontent, $formdata->encoding, $formdata->fielddelimiter);
-}
+/// Upload records section. Only for teachers and the admin.
+echo $OUTPUT->box_start('generalbox boxaligncenter boxwidthwide');
+$form->display();
+echo $OUTPUT->box_end();
+echo $OUTPUT->footer();
+die;
 
 if ($recordsadded > 0) {
     echo $OUTPUT->notification($recordsadded. ' '. get_string('recordssaved', 'data'), '');

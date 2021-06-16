@@ -48,10 +48,16 @@ if ($id) {
 $context = context_module::instance($cm->id, MUST_EXIST);
 require_login($course, false, $cm);
 require_capability('mod/data:managetemplates', $context);
-$PAGE->set_url(new moodle_url('/mod/data/preset.php', array('d'=>$data->id)));
+
+$url = new moodle_url('/mod/data/preset.php', array('d' => $data->id));
+
+$PAGE->set_url($url);
 $PAGE->set_title(get_string('course') . ': ' . $course->fullname);
 $PAGE->set_heading($course->fullname);
 $PAGE->force_settings_menu(true);
+
+$actionbar = new \mod_data\output\actionbar($data->id, $url);
+$PAGE->set_page_action($actionbar->get_fields_action_bar());
 
 // fill in missing properties needed for updating of instance
 $data->course     = $cm->course;
@@ -109,12 +115,12 @@ if (!$form_export->is_submitted()) {
     echo $OUTPUT->activity_information($cminfo, $completiondetails, $activitydates);
 
     // Needed for tabs.php
-    $currenttab = 'presets';
-    $currentgroup = groups_get_activity_group($cm);
-    $groupmode = groups_get_activity_groupmode($cm);
-    echo $OUTPUT->box(format_module_intro('data', $data, $cm->id), 'generalbox', 'intro');
-
-    include('tabs.php');
+//    $currenttab = 'presets';
+//    $currentgroup = groups_get_activity_group($cm);
+//    $groupmode = groups_get_activity_groupmode($cm);
+//    echo $OUTPUT->box(format_module_intro('data', $data, $cm->id), 'generalbox', 'intro');
+//
+//    include('tabs.php');
 }
 
 if (optional_param('sesskey', false, PARAM_BOOL) && confirm_sesskey()) {

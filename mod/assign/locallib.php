@@ -5783,10 +5783,10 @@ class assign {
         }
 
         // Add grading buttons to the action menu.
+        $renderedbuttons = '';
         if ($this->can_view_grades()) {
             $actionbuttons = new \mod_assign\output\actionmenu($this->get_course_module()->id);
-            $renderedbuttons = $this->get_renderer()->submission_actionmenu($actionbuttons);
-            $PAGE->set_page_action($renderedbuttons);
+            $renderedbuttons .= $this->get_renderer()->submission_actionmenu($actionbuttons);
         }
         if ($this->can_view_submission($USER->id)) {
 
@@ -5801,9 +5801,9 @@ class assign {
             $showedit = ($this->is_any_submission_plugin_enabled()) && $this->can_edit_submission($USER->id);
 
             $actionbuttons = new \mod_assign\output\user_submission_actionmenu($this->get_course_module()->id, $showsubmit, $showedit, $submission, $teamsubmission);
-            $renderedbuttons = $this->get_renderer()->render($actionbuttons);
-            $PAGE->set_page_action($renderedbuttons);
+            $renderedbuttons .= $this->get_renderer()->render($actionbuttons);
         }
+        $PAGE->set_page_action($renderedbuttons);
 
         $o .= $this->get_renderer()->render(new assign_header($instance,
                                                       $this->get_context(),

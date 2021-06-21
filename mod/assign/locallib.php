@@ -4679,12 +4679,16 @@ class assign {
      * @return string
      */
     protected function view_grading_page() {
-        global $CFG;
+        global $CFG, $PAGE;
 
         $o = '';
         // Need submit permission to submit an assignment.
         $this->require_view_grades();
         require_once($CFG->dirroot . '/mod/assign/gradeform.php');
+
+        $buttons = new \mod_assign\output\grading_actionmenu($this->get_course_module()->id);
+        $actionmenu = $this->get_renderer()->render($buttons);
+        $PAGE->set_page_action($actionmenu);
 
         $this->add_grade_notices();
 

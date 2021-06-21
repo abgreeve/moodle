@@ -3606,16 +3606,21 @@ function data_extend_settings_navigation(settings_navigation $settings, navigati
         } else {
             $addstring = get_string('editentry', 'data');
         }
-        $datanode->add($addstring, new moodle_url('/mod/data/edit.php', array('d'=>$PAGE->cm->instance)));
+        $addentrynode = $datanode->add($addstring,
+            new moodle_url('/mod/data/edit.php', array('d'=>$PAGE->cm->instance)));
+        $addentrynode->set_show_in_secondary_navigation(false);
     }
 
     if (has_capability(DATA_CAP_EXPORT, $PAGE->cm->context)) {
         // The capability required to Export database records is centrally defined in 'lib.php'
         // and should be weaker than those required to edit Templates, Fields and Presets.
-        $datanode->add(get_string('exportentries', 'data'), new moodle_url('/mod/data/export.php', array('d'=>$data->id)));
+        $exportentriesnode = $datanode->add(get_string('exportentries', 'data'),
+            new moodle_url('/mod/data/export.php', array('d'=>$data->id)));
+        $exportentriesnode->set_show_in_secondary_navigation(false);
     }
     if (has_capability('mod/data:manageentries', $PAGE->cm->context)) {
-        $datanode->add(get_string('importentries', 'data'), new moodle_url('/mod/data/import.php', array('d'=>$data->id)));
+        $importentriesnode = $datanode->add(get_string('importentries', 'data'), new moodle_url('/mod/data/import.php', array('d'=>$data->id)));
+        $importentriesnode->set_show_in_secondary_navigation(false);
     }
 
     if (has_capability('mod/data:managetemplates', $PAGE->cm->context)) {
@@ -3630,7 +3635,7 @@ function data_extend_settings_navigation(settings_navigation $settings, navigati
             $defaultemplate = 'singletemplate';
         }
 
-        $templates = $datanode->add(get_string('templates', 'data'));
+        $templates = $datanode->add(get_string('templates', 'data'), new moodle_url('/mod/data/templates.php', array('d'=>$data->id)));
 
         $templatelist = array ('listtemplate', 'singletemplate', 'asearchtemplate', 'addtemplate', 'rsstemplate', 'csstemplate', 'jstemplate');
         foreach ($templatelist as $template) {
@@ -3638,7 +3643,8 @@ function data_extend_settings_navigation(settings_navigation $settings, navigati
         }
 
         $datanode->add(get_string('fields', 'data'), new moodle_url('/mod/data/field.php', array('d'=>$data->id)));
-        $datanode->add(get_string('presets', 'data'), new moodle_url('/mod/data/preset.php', array('d'=>$data->id)));
+        $presetsnode = $datanode->add(get_string('presets', 'data'), new moodle_url('/mod/data/preset.php', array('d'=>$data->id)));
+        $presetsnode->set_show_in_secondary_navigation(false);
     }
 
     if (!empty($CFG->enablerssfeeds) && !empty($CFG->data_enablerssfeeds) && $data->rssarticles > 0) {

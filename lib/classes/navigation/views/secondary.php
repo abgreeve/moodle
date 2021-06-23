@@ -112,7 +112,7 @@ class secondary extends view {
      * @return array
      */
     protected function get_default_course_more_menu_nodes(): array {
-        return [];
+        return ['questionbank','contentbank','badgesview','competencies','courseadmin'];
     }
 
     /**
@@ -221,7 +221,7 @@ class secondary extends view {
         if ($mainnode) {
             $url = new \moodle_url('/mod/' . $this->page->activityname . '/view.php', ['id' => $this->page->cm->id]);
             $setactive = $url->compare($this->page->url, URL_MATCH_BASE);
-            $node = $this->add(get_string('module', 'course'), $url, null, null, 'modulepage');
+            $node = $this->add(get_string('modulename', $this->page->activityname), $url, null, null, 'modulepage');
             if ($setactive) {
                 $node->make_active();
             }

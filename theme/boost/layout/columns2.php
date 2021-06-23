@@ -59,13 +59,13 @@ $templatecontext = [
     'hasblocks' => $hasblocks,
     'bodyattributes' => $bodyattributes,
     'navdraweropen' => $navdraweropen,
-    'regionmainsettingsmenu' => $regionmainsettingsmenu,
-    'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
+    // 'regionmainsettingsmenu' => $regionmainsettingsmenu,
+    // 'hasregionmainsettingsmenu' => !empty($regionmainsettingsmenu),
     'primarymoremenu' => $OUTPUT->more_menu(array_merge($primarymenu['primary'], $primarymenu['custom']), 'navbar-nav'),
     'secondarymoremenu' => $secondarynavigation,
     'pageaction' => $pageaction,
 ];
 $nav = $PAGE->flatnav;
-$templatecontext['flatnavigation'] = $nav;
+// $templatecontext['flatnavigation'] = $nav;
 $templatecontext['firstcollectionlabel'] = $nav->get_collectionlabel();
 echo $OUTPUT->render_from_template('theme_boost/columns2', $templatecontext);

@@ -4234,6 +4234,12 @@ EOD;
             }
         }
 
+        if ($context->contextlevel == CONTEXT_MODULE) {
+            // print_object($this->page->cm->name);
+            $heading = $this->page->cm->name;
+            // $imagedata
+        }
+
         if ($this->should_display_main_logo($headinglevel)) {
             $sitename = format_string($SITE->fullname, true, ['context' => context_course::instance(SITEID)]);
             // Logo.

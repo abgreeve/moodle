@@ -102,7 +102,9 @@ if ($currentgroup) {
     $groupparam = "";
 }
 
-echo $OUTPUT->heading(format_string($chat->name), 2);
+if (!$PAGE->include_secondary_navigation()) {
+    echo $OUTPUT->heading(format_string($chat->name), 2);
+}
 
 // Render the activity information.
 $cminfo = cm_info::create($cm);

@@ -60,8 +60,7 @@ Feature: Set the site home page and dashboard as the default home page
     And I press "Save changes"
     And I log out
     And I log in as "user1"
-    And I am on "Course 1" course homepage
-    Then I should see "<breadcrumb>" in the ".breadcrumb" "css_element"
+    Then I should see "<breadcrumb>" is active in navigation
 
     Examples:
       | preference | breadcrumb |

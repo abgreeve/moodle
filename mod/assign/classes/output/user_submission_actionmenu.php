@@ -103,7 +103,7 @@ class user_submission_actionmenu implements templatable, renderable {
             $help = new help_icon('editsubmission', 'mod_assign');
             $edit = [
                 'button' => $button->export_for_template($output),
-                'help' => $help->export_for_template($output)
+                // 'help' => $help->export_for_template($output)
             ];
             $data['edit'] = $edit;
             $status = $this->get_current_status();
@@ -133,9 +133,8 @@ class user_submission_actionmenu implements templatable, renderable {
             }
             if ($status === ASSIGN_SUBMISSION_STATUS_NEW) {
                 $newattemptbutton = new single_button($url, get_string('addsubmission', 'mod_assign'), 'get');
-                $newattempthelp = new help_icon('addsubmission', 'mod_assign');
                 $data['edit']['button'] = $newattemptbutton->export_for_template($output);
-                $data['edit']['help'] = $newattempthelp->export_for_template($output);
+                $data['edit']['help'] = '';
             }
         }
         if ($this->showsubmit) {

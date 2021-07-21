@@ -698,7 +698,7 @@ class mod_assign_renderer extends plugin_renderer_base {
                 if (!$status->submissionsenabled) {
                     $cell2content = get_string('noonlinesubmissions', 'assign');
                 } else {
-                    $cell2content = get_string('noattempt', 'assign');
+                    $cell2content = get_string('nosubmissionyet', 'assign');
                 }
             }
         } else {

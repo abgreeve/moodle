@@ -145,44 +145,44 @@
     }
 
 }}
-<div class="container-fluid">
+<div class="container-fluid mb-1">
     <div class="row">
-        <div class="col-xs-6">
-            {{#submit}}
-                {{#button}}
-                    {{>core/single_button}}
-                {{/button}}
-                {{#help}}
-                    {{>core/help_icon}}
-                {{/help}}
-            {{/submit}}
+        {{#submit}}
+        <div class="col-xs-6 mr-3">
+            {{#button}}
+                {{>core/single_button}}
+            {{/button}}
+            {{#help}}
+                {{>core/help_icon}}
+            {{/help}}
         </div>
-        <div class="col-xs-6">
-            {{#previoussubmission}}
-                {{#button}}
-                    {{>core/single_button}}
-                {{/button}}
-                {{#help}}
-                    {{>core/help_icon}}
-                {{/help}}
-            {{/previoussubmission}}
+        {{/submit}}
+        {{#previoussubmission}}
+        <div class="col-xs-6 mr-3">
+            {{#button}}
+                {{>core/single_button}}
+            {{/button}}
+            {{#help}}
+                {{>core/help_icon}}
+            {{/help}}
         </div>
-        <div class="col-xs-6">
-            {{#edit}}
-                {{#button}}
-                    {{>core/single_button}}
-                {{/button}}
-                {{#help}}
-                    {{>core/help_icon}}
-                {{/help}}
-            {{/edit}}
+        {{/previoussubmission}}
+        {{#edit}}
+        <div class="col-xs-6 mr-3">
+            {{#button}}
+                {{>core/single_button}}
+            {{/button}}
+            {{#help}}
+                {{>core/help_icon}}
+            {{/help}}
         </div>
+        {{/edit}}
+        {{#remove}}
         <div class="col-xs-6">
-            {{#remove}}
-                {{#button}}
-                    {{>core/single_button}}
-                {{/button}}
-            {{/remove}}
+            {{#button}}
+                {{>core/single_button}}
+            {{/button}}
         </div>
+        {{/remove}}
     </div>
 </div>

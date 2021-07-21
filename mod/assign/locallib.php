@@ -5822,6 +5822,14 @@ class assign {
                 && $this->show_submit_button($submission, $teamsubmission, $USER->id));
             $showedit = ($this->is_any_submission_plugin_enabled()) && $this->can_edit_submission($USER->id);
 
+            // The method get_group_submission() says that it returns a stdClass, but it can return false >_>.
+            if ($teamsubmission === false) {
+                $teamsubmission = new stdClass();
+            }
+            // Same goes for get_user_submission().
+            if ($submission === false) {
+                $submission = new stdClass();
+            }
             $actionbuttons = new \mod_assign\output\user_submission_actionmenu(
                 $this->get_course_module()->id,
                 $showsubmit,

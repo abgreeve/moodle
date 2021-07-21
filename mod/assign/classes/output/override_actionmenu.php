@@ -80,9 +80,9 @@ class override_actionmenu implements templatable, renderable {
         if ($assigngroupmode == NOGROUPS) {
             return false;
         }
-        $canaccessallgroups = has_capability('moodle/site:accessallgroups', $this->cm->get_context());
+        $canaccessallgroups = has_capability('moodle/site:accessallgroups', $this->cm->context);
         $groups = $canaccessallgroups ? groups_get_all_groups($this->cm->course) : groups_get_activity_allowed_groups($this->cm);
-        return empty($groups);
+        return !empty($groups);
     }
 
     /**
@@ -105,8 +105,8 @@ class override_actionmenu implements templatable, renderable {
         $url = new moodle_url('/mod/assign/overrideedit.php', $params);
 
         $options = [];
-        if ($action == 'addgroup') {
-            $options = ['disabled' => !$this->show_groups()];
+        if ($action == 'addgroup' && !$this->show_groups()) {
+            $options = ['disabled' => 'true'];
         }
         $overridebutton = new single_button($url, $text, 'post', true, $options);
 

@@ -32,7 +32,8 @@ Feature: In an assignment, page titles are informative
     And I am on "Course 1" course homepage
     Then I follow "History of ants"
     And "title[text() = 'C1: History of ants']" "xpath_element" should exist in the "head" "css_element"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And "title[text() = 'C1: History of ants - Grading']" "xpath_element" should exist in the "head" "css_element"
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And "title[text() = 'C1: History of ants - Grading']" "xpath_element" should exist in the "head" "css_element"

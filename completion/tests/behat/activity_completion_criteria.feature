@@ -67,7 +67,8 @@ Feature: Allow to mark course as completed without cron for activity completion 
     Given I log in as "teacher1"
     And I am on "Completion course" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "student1@example.com" "table_row"
     And I set the field "Grade out of 100" to "40"
     And I click on "Save changes" "button"
@@ -100,7 +101,8 @@ Feature: Allow to mark course as completed without cron for activity completion 
     And I press "Save changes"
     And I am on "Completion course" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "student1@example.com" "table_row"
     And I set the field "Grade out of 100" to "40"
     And I click on "Save changes" "button"
@@ -113,7 +115,8 @@ Feature: Allow to mark course as completed without cron for activity completion 
     When I log in as "teacher1"
     And I am on "Completion course" course homepage
     And I follow "Test assignment name2"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "student1@example.com" "table_row"
     And I set the field "Grade out of 100" to "40"
     And I click on "Save changes" "button"

@@ -24,7 +24,8 @@ Feature: Check that any changes to assignment feedback comments are not lost
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Student 1" "table_row"
     When I set the following fields to these values:
       | Grade out of 100  | 101                    |

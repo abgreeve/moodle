@@ -45,7 +45,8 @@ Feature: View the grading status of an assignment
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "Not marked" in the "Student 1" "table_row"
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I should see "1 of 2"
@@ -59,7 +60,8 @@ Feature: View the grading status of an assignment
     And I press "Save changes"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "In review" in the "Student 1" "table_row"
     And I log out
     # View the grading status as a student.
@@ -73,7 +75,8 @@ Feature: View the grading status of an assignment
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "In review" in the "Student 1" "table_row"
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I should see "1 of 1"
@@ -81,7 +84,8 @@ Feature: View the grading status of an assignment
     And I press "Save changes"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "Released" in the "Student 1" "table_row"
     And I log out
     # View the grading status as a student.
@@ -95,7 +99,8 @@ Feature: View the grading status of an assignment
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "Released" in the "Student 1" "table_row"
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I should see "1 of 1"
@@ -104,7 +109,8 @@ Feature: View the grading status of an assignment
     And I press "Save changes"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "In marking" in the "Student 1" "table_row"
     # The grade should also remain displayed as it's stored in the assign DB tables, but the final grade should be empty.
     And "Student 1" row "Grade" column of "generaltable" table should contain "50.00"
@@ -140,7 +146,8 @@ Feature: View the grading status of an assignment
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should not see "Graded" in the "Student 1" "table_row"
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I should see "1 of 2"
@@ -152,7 +159,8 @@ Feature: View the grading status of an assignment
     And I press "Save changes"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "Graded" in the "Student 1" "table_row"
     And I log out
     # View the grading status as a student.
@@ -175,7 +183,8 @@ Feature: View the grading status of an assignment
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "Graded - follow-up submission received" in the "Student 1" "table_row"
     And I wait "10" seconds
     And I click on "Grade" "link" in the "Student 1" "table_row"
@@ -185,7 +194,8 @@ Feature: View the grading status of an assignment
     And I press "Save changes"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "Graded" in the "Student 1" "table_row"
     And I log out
     # View the grading status as a student again.

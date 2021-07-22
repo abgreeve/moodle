@@ -56,7 +56,8 @@ Feature: Bulk remove submissions
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "I'm the student1 submission"
     And I should see "I'm the student2 submission"
     And I set the field "selectall" to "1"
@@ -104,7 +105,8 @@ Feature: Bulk remove submissions
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "I'm the student1 submission"
     And I should see "I'm the student2 submission"
     And I set the field "selectall" to "1"
@@ -146,7 +148,8 @@ Feature: Bulk remove submissions
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "I'm the student1 submission"
     And I should see "I'm the student2 submission"
     And I set the field "selectall" to "1"
@@ -197,7 +200,8 @@ Feature: Bulk remove submissions
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "I'm the student1 submission"
     And I should see "I'm the student2 submission"
     And I set the field "selectall" to "1"

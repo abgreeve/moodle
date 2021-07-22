@@ -34,7 +34,8 @@ Feature: Group assignment submissions
       | Students submit in groups | Yes |
       | Group mode | No groups |
     And I follow "Test assignment name"
-    When I navigate to "View all submissions" in current page administration
+    When I follow "View all submissions"
+
     Then "//tr[contains(., 'Student 0')][contains(., 'Default group')]" "xpath_element" should exist
     And "//tr[contains(., 'Student 1')][contains(., 'Default group')]" "xpath_element" should exist
     And "//tr[contains(., 'Student 2')][contains(., 'Default group')]" "xpath_element" should exist
@@ -53,7 +54,8 @@ Feature: Group assignment submissions
     And I add "Student 1 (student1@example.com)" user to "Group 1" group members
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And "//tr[contains(., 'Student 0')][contains(., 'Group 1')]" "xpath_element" should exist
     And "//tr[contains(., 'Student 1')][contains(., 'Group 1')]" "xpath_element" should exist
     And I should not see "Student 2"
@@ -111,7 +113,8 @@ Feature: Group assignment submissions
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    When I navigate to "View all submissions" in current page administration
+    When I follow "View all submissions"
+
     Then "Student 1" row "Status" column of "generaltable" table should contain "Submitted for grading"
     And "Student 2" row "Status" column of "generaltable" table should contain "Submitted for grading"
     And "Student 3" row "Status" column of "generaltable" table should not contain "Submitted for grading"
@@ -128,7 +131,8 @@ Feature: Group assignment submissions
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And "Student 1" row "Status" column of "generaltable" table should contain "Submitted for grading"
     And "Student 2" row "Status" column of "generaltable" table should contain "Submitted for grading"
     And "Student 3" row "Status" column of "generaltable" table should contain "Submitted for grading"
@@ -183,7 +187,8 @@ Feature: Group assignment submissions
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the following fields to these values:
       | Grade out of 100 | 50.0 |
@@ -194,7 +199,8 @@ Feature: Group assignment submissions
     And I press "Save changes"
     When I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     Then "Student 1" row "Status" column of "generaltable" table should contain "Reopened"
     And "Student 2" row "Status" column of "generaltable" table should contain "Reopened"
 
@@ -371,6 +377,7 @@ Feature: Group assignment submissions
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    When I navigate to "View all submissions" in current page administration
+    When I follow "View all submissions"
+
     Then "Student 1" row "Status" column of "generaltable" table should contain "Submitted for grading"
     And "Student 2" row "Status" column of "generaltable" table should contain "Submitted for grading"

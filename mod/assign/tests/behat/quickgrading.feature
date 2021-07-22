@@ -35,7 +35,8 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I wait until the page is ready
     And I press "Save changes"
@@ -105,7 +106,8 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the following fields to these values:
       | Grade out of 100 | 50.0 |
@@ -114,7 +116,8 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I press "Save changes"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     Then I click on "Quick grading" "checkbox"
     And I set the field "User grade" to "60.0"
     And I press "Save all quick grading changes"
@@ -142,7 +145,8 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Hide User picture" "link"
     And I click on "Hide Full name" "link"
     And I click on "Hide Email address" "link"

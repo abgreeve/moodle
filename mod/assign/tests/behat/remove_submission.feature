@@ -52,7 +52,8 @@ Feature: Remove a submission
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I open the action menu in "Student 1" "table_row"
     And I follow "Remove submission"
     And I click on "Continue" "button"
@@ -85,7 +86,8 @@ Feature: Remove a submission
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I open the action menu in "Student 1" "table_row"
     And I follow "Remove submission"
     And I click on "Continue" "button"
@@ -121,7 +123,8 @@ Feature: Remove a submission
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     Then I should not see "I'm the student submission"
     And I log out
     And I log in as "student1"

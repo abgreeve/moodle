@@ -27,7 +27,8 @@ Feature: Check that the assignment grade can not be input in a wrong format.
       | Description | Test assignment description |
       | Use marking workflow | Yes |
     When I follow "Test assignment name"
-    Then I navigate to "View all submissions" in current page administration
+    Then I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "Grade out of 100" to "50,,6"
     And I press "Save changes"
@@ -56,7 +57,8 @@ Feature: Check that the assignment grade can not be input in a wrong format.
       | Description | Test assignment description |
       | Use marking workflow | Yes |
     When I follow "Test assignment name"
-    Then I navigate to "View all submissions" in current page administration
+    Then I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "Grade out of 100" to "50..6"
     And I press "Save changes"

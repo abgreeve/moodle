@@ -95,7 +95,8 @@ Feature: Set availability dates for an assignment
     And I am on "Course 1" course homepage
     And I follow "Assignment name"
     And I should see "1" in the "Submitted" "table_row"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "Submitted for grading" in the "Student 1" "table_row"
 
   @_file_upload
@@ -130,7 +131,8 @@ Feature: Set availability dates for an assignment
     And I am on "Course 1" course homepage
     And I follow "Assignment name"
     And I should see "1" in the "Submitted" "table_row"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "Submitted for grading" in the "Student 1" "table_row"
     And I should see "2 days 5 hours late" in the "Student 1" "table_row"
 
@@ -157,6 +159,7 @@ Feature: Set availability dates for an assignment
     And I am on "Course 1" course homepage
     And I follow "Assignment name"
     And I should see "0" in the "Submitted" "table_row"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "No submission" in the "Student 1" "table_row"
     And I should see "Assignment is overdue by: 2 days 5 hours" in the "Student 1" "table_row"

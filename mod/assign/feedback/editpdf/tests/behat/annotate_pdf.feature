@@ -51,7 +51,8 @@ Feature: In an assignment, teacher can annotate PDF files during grading
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Submitted for grading" "table_row"
     And I should see "Page 1 of 3"
     And I click on ".navigate-next-button" "css_element"
@@ -125,7 +126,8 @@ Feature: In an assignment, teacher can annotate PDF files during grading
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I open the action menu in "Student 2" "table_row"
     And I click on "Grade" "link" in the "Student 2" "table_row"
     And I wait for the complete PDF to load
@@ -135,5 +137,6 @@ Feature: In an assignment, teacher can annotate PDF files during grading
     And I should see "The changes to the grade and feedback were saved"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "View annotated PDF..." in the "student2@example.com" "table_row"

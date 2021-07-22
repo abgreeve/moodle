@@ -50,7 +50,8 @@ Feature: Assign reset
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I should see "Submitted for grading"
     And I am on "Course 1" course homepage
     And I navigate to "Reset" in current page administration
@@ -60,7 +61,8 @@ Feature: Assign reset
     And I press "Continue"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     Then I should not see "Submitted for grading"
 
   @javascript
@@ -68,7 +70,7 @@ Feature: Assign reset
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "User overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
         | Override user    | Student1  |
@@ -88,14 +90,15 @@ Feature: Assign reset
     And I press "Continue"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "User overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
     Then I should not see "Sam1 Student1"
 
   Scenario: Use course reset to remove group overrides.
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "Group overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
+    And I select "Group overrides" from the "jump" singleselect
     And I press "Add group override"
     And I set the following fields to these values:
         | Override group   | Group 1  |
@@ -115,7 +118,8 @@ Feature: Assign reset
     And I press "Continue"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "Group overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
+    And I select "Group overrides" from the "jump" singleselect
     Then I should not see "Group 1"
 
   Scenario: Use course reset to reset blind marking assignment.
@@ -127,7 +131,8 @@ Feature: Assign reset
         | blindmarking | 1 |
     And I press "Save"
     When I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I select "Reveal student identities" from the "Grading action" singleselect
     And I press "Continue"
     And I should see "Sam1 Student1"
@@ -139,5 +144,6 @@ Feature: Assign reset
     And I press "Continue"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     Then I should not see "Sam1 Student1"

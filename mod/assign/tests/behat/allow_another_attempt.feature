@@ -38,7 +38,7 @@ Feature: In an assignment, students start a new attempt based on their previous 
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the following fields to these values:
       | Allow another attempt | 1 |
@@ -55,7 +55,7 @@ Feature: In an assignment, students start a new attempt based on their previous 
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I should see "I'm the student first submission"
 
@@ -111,7 +111,7 @@ Feature: In an assignment, students start a new attempt based on their previous 
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    When I navigate to "View all submissions" in current page administration
+    When I follow "View all submissions"
     Then "Student 1" row "Status" column of "generaltable" table should contain "Submitted for grading"
     And "Student 2" row "Status" column of "generaltable" table should contain "Submitted for grading"
     And "Student 3" row "Status" column of "generaltable" table should contain "No submission"
@@ -140,7 +140,7 @@ Feature: In an assignment, students start a new attempt based on their previous 
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
     And "Student 1" row "Status" column of "generaltable" table should contain "Reopened"
     And "Student 2" row "Status" column of "generaltable" table should contain "Reopened"
     And "Student 3" row "Status" column of "generaltable" table should contain "Submitted for grading"

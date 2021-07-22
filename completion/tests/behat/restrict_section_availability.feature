@@ -86,7 +86,8 @@ Feature: Restrict sections availability through completion or grade conditions
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Grade assignment"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Student First" "table_row"
     And I set the following fields to these values:
       | Grade | 21 |

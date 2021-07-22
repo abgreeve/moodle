@@ -38,7 +38,8 @@ Feature: In an assignment, teachers can change filters in the grading app
     Given I log in as "teacher1"
     And I am on "Course 1 &" course homepage
     And I follow "Test assignment name &"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I should not see "Course 1 &amp;"
     And the "title" attribute of "a[title='Course: Course 1 &']" "css_element" should not contain "&amp;"
@@ -52,7 +53,8 @@ Feature: In an assignment, teachers can change filters in the grading app
     When I log in as "teacher1"
     And I am on "Course 1 &" course homepage
     And I follow "Test assignment name &"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I set the field "filter" to "Not submitted"
     And I set the field "markerfilter" to "Marker 1"
     And I set the field "workflowfilter" to "In marking"
@@ -66,7 +68,8 @@ Feature: In an assignment, teachers can change filters in the grading app
     Given I log in as "teacher1"
     And I am on "Course 1 &" course homepage
     And I follow "Test assignment name &"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "allocatedmarker" to "Marker 1"
     And I set the field "workflowstate" to "In marking"
@@ -77,7 +80,8 @@ Feature: In an assignment, teachers can change filters in the grading app
     When I log in as "teacher1"
     And I am on "Course 1 &" course homepage
     And I follow "Test assignment name &"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I click on "[data-region=user-filters]" "css_element"
     And I set the field "filter" to "Not submitted"

@@ -44,7 +44,8 @@ Feature: Prevent or allow assignment submission changes
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    When I navigate to "View all submissions" in current page administration
+    When I follow "View all submissions"
+
     And I open the action menu in "Student 1" "table_row"
     And I follow "Prevent submission changes"
     Then I should see "Submission changes not allowed"
@@ -58,7 +59,8 @@ Feature: Prevent or allow assignment submission changes
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I open the action menu in "Student 1" "table_row"
     And I follow "Allow submission changes"
     And I should not see "Submission changes not allowed"
@@ -97,7 +99,8 @@ Feature: Prevent or allow assignment submission changes
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    When I navigate to "View all submissions" in current page administration
+    When I follow "View all submissions"
+
     And I set the field "selectall" to "1"
     And I click on "Go" "button" confirming the dialogue
     Then I should see "Submission changes not allowed" in the "Student 1" "table_row"
@@ -111,7 +114,8 @@ Feature: Prevent or allow assignment submission changes
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I set the field "selectall" to "1"
     And I set the field "id_operation" to "Unlock submissions"
     And I click on "Go" "button" confirming the dialogue

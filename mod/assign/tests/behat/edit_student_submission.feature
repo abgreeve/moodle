@@ -33,7 +33,8 @@ Feature: In an assignment, the administrator can edit students' submissions
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I open the action menu in "Student 1" "table_row"
     And I choose "Edit submission" in the open action menu
     And I set the following fields to these values:

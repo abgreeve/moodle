@@ -37,7 +37,8 @@ Feature: Assign group override
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     When I follow "Test assignment name"
-    And I navigate to "Group overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
+    And I select "Group overrides" from the "jump" singleselect
     And I press "Add group override"
     And I set the following fields to these values:
       | Override group | Group 1              |
@@ -57,7 +58,8 @@ Feature: Assign group override
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     When I follow "Test assignment name"
-    And I navigate to "Group overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
+    And I select "Group overrides" from the "jump" singleselect
     And I press "Add group override"
     And I set the following fields to these values:
       | Override group | Group 1              |
@@ -82,7 +84,8 @@ Feature: Assign group override
       | Due date               | ##1 Jan 2000 08:00## |
       | Cut-off date           | disabled             |
     And I press "Save and display"
-    And I navigate to "Group overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
+    And I select "Group overrides" from the "jump" singleselect
     And I press "Add group override"
     And I set the following fields to these values:
       | Override group | Group 1              |
@@ -110,7 +113,8 @@ Feature: Assign group override
       | Allow submissions from | disabled             |
       | Cut-off date           | ##1 Jan 2000 08:00## |
     And I press "Save and display"
-    And I navigate to "Group overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
+    And I select "Group overrides" from the "jump" singleselect
     And I press "Add group override"
     And I set the following fields to these values:
       | Override group | Group 1              |
@@ -121,12 +125,12 @@ Feature: Assign group override
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    Then I should not see "You have not made a submission yet."
+    Then I should not see "Add submission"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I should see "You have not made a submission yet."
+    And I should see "Add submission"
 
   Scenario: Allow a group to have a different start date
     Given I log in as "teacher1"
@@ -138,7 +142,8 @@ Feature: Assign group override
       | Allow submissions from | ##1 January 2030 08:00## |
       | Cut-off date           | disabled                 |
     And I press "Save and display"
-    And I navigate to "Group overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
+    And I select "Group overrides" from the "jump" singleselect
     And I press "Add group override"
     And I set the following fields to these values:
       | Override group         | Group 1              |
@@ -164,19 +169,22 @@ Feature: Assign group override
     When I follow "Test assignment name"
     And I navigate to "Edit settings" in current page administration
     And I set the following fields to these values:
-      | Due date               | disabled                 |
-      | Allow submissions from | ##1 January 2040 08:00## |
-      | Cut-off date           | disabled                 |
+      | Due date                  | disabled                 |
+      | Allow submissions from    | ##1 January 2040 08:00## |
+      | Cut-off date              | disabled                 |
+      | Group mode                | Separate groups          |
     And I press "Save and display"
-    And I navigate to "Group overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
+    And I select "Group overrides" from the "jump" singleselect
     And I press "Add group override"
     And I set the following fields to these values:
       | Override group         | Group 1                  |
       | Allow submissions from | ##1 January 2030 08:00## |
     And I press "Save"
     And I should see "Tuesday, 1 January 2030, 8:00"
+    And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "User overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
       | Override user          | Student1                 |
@@ -209,7 +217,8 @@ Feature: Assign group override
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Assignment 2"
-    And I navigate to "Group overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
+    And I select "Group overrides" from the "jump" singleselect
     Then I should see "No groups you can access."
     And the "Add group override" "button" should be disabled
 
@@ -227,7 +236,8 @@ Feature: Assign group override
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Assignment 2"
-    And I navigate to "Group overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
+    And I select "Group overrides" from the "jump" singleselect
     And I press "Add group override"
     Then the "Override group" select box should contain "Group 1"
     And the "Override group" select box should not contain "Group 2"
@@ -246,7 +256,8 @@ Feature: Assign group override
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Assignment 2"
-    And I navigate to "Group overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
+    And I select "Group overrides" from the "jump" singleselect
     And I press "Add group override"
     And I set the following fields to these values:
       | Override group         | Group 1                  |
@@ -260,6 +271,7 @@ Feature: Assign group override
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Assignment 2"
-    And I navigate to "Group overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
+    And I select "Group overrides" from the "jump" singleselect
     Then I should see "Group 1" in the ".generaltable" "css_element"
     And I should not see "Group 2" in the ".generaltable" "css_element"

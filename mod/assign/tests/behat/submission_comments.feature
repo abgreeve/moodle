@@ -62,7 +62,8 @@ Feature: In an assignment, students can comment in their submissions
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I click on ".comment-link" "css_element"
     When I set the field "content" to "Teacher feedback first comment"
@@ -86,7 +87,8 @@ Feature: In an assignment, students can comment in their submissions
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I click on ".comment-link" "css_element"
     When I set the field "content" to "Teacher feedback first comment"
@@ -105,7 +107,8 @@ Feature: In an assignment, students can comment in their submissions
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Student 1" "table_row"
     When I set the following fields to these values:
       | Grade out of 100 | 50 |
@@ -113,7 +116,8 @@ Feature: In an assignment, students can comment in their submissions
     And I press "Save changes"
     And I click on "Edit settings" "link"
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     Then I should see "50.00" in the "Student 1" "table_row"
     And I should see "I'm the teacher feedback" in the "Student 1" "table_row"
 
@@ -124,7 +128,8 @@ Feature: In an assignment, students can comment in their submissions
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
+
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the following fields to these values:
       | Grade out of 100 | 0 |

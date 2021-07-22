@@ -27,7 +27,7 @@ Feature: Assign user override
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     When I follow "Test assignment name"
-    And I navigate to "User overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
       | Override user | Student1                            |
@@ -48,7 +48,7 @@ Feature: Assign user override
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
     When I follow "Test assignment name"
-    And I navigate to "User overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
       | Override user | Student1             |
@@ -74,7 +74,7 @@ Feature: Assign user override
       | Due date               | ##1 Jan 2000 08:00## |
       | Cut-off date           | disabled             |
     And I press "Save and display"
-    And I navigate to "User overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
       | Override user | Student1             |
@@ -103,7 +103,7 @@ Feature: Assign user override
       | Allow submissions from | disabled             |
       | Cut-off date           | ##1 Jan 2000 08:00## |
     And I press "Save and display"
-    And I navigate to "User overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
       | Override user       | Student1             |
@@ -114,12 +114,12 @@ Feature: Assign user override
     And I log in as "student2"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    Then I should not see "You have not made a submission yet."
+    Then I should not see "Add submission"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
     And I follow "Test assignment name"
-    And I should see "You have not made a submission yet."
+    And I should see "Add submission"
 
   @javascript
   Scenario: Allow a user to have a different start date
@@ -132,7 +132,7 @@ Feature: Assign user override
       | Allow submissions from | ##1 January 2030 08:00## |
       | Cut-off date           | disabled                 |
     And I press "Save and display"
-    And I navigate to "User overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
       | Override user          | Student1             |
@@ -160,7 +160,7 @@ Feature: Assign user override
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Assignment 2"
-    And I navigate to "User overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
     Then I should see "No groups you can access."
     And the "Add user override" "button" should be disabled
 
@@ -184,7 +184,7 @@ Feature: Assign user override
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Assignment 2"
-    And I navigate to "User overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
     And I press "Add user override"
     Then the "Override user" select box should contain "Sam1 Student1, student1@example.com"
     And the "Override user" select box should not contain "Sam2 Student2, student2@example.com"
@@ -210,7 +210,7 @@ Feature: Assign user override
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "Assignment 2"
-    And I navigate to "User overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
       | Override user          | Student1                            |
@@ -224,7 +224,7 @@ Feature: Assign user override
     When I log in as "teacher1"
     And I am on "Course 1" course homepage
     And I follow "Assignment 2"
-    And I navigate to "User overrides" in current page administration
+    And I navigate to "Overrides" in current page administration
     Then I should see "Student1" in the ".generaltable" "css_element"
     And I should not see "Student2" in the ".generaltable" "css_element"
 
@@ -237,7 +237,7 @@ Feature: Assign user override
     And I expand all fieldsets
     And I set the field "Availability" to "Hide from students"
     And I click on "Save and display" "button"
-    When I navigate to "User overrides" in current page administration
+    When I navigate to "Overrides" in current page administration
     And I press "Add user override"
     And I set the following fields to these values:
       | Override user          | Student1             |

@@ -153,7 +153,7 @@ class core_renderer extends \core_renderer {
         }
 
         if ($this->should_display_main_logo($headinglevel)) {
-            $sitename = format_string($SITE->fullname, true, ['context' => context_course::instance(SITEID)]);
+            $sitename = format_string($SITE->fullname, true, ['context' => \context_course::instance(SITEID)]);
             // Logo.
             $html = html_writer::div(
                 html_writer::empty_tag('img', [

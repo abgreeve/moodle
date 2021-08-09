@@ -71,7 +71,7 @@ $regionmainsettingsmenu = $buildregionmainsettings ? $OUTPUT->region_main_settin
 if (defined('BEHAT_SITE_RUNNING')) {
     $secondarynavigation = false;
 } else {
-    $buildsecondarynavigation = $PAGE->include_secondary_navigation();
+    $buildsecondarynavigation = $PAGE->has_secondary_navigation();
     $secondarynavigation = $buildsecondarynavigation ? $OUTPUT->more_menu($PAGE->secondarynav, 'nav-tabs') : false;
 }
 

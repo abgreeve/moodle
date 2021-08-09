@@ -11,7 +11,7 @@ $query = trim(optional_param('query', '', PARAM_NOTAGS));  // Search string
 
 $context = context_system::instance();
 $PAGE->set_context($context);
-$PAGE->include_secondary_navigation(false);
+$PAGE->has_secondary_navigation();
 
 $hassiteconfig = has_capability('moodle/site:config', $context);
 
@@ -47,7 +47,7 @@ if ($data = data_submitted() and confirm_sesskey() and isset($data->action) and 
     }
 }
 
-$PAGE->set_include_secondary_navigation(false);
+$PAGE->has_secondary_navigation_setter(false);
 
 // and finally, if we get here, then there are matching settings and we have to print a form
 // to modify them

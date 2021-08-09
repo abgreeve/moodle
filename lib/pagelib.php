@@ -2177,7 +2177,7 @@ class moodle_page {
      *
      * @param bool $value If the secondary navigation should be rendered.
      */
-    public function set_include_secondary_navigation(bool $value) : void {
+    public function has_secondary_navigation_setter(bool $value) : void {
         $this->_hassecondarynavigation = $value;
     }
 
@@ -2186,7 +2186,7 @@ class moodle_page {
      *
      * @return bool
      */
-    public function include_secondary_navigation() : bool {
+    public function has_secondary_navigation() : bool {
         return $this->_hassecondarynavigation;
     }
 }

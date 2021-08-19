@@ -28,6 +28,8 @@ $bodyattributes = $OUTPUT->body_attributes();
 $blockspre = $OUTPUT->blocks('side-pre');
 $blockspost = $OUTPUT->blocks('side-post');
 
+$PAGE->has_secondary_navigation_setter(false);
+
 $hassidepre = $PAGE->blocks->region_has_content('side-pre', $OUTPUT);
 $hassidepost = $PAGE->blocks->region_has_content('side-post', $OUTPUT);
 

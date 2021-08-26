@@ -135,7 +135,7 @@ Feature: Using the activity grade form element
       | grade[modgrade_type] | Scale |
       | grade[modgrade_scale] | ABCDEF |
     And I am on the "Test assignment name" "assign activity" page
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "Grade" to "C"
     And I press "Save changes"
@@ -186,7 +186,7 @@ Feature: Using the activity grade form element
       | activity | assign           |
       | name     | Test assign name |
     And I am on the "Test assign name" "assign activity" page logged in as teacher1
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
     And I click on "Grade" "link" in the "Student 1" "table_row"
     And I set the field "Grade out of 100" to "50"
     And I press "Save changes"

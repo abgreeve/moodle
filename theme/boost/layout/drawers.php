@@ -81,6 +81,15 @@ $primary = new core\navigation\output\primary($PAGE);
 $renderer = $PAGE->get_renderer('core');
 $primarymenu = $primary->export_for_template($renderer);
 
+// Get the pre-content stuff.
+$thing = $PAGE->secondarynav->get_overflow_menu_data();
+$overflow = false;
+if (!is_null($thing)) {
+    $overflow = $thing->export_for_template($OUTPUT);
+}
+
+
+
 $templatecontext = [
     'sitename' => format_string($SITE->shortname, true, ['context' => context_course::instance(SITEID), "escape" => false]),
     'output' => $OUTPUT,
@@ -97,6 +106,7 @@ $templatecontext = [
     'secondarymoremenu' => $secondarynavigation,
     'usermenu' => $primarymenu['user'],
     'langmenu' => $primarymenu['lang'],
+    'overflow' => $overflow
 ];
 
 $nav = $PAGE->flatnav;

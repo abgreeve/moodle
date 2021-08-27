@@ -40,12 +40,6 @@ define(['jquery', 'core/custom_interaction_events', 'core/log', 'core/pubsub', '
      */
     var Drawer = function() {
 
-        if (!$(SELECTORS.TOGGLE_REGION).length) {
-            Log.debug('Page is missing a drawer region');
-        }
-        if (!$(SELECTORS.TOGGLE_ACTION).length) {
-            Log.debug('Page is missing a drawer toggle link');
-        }
         $(SELECTORS.TOGGLE_REGION).each(function(index, ele) {
             var trigger = $(ele).find(SELECTORS.TOGGLE_ACTION);
             var drawerid = trigger.attr('aria-controls');

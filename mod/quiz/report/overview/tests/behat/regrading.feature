@@ -43,7 +43,7 @@ Feature: Regrading quiz attempts using the Grades report
 
   Scenario: Regrade all attempts
     Given I am on the "Quiz for testing regrading" "quiz activity" page logged in as teacher
-    And I navigate to "Results > Grades" in current page administration
+    And I navigate to "Results" in current page administration
     When I press "Regrade all"
 
     # Note, the order is not defined, so we can only check part of the message.
@@ -60,7 +60,7 @@ Feature: Regrading quiz attempts using the Grades report
 
   Scenario: Regrade selected attempts
     Given I am on the "Quiz for testing regrading" "quiz activity" page logged in as teacher
-    And I navigate to "Results > Grades" in current page administration
+    And I navigate to "Results" in current page administration
     When I click on "Select attempt" "checkbox" in the "Student Two" "table_row"
 
     And I press "Regrade selected attempts"
@@ -75,7 +75,7 @@ Feature: Regrading quiz attempts using the Grades report
 
   Scenario: Dry-run a full regrade, then regrade the attempts that will need it.
     Given I am on the "Quiz for testing regrading" "quiz activity" page logged in as teacher
-    When I navigate to "Edit quiz" in current page administration
+    When I press "Edit quiz"
     And I follow "Edit question SA"
     And I set the field "id_fraction_1" to "50%"
     And I press "id_submitbutton"

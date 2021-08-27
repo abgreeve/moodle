@@ -1,4 +1,4 @@
-@gradingform @gradingform_rubric @javascript
+@gradingform @gradingform_rubric @javascript @classicfail
 Feature: Rubrics can have levels with negative scores
   In order to use and refine rubrics to grade students
   As a teacher
@@ -39,6 +39,7 @@ Feature: Rubrics can have levels with negative scores
       | Criterion 3 | Level 31    | 10  | Level 32 | 20 |          |    |           |     |
     And I press "Save rubric and make it ready"
     # Grading a student.
+    And I navigate to "Assignment" in current page administration
     And I go to "Student 1" "Test assignment 1" activity advanced grading page
     And I grade by filling the rubric with:
       | Criterion 1 | 25 |  |

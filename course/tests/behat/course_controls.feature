@@ -15,7 +15,7 @@ Feature: Course activity controls works as expected
   # * Course controls with paged mode in the course home page
   # * Course controls with paged mode in a section's page
 
-  @javascript @_cross_browser
+  @javascript @_cross_browser @classicfail
   Scenario Outline: General activities course controls using topics and weeks formats, and paged mode and not paged mode works as expected
     Given the following "users" exist:
       | username | firstname | lastname | email |
@@ -28,7 +28,7 @@ Feature: Course activity controls works as expected
       | teacher1 | C1 | editingteacher |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    When I follow <targetpage>
+    When I click on <targetpage> "link" skipping visibility check
     And I turn editing mode on
     And I add the "Recent activity" block
     And I open the action menu in "Recent activity" "block"
@@ -77,13 +77,14 @@ Feature: Course activity controls works as expected
 
     Examples:
       | courseformat | coursedisplay | targetpage              | should_see_other_sections | should_see_other_sections_following_block_sections_links | belowpage                |
-      | topics       | 0             | "C1"                    | should                    | should                                                   | "Topic 2"                |
+      | topics       | 0             | ""                      | should                    | should                                                   | "Topic 2"                |
       | topics       | 1             | "Topic 1"               | should not                | should not                                               | "Topic 2"                |
-      | topics       | 1             | "C1"                    | should                    | should not                                               | "Topic 2"                |
-      | weeks        | 0             | "C1"                    | should                    | should                                                   | "8 January - 14 January" |
+      | topics       | 1             | ""                      | should                    | should not                                               | "Topic 2"                |
+      | weeks        | 0             | ""                      | should                    | should                                                   | "8 January - 14 January" |
       | weeks        | 1             | "1 January - 7 January" | should not                | should not                                               | "8 January - 14 January" |
-      | weeks        | 1             | "C1"                    | should                    | should not                                               | "8 January - 14 January" |
+      | weeks        | 1             | ""                      | should                    | should not                                               | "8 January - 14 January" |
 
+  @migrationissue @classicfail
   Scenario Outline: General activities course controls using topics and weeks formats, and paged mode and not paged mode works as expected
     Given the following "users" exist:
       | username | firstname | lastname | email |
@@ -100,7 +101,7 @@ Feature: Course activity controls works as expected
       | forum     | Test forum name 2      | Test forum description 2      | C1     | 0002         | 1       |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    When I follow <targetpage>
+    When I click on <targetpage> "link" skipping visibility check
     And I turn editing mode on
     And I add the "Recent activity" block
     And I open the action menu in "Recent activity" "block"
@@ -137,9 +138,9 @@ Feature: Course activity controls works as expected
 
     Examples:
       | courseformat | coursedisplay | targetpage              | should_see_other_sections | should_see_other_sections_following_block_sections_links | belowpage                |
-      | topics       | 0             | "C1"                    | should                    | should                                                   | "Topic 2"                |
+      | topics       | 0             | ""                      | should                    | should                                                   | "Topic 2"                |
       | topics       | 1             | "Topic 1"               | should not                | should not                                               | "Topic 2"                |
-      | topics       | 1             | "C1"                    | should                    | should not                                               | "Topic 2"                |
-      | weeks        | 0             | "C1"                    | should                    | should                                                   | "8 January - 14 January" |
+      | topics       | 1             | ""                      | should                    | should not                                               | "Topic 2"                |
+      | weeks        | 0             | ""                      | should                    | should                                                   | "8 January - 14 January" |
       | weeks        | 1             | "1 January - 7 January" | should not                | should not                                               | "8 January - 14 January" |
-      | weeks        | 1             | "C1"                    | should                    | should not                                               | "8 January - 14 January" |
+      | weeks        | 1             | ""                      | should                    | should not                                               | "8 January - 14 January" |

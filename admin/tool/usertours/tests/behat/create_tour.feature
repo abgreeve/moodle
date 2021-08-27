@@ -95,7 +95,7 @@ Feature: Add a new user tour
       | Display in middle of page | Welcome | First step of the Tour |
     And I add steps to the "Steps tour" tour:
       | targettype | targetvalue_block | Title           | Content                 |
-      | Block      | Course overview   | Course overview | Second step of the Tour |
+      | Block      | Timeline          | Timeline        | Second step of the Tour |
       | Block      | Calendar          | Calendar        | Third step of the Tour  |
     When I am on homepage
     Then I should see "First step of the Tour"
@@ -129,7 +129,7 @@ Feature: Add a new user tour
       | Display in middle of page | Welcome | First step of the Tour |
     And I add steps to the "Steps tour" tour:
       | targettype | targetvalue_block | Title           | Content                 |
-      | Block      | Course overview   | Course overview | Second step of the Tour |
+      | Block      | Timeline          | Timeline        | Second step of the Tour |
       | Block      | Calendar          | Calendar        | Third step of the Tour  |
     When I am on homepage
     Then I should see "First step of the Tour"

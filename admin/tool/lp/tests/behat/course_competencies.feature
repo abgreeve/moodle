@@ -25,7 +25,7 @@ Feature: See the competencies for an activity on the course competencies page.
       | page     | PageName1  | PageDesc1  | C1     | PAGE1    | 1          | 1              |
       | page     | PageName2  | PageDesc2  | C1     | PAGE2    | 1          | 1              |
     And I am on the "Course 1" course page logged in as admin
-    And I follow "Competencies"
+    And I navigate to "Competencies" in current page administration
     And I press "Add competencies to course"
     And "Competency picker" "dialogue" should be visible
     And I select "Test-Comp1" of the competency tree
@@ -40,7 +40,7 @@ Feature: See the competencies for an activity on the course competencies page.
     And I press "Save and return to course"
     And I log out
 
-  @javascript
+  @javascript @classicfail
   Scenario: Go to the competency course competencies page.
     Given I am on the "Course 1" course page logged in as student1
     When I follow "Competencies"
@@ -56,7 +56,7 @@ Feature: See the competencies for an activity on the course competencies page.
     And I should not see "Test-Comp2"
     And I should see "No competencies have been linked to this activity or resource."
 
-  @javascript
+  @javascript @classicfail
   Scenario: None course competencies page.
     When I am on the PageName1 "page activity" page logged in as student1
     Then I should see "Test page content"

@@ -91,6 +91,23 @@ $PAGE->set_title($pagetitle);
 $PAGE->set_heading($header);
 $PAGE->has_secondary_navigation_setter(false);
 
+// Add-a-block in editing mode.
+if (isset($PAGE->theme->addblockposition) && $PAGE->user_is_editing() && $PAGE->user_can_edit_blocks() && !defined('BEHAT_SITE_RUNNING')) {
+    $url = new moodle_url($PAGE->url, ['bui_addblock' => '', 'bui_blockregion' => 'content', 'sesskey' => sesskey()]);
+
+    $block = new block_contents;
+    $block->content = $OUTPUT->render_from_template('core/add_block_button',
+        [
+            'link' => $url,
+            'escapedlink' => "?{$url->get_query_string(false)}",
+            'pageType' => $PAGE->pagetype,
+            'pageLayout' => $PAGE->pagelayout,
+        ]
+    );
+
+    $PAGE->blocks->add_fake_block($block, 'content');
+}
+
 if (!isguestuser()) {   // Skip default home page for guests
     if (get_home_page() != HOMEPAGE_MY) {
         if (optional_param('setdefaulthome', false, PARAM_BOOL)) {

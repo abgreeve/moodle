@@ -36,12 +36,12 @@ Feature: Course content can be downloaded
     # Without the ability to check the downloaded file, the absence of an exception being thrown here is considered a success.
     And I click on "Download" "button" in the "Download course content" "dialogue"
 
-  @javascript
+  @javascript @migrationissue @classicfail
   Scenario: A teacher can download course content when the feature is enabled in their course
     Given I log in as "teacher1"
     When I am on "Hockey 101" course homepage
-    And "Download course content" "link" should exist in current page administration
-    And I navigate to "Download course content" in current page administration
-    Then I should see "You are about to download a zip file"
+    And I navigate to "Course administration" in current page administration
+    And I follow "Download course content"
+    Then I should see "You are about to download a zip file" in the "Download course content" "dialogue"
     # Without the ability to check the downloaded file, the absence of an exception being thrown here is considered a success.
     And I click on "Download" "button" in the "Download course content" "dialogue"

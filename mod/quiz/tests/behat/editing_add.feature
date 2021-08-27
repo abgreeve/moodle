@@ -106,7 +106,8 @@ Feature: Edit quiz page - adding things
 
     # Create a couple of sub categories.
     When I am on "Course 1" course homepage
-    And I navigate to "Question bank > Categories" in current page administration
+    And I navigate to "Question bank" in current page administration
+    And I select "Categories" from the "questionbankactionselect" singleselect
     Then I should see "Add category"
     Then I set the field "Parent category" to "Default for C1"
     And I set the field "Name" to "Subcat 1"

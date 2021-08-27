@@ -82,10 +82,11 @@ Feature: Marking guides can be created and edited
     And I should see "Comment \"4\""
     But I should not see "Comment 3"
 
-  @javascript
+  @javascript @classicfail
   Scenario: Grading and viewing graded marking guide
     # Grading a student.
-    When I go to "Student 1" "Test assignment 1 name" activity advanced grading page
+    When I navigate to "Assignment" in current page administration
+    And I go to "Student 1" "Test assignment 1 name" activity advanced grading page
     And I grade by filling the marking guide with:
       | Guide criterion A | 25 | Very good  |
       | Guide criterion B | 20 |            |
@@ -97,9 +98,8 @@ Feature: Marking guides can be created and edited
     And I wait "1" seconds
     Then the field "Guide criterion B criterion remark" matches value "Comment \"4\""
     When I press "Save changes"
-    And I follow "Edit settings"
-    And I follow "Test assignment 1 name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "Assignment: Test assignment 1 name"
+    And I follow "View all submissions"
     # Checking that the user grade is correct.
     Then I should see "80" in the "Student 1" "table_row"
     And I log out

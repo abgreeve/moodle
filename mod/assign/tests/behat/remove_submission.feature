@@ -56,7 +56,7 @@ Feature: Remove a submission
 
     And I am on the "Test assignment name" Activity page logged in as student1
     And I should not see "I'm the student submission"
-    And I should see "No attempt" in the "Submission status" "table_row"
+    And I should see "No submissions have been made yet" in the "Submission status" "table_row"
 
   @javascript @skip_chrome_zerosize
   Scenario: Remove a group submission should remove the data from all group members
@@ -113,4 +113,4 @@ Feature: Remove a submission
 
     And I am on the "Test assignment name" Activity page logged in as student1
     And I should not see "I'm the student submission"
-    And I should see "No attempt" in the "Submission status" "table_row"
+    And I should see "No submissions have been made yet" in the "Submission status" "table_row"

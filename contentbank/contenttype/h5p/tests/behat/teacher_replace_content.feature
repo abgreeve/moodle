@@ -1,4 +1,4 @@
-@core @core_contentbank @core_h5p @contenttype_h5p @_file_upload @_switch_iframe @javascript
+@core @core_contentbank @core_h5p @contenttype_h5p @_file_upload @_switch_iframe @javascript @classicfail
 Feature: Replace H5P file from an existing content requires special capabilities
   In order replace an H5P content from the content bank
   As a teacher
@@ -35,7 +35,7 @@ Feature: Replace H5P file from an existing content requires special capabilities
     And I click on "Content bank" "link"
     # Force the content deploy
     And I click on "admincontent" "link"
-    And I click on "Content bank" "link"
+    And I navigate to "Content bank" in current page administration
 
   Scenario: Teacher can replace its own H5P files
     Given I click on "teachercontent" "link"

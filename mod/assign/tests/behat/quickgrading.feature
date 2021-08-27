@@ -32,7 +32,6 @@ Feature: In an assignment, teachers grade multiple students on one page
     And I navigate to "View all submissions" in current page administration
     When I click on "Grade" "link" in the "Student 1" "table_row"
     And I press "Save changes"
-    And I click on "Edit settings" "link"
     And I follow "Test assignment name"
     Then I should see "1" in the "Needs grading" "table_row"
 
@@ -100,9 +99,7 @@ Feature: In an assignment, teachers grade multiple students on one page
       | M8d skillZ! | 1337 |
       | Feedback comments | I'm the teacher first feedback |
     And I press "Save changes"
-    And I click on "Edit settings" "link"
-    And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
+    And I follow "View all submissions"
     Then I click on "Quick grading" "checkbox"
     And I set the field "User grade" to "60.0"
     And I press "Save all quick grading changes"

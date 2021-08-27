@@ -165,6 +165,7 @@ Feature: Content bank use editor feature
     And I follow "filltheblanks.h5p"
     Then "Edit" "link" should not exist in the "region-main" "region"
 
+  @classicfail
   Scenario: Teachers keep their content authoring in copied courses
     Given the following "users" exist:
       | username | firstname | lastname | email                |
@@ -195,6 +196,6 @@ Feature: Content bank use editor feature
     And I click on "Content bank" "link"
     And I follow "ipsums.h5p"
     Then "Edit" "link" should exist in the "region-main" "region"
-    And I click on "Content bank" "link"
+    And I navigate to "Content bank" in current page administration
     And I follow "filltheblanks.h5p"
     Then "Edit" "link" should not exist in the "region-main" "region"

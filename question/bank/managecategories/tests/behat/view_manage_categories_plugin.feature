@@ -36,7 +36,7 @@ Feature: Use the qbank plugin manager page for managecategories
     And I should see "Manage categories"
     And I click on "Disable" "link" in the "Manage categories" "table_row"
     And I am on the "Test quiz" "quiz activity" page
-    And I navigate to "Edit quiz" in current page administration
+    And I click on "Add question" "button"
     And I open the "last" add to quiz menu
     And I follow "a random question"
     Then I should not see "New category"
@@ -44,7 +44,7 @@ Feature: Use the qbank plugin manager page for managecategories
     And I navigate to "Plugins > Question bank plugins > Manage question bank plugins" in site administration
     And I click on "Enable" "link" in the "Manage categories" "table_row"
     And I am on the "Test quiz" "quiz activity" page
-    And I navigate to "Edit quiz" in current page administration
+    And I click on "Add question" "button"
     And I open the "last" add to quiz menu
     And I follow "a random question"
     And I should see "New category"

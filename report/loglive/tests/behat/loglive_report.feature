@@ -48,6 +48,7 @@ Feature: In a report, admin can see loglive data
     And I follow "Course module created"
     And I switch to "action" window
     And I am on "Course 1" course homepage
+    And I change window size to "large"
     And I add a "Database" to section "3" and I fill the form with:
       | Name | Test name2 |
       | Description | Test database description |
@@ -58,7 +59,7 @@ Feature: In a report, admin can see loglive data
     And I wait "8" seconds
     And I should see "Test name2"
 
-  @javascript @_switch_window
+  @javascript @_switch_window @migrationissue
   Scenario: Check loglive report entries and make sure the pause/resume button works for legacy reader along with ajax calls
     Given I am on site homepage
     When I navigate to "Reports > Live logs" in site administration
@@ -69,6 +70,7 @@ Feature: In a report, admin can see loglive data
     And I follow "course_add mod"
     And I switch to "action" window
     And I am on "Course 1" course homepage
+    And I change window size to "large"
     And I add a "Database" to section "3" and I fill the form with:
       | Name | Test name2 |
       | Description | Test database description |

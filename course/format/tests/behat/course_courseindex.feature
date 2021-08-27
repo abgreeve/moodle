@@ -44,7 +44,6 @@ Feature: Course index depending on role
   Scenario: Course index as a teacher
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I click on "Side panel" "button"
     When I click on "Open course index drawer" "button"
     Then I should see "Topic 1" in the "courseindex-content" "region"
     And I should see "Topic 2" in the "courseindex-content" "region"
@@ -63,7 +62,6 @@ Feature: Course index depending on role
     And I log out
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I click on "Side panel" "button"
     When I click on "Open course index drawer" "button"
     Then I should see "Topic 1" in the "courseindex-content" "region"
     And I should see "Topic 2" in the "courseindex-content" "region"
@@ -82,7 +80,6 @@ Feature: Course index depending on role
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
-    And I click on "Side panel" "button"
     When I click on "Open course index drawer" "button"
     Then I should see "Topic 1" in the "courseindex-content" "region"
     And I should not see "Topic 2" in the "courseindex-content" "region"
@@ -95,7 +92,6 @@ Feature: Course index depending on role
   Scenario: Delete an activity as a teacher
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I click on "Side panel" "button"
     When I delete "Activity sample 2" activity
     And I click on "Open course index drawer" "button"
     Then I should not see "Activity sample 2" in the "courseindex-content" "region"
@@ -104,7 +100,6 @@ Feature: Course index depending on role
   Scenario: Highlight sections are represented in the course index.
     Given I log in as "teacher1"
     And I am on "Course 1" course homepage with editing mode on
-    And I click on "Side panel" "button"
     And I turn section "2" highlighting on
     And I click on "Open course index drawer" "button"
     # Current section is only marked visually in the course index.
@@ -124,7 +119,6 @@ Feature: Course index depending on role
       | book     | Second activity in section 1 | Test book description       | C1     | sample4  | 1       |
     And I log in as "teacher1"
     And I am on "Course 1" course homepage
-    And I click on "Side panel" "button"
     When I click on "Open course index drawer" "button"
     # Sections should be opened by default.
     Then I should see "Topic 1" in the "courseindex-content" "region"

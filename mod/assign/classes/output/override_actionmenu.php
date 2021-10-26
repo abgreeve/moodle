@@ -42,14 +42,20 @@ class override_actionmenu implements templatable, renderable {
 
     /** @var moodle_url The current url for this page. */
     protected $currenturl;
-    /** @var cm_info course module information */
+    /** @var \cm_info course module information */
     protected $cm;
+    /** @var int The activity group mode */
+    protected $groupmode;
+    /** @var bool Can all groups be accessed */
+    protected $canaccessallgroups;
+    /** @var array Groups related to this activity */
+    protected $groups;
 
     /**
      * Constructor for this action menu.
      *
      * @param moodle_url $currenturl The current url for this page.
-     * @param cm_info $cm course module information.
+     * @param \cm_info $cm course module information.
      */
     public function __construct(moodle_url $currenturl, \cm_info $cm) {
         $this->currenturl = $currenturl;
@@ -73,7 +79,7 @@ class override_actionmenu implements templatable, renderable {
             $userlink->out(false) => get_string('useroverrides', 'mod_assign'),
             $grouplink->out(false) => get_string('groupoverrides', 'mod_assign'),
         ];
-        return new url_select($menu, $this->currenturl->out(false), null, 'assignselectthing');
+        return new url_select($menu, $this->currenturl->out(false), null, 'mod_assign_override_select');
     }
 
     /**
@@ -104,10 +110,10 @@ class override_actionmenu implements templatable, renderable {
             list($ingroupsql, $ingroupparams) = $DB->get_in_or_equal(array_keys($this->groups), SQL_PARAMS_NAMED);
             $params = $enrolledjoin->params + $ingroupparams;
             $sql = "SELECT u.id
-                  FROM {user} u
-                  JOIN {groups_members} gm ON gm.userid = u.id
-                       {$enrolledjoin->joins}
-                 WHERE gm.groupid $ingroupsql
+                      FROM {user} u
+                      JOIN {groups_members} gm ON gm.userid = u.id
+                           {$enrolledjoin->joins}
+                     WHERE gm.groupid $ingroupsql
                        AND {$enrolledjoin->wheres}";
             $users = $DB->get_records_sql($sql, $params);
         }
@@ -115,11 +121,7 @@ class override_actionmenu implements templatable, renderable {
         $info = new info_module($this->cm);
         $users = $info->filter_user_list($users);
 
-        if (empty($users)) {
-            return false;
-        }
-
-        return  true;
+        return !empty($users);
     }
 
     /**
@@ -150,10 +152,9 @@ class override_actionmenu implements templatable, renderable {
         $overridebutton = new single_button($url, $text, 'post', true, $options);
 
         $urlselect = $this->get_select_menu();
-        $data = [
+        return [
             'addoverride' => $overridebutton->export_for_template($output),
             'urlselect' => $urlselect->export_for_template($output)
         ];
-        return $data;
     }
 }

@@ -54,14 +54,14 @@ class user_submission_actionmenu implements templatable, renderable {
     /**
      * Constructor for this object.
      *
-     * @param int      $cmid           The course module ID.
-     * @param bool     $showsubmit     Whether to show the submit button.
-     * @param bool     $showedit       Whether to show the edit button.
-     * @param stdClass $submission     A submission for this activity.
-     * @param stdClass $teamsubmission A team submission for this activity.
+     * @param int $cmid The course module ID.
+     * @param bool $showsubmit Whether to show the submit button.
+     * @param bool $showedit Whether to show the edit button.
+     * @param stdClass|null $submission A submission for this activity.
+     * @param stdClass|null $teamsubmission A team submission for this activity.
      */
     public function __construct(int $cmid, bool $showsubmit, bool $showedit, stdClass $submission = null,
-        stdClass $teamsubmission = null) {
+            stdClass $teamsubmission = null) {
 
         $this->cmid = $cmid;
         $this->showsubmit = $showsubmit;

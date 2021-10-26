@@ -66,6 +66,7 @@ $groupmode = ($mode == "group");
 $url = new moodle_url('/mod/assign/overrides.php', array('cmid' => $cm->id, 'mode' => $mode));
 
 $PAGE->set_url($url);
+navigation_node::override_active_url(new moodle_url('/mod/assign/overrides.php', ['cmid' => $cmid]));
 
 if ($action == 'movegroupoverride') {
     $id = required_param('id', PARAM_INT);

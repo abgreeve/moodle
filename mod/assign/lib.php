@@ -434,7 +434,7 @@ function assign_extend_settings_navigation(settings_navigation $settings, naviga
         $url = new moodle_url('/mod/assign/overrides.php', array('cmid' => $PAGE->cm->id));
 
         $node = navigation_node::create(get_string('overrides', 'assign'),
-            new moodle_url($url, array('mode' => 'user')),
+            $url,
             navigation_node::TYPE_SETTING, null, 'mod_assign_useroverrides');
         $navref->add_node($node, $beforekey);
     }

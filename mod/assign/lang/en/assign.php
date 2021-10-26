@@ -95,6 +95,7 @@ $string['attemptreopenmethod_manual'] = 'Manually';
 $string['attemptreopenmethod_none'] = 'Never';
 $string['attemptreopenmethod_untilpass'] = 'Automatically until pass';
 $string['availability'] = 'Availability';
+$string['back'] = 'Back';
 $string['backtoassignment'] = 'Back to assignment';
 $string['batchoperationsdescription'] = 'With selected...';
 $string['batchoperationconfirmlock'] = 'Lock all selected submissions?';
@@ -630,8 +631,6 @@ $string['viewsubmissiongradingtable'] = 'View submission grading table.';
 $string['viewrevealidentitiesconfirm'] = 'View reveal student identities confirmation page.';
 $string['workflowfilter'] = 'Workflow filter';
 $string['xofy'] = '{$a->x} of {$a->y}';
-
-$string['back'] = 'Back';
 
 // Deprecated since Moodle 3.8.
 $string['duedateno'] = 'No due date';

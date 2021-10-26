@@ -141,7 +141,7 @@ class main_action_menu implements templatable, renderable {
             $chaptertitle = book_get_chapter_title($next->id, $this->chapters, $this->book, $context);
             $nextdata = [
                 'title' => get_string('navnext', 'mod_book'),
-                'url' => new moodle_url('/mod/book/view.php', ['id' => $this->cmid, 'chapterid' => $next->id])
+                'url' => (new moodle_url('/mod/book/view.php', ['id' => $this->cmid, 'chapterid' => $next->id]))->out(false)
             ];
             $data['next'] = $nextdata;
         }
@@ -149,7 +149,7 @@ class main_action_menu implements templatable, renderable {
             $chaptertitle = book_get_chapter_title($previous->id, $this->chapters, $this->book, $context);
             $previousdata = [
                 'title' => get_string('navprev', 'mod_book'),
-                'url' => new moodle_url('/mod/book/view.php', ['id' => $this->cmid, 'chapterid' => $previous->id])
+                'url' => (new moodle_url('/mod/book/view.php', ['id' => $this->cmid, 'chapterid' => $previous->id]))->out(false)
             ];
             $data['previous'] = $previousdata;
         }

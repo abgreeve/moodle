@@ -20,7 +20,7 @@
  * @package mod_book
  * @copyright  2021 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- **/
+ */
 
 namespace mod_book\output;
 
@@ -30,7 +30,7 @@ namespace mod_book\output;
  * @package mod_book
  * @copyright  2021 Adrian Greeve <adrian@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- **/
+ */
 class renderer extends \plugin_renderer_base {
 
     /**

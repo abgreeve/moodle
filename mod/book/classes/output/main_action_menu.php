@@ -44,8 +44,6 @@ class main_action_menu implements templatable, renderable {
     protected $chapters;
     /** @var stdClass Current chapter of the book. */
     protected $chapter;
-    /** @var stdClass The book object. */
-    protected $book;
 
     /**
      * Constructor for this class.
@@ -55,11 +53,10 @@ class main_action_menu implements templatable, renderable {
      * @param stdClass $chapter  The current chapter.
      * @param stdClass $book     The book object.
      */
-    public function __construct(int $cmid, array $chapters, stdClass $chapter, stdClass $book) {
+    public function __construct(int $cmid, array $chapters, stdClass $chapter) {
         $this->cmid = $cmid;
         $this->chapters = $chapters;
         $this->chapter = $chapter;
-        $this->book = $book;
     }
 
     /**
@@ -138,18 +135,16 @@ class main_action_menu implements templatable, renderable {
         $data = [];
 
         if ($next) {
-            $chaptertitle = book_get_chapter_title($next->id, $this->chapters, $this->book, $context);
             $nextdata = [
                 'title' => get_string('navnext', 'mod_book'),
-                'url' => new moodle_url('/mod/book/view.php', ['id' => $this->cmid, 'chapterid' => $next->id])
+                'url' => (new moodle_url('/mod/book/view.php', ['id' => $this->cmid, 'chapterid' => $next->id]))->out(false)
             ];
             $data['next'] = $nextdata;
         }
         if ($previous) {
-            $chaptertitle = book_get_chapter_title($previous->id, $this->chapters, $this->book, $context);
             $previousdata = [
                 'title' => get_string('navprev', 'mod_book'),
-                'url' => new moodle_url('/mod/book/view.php', ['id' => $this->cmid, 'chapterid' => $previous->id])
+                'url' => (new moodle_url('/mod/book/view.php', ['id' => $this->cmid, 'chapterid' => $previous->id]))->out(false)
             ];
             $data['previous'] = $previousdata;
         }

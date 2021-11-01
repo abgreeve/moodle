@@ -1,4 +1,4 @@
-@core @core_course @javascript
+@core @core_course @javascript @matt
 Feature: Restricting access to course lists
   In order to provide more targeted content
   As a Moodle Administrator

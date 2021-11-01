@@ -67,11 +67,5 @@ Feature: Check that the assignment grade can be updated correctly
     And I set the field "Grade out of 100" to "50"
     And I set the field "Notify students" to "0"
     And I press "Save changes"
-<<<<<<< HEAD
-    And I click on "Edit settings" "link"
-    And I follow "Test assignment name"
-    And I navigate to "View all submissions" in current page administration
-=======
     And I follow "View all submissions"
->>>>>>> 0e06aef0b6d (Initial run at gutting old nav)
     Then "Student 1" row "Grade" column of "generaltable" table should contain "50.00"

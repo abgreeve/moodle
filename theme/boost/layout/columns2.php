@@ -31,7 +31,7 @@ require_once($CFG->libdir . '/behat/lib.php');
 if (isset($PAGE->theme->addblockposition) &&
     $PAGE->user_is_editing() &&
     $PAGE->user_can_edit_blocks() &&
-    $PAGE->blocks->is_known_region(BLOCK_POS_RIGHT)
+    $PAGE->pagelayout !== 'mycourses'
 ) {
     $url = new moodle_url($PAGE->url, ['bui_addblock' => '', 'sesskey' => sesskey()]);
 

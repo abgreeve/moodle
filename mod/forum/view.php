@@ -108,7 +108,7 @@ $PAGE->set_heading($course->fullname);
 
 // MDL-XXXXX: Sujith to remove this place holder.
 if (defined('BEHAT_SITE_RUNNING')) {
-    $buildsecondarynavigation = $PAGE->has_secondary_navigation_setter(false);
+    $PAGE->has_secondary_navigation_setter(false);
 }
 $PAGE->add_header_action(forum_search_form($course, $search).$OUTPUT->region_main_settings_menu());
 

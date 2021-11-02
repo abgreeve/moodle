@@ -60,8 +60,9 @@ Feature: A teacher can control the subscription to a forum
       | type           | general       |
       | forcesubscribe | <initialmode> |
     When I am on the "Test forum" "forum activity" page logged in as "teacher"
-    And I navigate to "Subscriptions" in current page administration
-    And I set the field "Subscriptions" to "<updatedmode>"
+    And I navigate to "Subscription mode > <updatedmode>" in current page administration
+    And I should see "Are you sure you want to change the subscription mode to <updatedmode>" in the "Confirmation" "dialogue"
+    And I click on "Yes" "button" in the "Confirmation" "dialogue"
     Then I should see "<updatedmodeconfirmed>"
     Examples:
       | initialmode | updatedmode           | updatedmodeconfirmed                     |

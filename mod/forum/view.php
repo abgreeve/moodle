@@ -107,6 +107,9 @@ $PAGE->add_body_class('forumtype-' . $forum->get_type());
 $PAGE->set_heading($course->fullname);
 
 // MDL-XXXXX: Sujith to remove this place holder.
+if (defined('BEHAT_SITE_RUNNING')) {
+    $buildsecondarynavigation = $PAGE->has_secondary_navigation_setter(false);
+}
 $PAGE->add_header_action(forum_search_form($course, $search).$OUTPUT->region_main_settings_menu());
 
 if ($istypesingle && $displaymode == FORUM_MODE_NESTED_V2) {

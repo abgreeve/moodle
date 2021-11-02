@@ -1051,6 +1051,17 @@ class behat_navigation extends behat_base {
         }
         return $menuxpath;
     }
+    protected function find_page_administration_menu_backup($mustexist = false) {
+        $menuxpath = '//div[@id=\'action-menu-0-menubar\']';
+
+        if ($mustexist) {
+            $exception = new ElementNotFoundException($this->getSession(), 'Page check');
+            $this->find('xpath', $menuxpath, $exception);
+        } else if (!$this->getSession()->getPage()->find('xpath', $menuxpath)) {
+            return null;
+        }
+        return $menuxpath;
+    }
 
     /**
      * Toggles administration menu
@@ -1081,6 +1092,8 @@ class behat_navigation extends behat_base {
     protected function select_from_administration_menu($nodelist) {
         // Find administration menu.
         if ($menuxpath = $this->find_header_administration_menu()) {
+            $isheader = true;
+        } else if ($menuxpath = $this->find_page_administration_menu_backup(true)) {
             $isheader = true;
         } else {
             $menuxpath = $this->find_page_administration_menu(true);

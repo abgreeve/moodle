@@ -58,7 +58,7 @@ Feature: Report relevant content availability
     Given I am on the "forum1" "forum activity" page logged in as student1
     Then "Forum summary report" "link" should not exist in current page administration
 
-  @javascript
+  @javascript @migrationissue
   Scenario: Students given the view capability can only view their own report data
     Given the following "permission overrides" exist:
       | capability               | permission | role    | contextlevel | reference |

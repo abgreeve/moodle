@@ -30,6 +30,7 @@ Feature: Use the qbank plugin manager page for managecategories
     And I navigate to "Question bank" in current page administration
     And I should see "Categories"
 
+  @migrationissue
   Scenario: Enable/disable the tab New category when tyring to add a random question to a quiz
     Given I log in as "admin"
     When I navigate to "Plugins > Question bank plugins > Manage question bank plugins" in site administration

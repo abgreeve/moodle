@@ -19,8 +19,7 @@ Feature: Test importing questions from GIFT format.
 
   @javascript @_file_upload
   Scenario: import some GIFT questions
-    When I navigate to "Question bank" in current page administration
-    And I select "Import" from the "questionbankactionselect" singleselect
+    When I navigate to "Question bank > Import" in current page administration
     And I set the field "id_format_gift" to "1"
     And I upload "question/format/gift/tests/fixtures/questions.gift.txt" file to "Import" filemanager
     And I press "id_submitbutton"
@@ -38,8 +37,7 @@ Feature: Test importing questions from GIFT format.
 
   @javascript @_file_upload
   Scenario: import a GIFT file which specifies the category
-    When I navigate to "Question bank" in current page administration
-    And I select "Import" from the "questionbankactionselect" singleselect
+    When I navigate to "Question bank > Import" in current page administration
     And I set the field "id_format_gift" to "1"
     And I upload "question/format/gift/tests/fixtures/questions_in_category.gift.txt" file to "Import" filemanager
     And I press "id_submitbutton"

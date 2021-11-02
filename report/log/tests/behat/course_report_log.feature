@@ -25,24 +25,3 @@ Feature: In a course administration page, navigate through report page, test for
     Then "Report" "field" should exist
     And the "Report" select box should contain "Logs"
     And the field "Report" matches value "Logs"
-
-  @javascript @migrationissue @classicfail
-  Scenario: Verify the session setting is saved for different courses
-    Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I navigate to "Reports" in current page administration
-    And "Report" "field" should exist
-    And the "Report" select box should contain "Logs"
-    And the field "Report" matches value "Logs"
-    # Now select the Live logs for Course 2
-    And I am on "Course 2" course homepage
-    And I navigate to "Reports" in current page administration
-    And I select "Live logs" from the "Report type" singleselect
-    # now come back to course 1 and see if the default is logs page or not
-    And I am on "Course 1" course homepage
-    And I navigate to "Reports" in current page administration
-    And the "Report" select box should contain "Logs"
-    # Now come back again to Course 2
-    And I am on "Course 2" course homepage
-    When I navigate to "Reports" in current page administration
-    Then the field "Report" matches value "Live logs"

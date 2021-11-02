@@ -129,7 +129,6 @@ Feature: Manage plearning plan
     And I wait until the page is ready
     Then I should not see "Science plan Year-4"
 
-  @classicfail
   Scenario: See a learning plan from a course
     Given the following lp "plans" exist:
       | name | user | description |

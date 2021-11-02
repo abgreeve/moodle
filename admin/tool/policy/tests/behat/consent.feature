@@ -448,7 +448,7 @@ Feature: User must accept policy managed by this plugin when logging in and sign
     When I open my profile in edit mode
     Then the field "First name" matches value "User"
 
-  @javascript @classicfail
+  @javascript
   Scenario: Accept policy on login as guest
     Given the following config values are set as admin:
       | registerauth    | email |

@@ -15,7 +15,7 @@ Feature: Course activity controls works as expected
   # * Course controls with paged mode in the course home page
   # * Course controls with paged mode in a section's page
 
-  @javascript @_cross_browser @classicfail
+  @javascript @_cross_browser
   Scenario Outline: General activities course controls using topics and weeks formats, and paged mode and not paged mode works as expected
     Given the following "users" exist:
       | username | firstname | lastname | email |
@@ -84,7 +84,6 @@ Feature: Course activity controls works as expected
       | weeks        | 1             | "1 January - 7 January" | should not                | should not                                               | "8 January - 14 January" |
       | weeks        | 1             | ""                      | should                    | should not                                               | "8 January - 14 January" |
 
-  @migrationissue @classicfail
   Scenario Outline: General activities course controls using topics and weeks formats, and paged mode and not paged mode works as expected
     Given the following "users" exist:
       | username | firstname | lastname | email |

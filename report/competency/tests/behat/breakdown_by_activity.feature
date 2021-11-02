@@ -46,7 +46,7 @@ Feature: See the competencies for an activity
     And I set the field "Course competencies" to "Test-Comp1"
     And I press "Save and return to course"
 
-  @javascript @classicfail
+  @javascript
   Scenario: Go to the competency breakdown report
     When I navigate to "Reports" in current page administration
     And I select "Competency breakdown" from the "Report type" singleselect

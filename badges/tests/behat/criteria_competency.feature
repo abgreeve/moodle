@@ -1,4 +1,4 @@
-@core @core_badges @_file_upload @classicfail
+@core @core_badges @_file_upload
 Feature: Award badges based on competency completion
   In order to award badges to users based on competency completion
   As an admin

@@ -1,4 +1,4 @@
-@gradingform @gradingform_rubric @javascript @classicfail
+@gradingform @gradingform_rubric @javascript
 Feature: Converting rubric score to grades
   In order to use and refine rubrics to grade students
   As a teacher

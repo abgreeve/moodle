@@ -50,6 +50,7 @@ class behat_blocks extends behat_base {
         $this->execute('behat_general::i_click_on_in_the', [$addblock, 'link_exact', '.block_fake', 'css_element']);
 
         if (!$this->running_javascript()) {
+            // TODO: @matt
             $this->execute('behat_general::i_click_on_in_the', [$blockname, 'link_exact', '#region-main', 'css_element']);
         } else {
             $this->execute('behat_general::i_click_on_in_the', [$blockname, 'link_exact', $addblock, 'dialogue']);

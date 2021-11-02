@@ -103,7 +103,7 @@ Feature: Upload users
     And I should see "Users created: 2"
     And I log out
 
-  @javascript @classicfail
+  @javascript
   Scenario: Upload users setting their user theme
     Given the following "courses" exist:
       | fullname | shortname | category |

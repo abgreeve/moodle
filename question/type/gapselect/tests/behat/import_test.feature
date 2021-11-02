@@ -20,8 +20,7 @@ Feature: Import and export select missing words questions
   @javascript @_file_upload
   Scenario: Import and export select missing words questions
     # Import sample file.
-    When I navigate to "Question bank" in current page administration
-    And I select "Import" from the "questionbankactionselect" singleselect
+    When I navigate to "Question bank > Import" in current page administration
     And I set the field "id_format_xml" to "1"
     And I upload "question/type/gapselect/tests/fixtures/testquestion.moodle.xml" file to "Import" filemanager
     And I press "id_submitbutton"

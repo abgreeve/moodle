@@ -1,4 +1,4 @@
-@gradingform @gradingform_rubric @javascript @classicfail
+@gradingform @gradingform_rubric @javascript
 Feature: Rubrics can have levels with negative scores
   In order to use and refine rubrics to grade students
   As a teacher

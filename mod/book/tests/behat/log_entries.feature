@@ -4,7 +4,7 @@ Feature: In a book, verify log entries
   As an admin
   I need to perform various actions in a book.
 
-  @javascript @_switch_window
+  @javascript @_switch_window @migrationissue
   Scenario: perform various book actions and verify log entries.
     Given the following "courses" exist:
       | fullname | shortname | category | groupmode |

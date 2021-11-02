@@ -99,15 +99,14 @@ Feature: Edit quiz page - adding things
     And I should see "Essay 04 new" on quiz page "2"
     And I should see "Essay for page 2" on quiz page "2"
 
-  @javascript
+  @javascript @migrationissue
   Scenario: Add questions from question bank to the quiz. In order to be able to
       add questions from question bank to the quiz, first we create some new questions
       in various categories and add them to the question bank.
 
     # Create a couple of sub categories.
     When I am on "Course 1" course homepage
-    And I navigate to "Question bank" in current page administration
-    And I select "Categories" from the "questionbankactionselect" singleselect
+    And I navigate to "Question bank > Categories" in current page administration
     Then I should see "Add category"
     Then I set the field "Parent category" to "Default for C1"
     And I set the field "Name" to "Subcat 1"

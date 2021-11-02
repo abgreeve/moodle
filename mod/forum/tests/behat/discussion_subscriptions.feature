@@ -16,7 +16,7 @@ Feature: A user can control their own subscription preferences for a discussion
       | student1 | C1 | student |
     And I log in as "admin"
 
-  @javascript @classicfail
+  @javascript @migrationissue
   Scenario: An optional forum can have discussions subscribed to
     Given the following "activity" exists:
       | activity       | forum                  |
@@ -61,7 +61,7 @@ Feature: A user can control their own subscription preferences for a discussion
     And "Subscribe to this discussion" "checkbox" should exist in the "Test post subject one" "table_row"
     And "Subscribe to this discussion" "checkbox" should exist in the "Test post subject two" "table_row"
 
-  @javascript @classicfail
+  @javascript @migrationissue
   Scenario: An automatic subscription forum can have discussions unsubscribed from
     Given the following "activity" exists:
       | activity       | forum                  |
@@ -106,7 +106,7 @@ Feature: A user can control their own subscription preferences for a discussion
     And "Unsubscribe from this discussion" "checkbox" should exist in the "Test post subject one" "table_row"
     And "Unsubscribe from this discussion" "checkbox" should exist in the "Test post subject two" "table_row"
 
-  @javascript @classicfail
+  @javascript @migrationissue
   Scenario: A user does not lose their preferences when a forum is switch from optional to automatic
     Given the following "activity" exists:
       | activity       | forum                  |
@@ -149,7 +149,7 @@ Feature: A user can control their own subscription preferences for a discussion
     And "Unsubscribe from this discussion" "checkbox" should exist in the "Test post subject one" "table_row"
     And "Subscribe to this discussion" "checkbox" should exist in the "Test post subject two" "table_row"
 
-  @javascript @classicfail
+  @javascript @migrationissue
   Scenario: A user does not lose their preferences when a forum is switch from optional to automatic
     Given the following "activity" exists:
       | activity       | forum                  |

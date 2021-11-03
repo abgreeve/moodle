@@ -82,7 +82,7 @@ Feature: Marking guides can be created and edited
     And I should see "Comment \"4\""
     But I should not see "Comment 3"
 
-  @javascript @matt
+  @javascript
   Scenario: Grading and viewing graded marking guide
     # Grading a student.
     When I navigate to "Assignment" in current page administration

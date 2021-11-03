@@ -37,7 +37,7 @@ Feature: In a report, admin can see loglive data
     And I wait to be redirected
     And I should see "course_add mod"
 
-  @javascript @_switch_window
+  @javascript @_switch_window @matt
   Scenario: Check loglive report entries and make sure the pause/resume button works for standard reader along with ajax calls
     Given I am on site homepage
     When I navigate to "Reports > Live logs" in site administration
@@ -59,7 +59,7 @@ Feature: In a report, admin can see loglive data
     And I wait "8" seconds
     And I should see "Test name2"
 
-  @javascript @_switch_window
+  @javascript @_switch_window @matt
   Scenario: Check loglive report entries and make sure the pause/resume button works for legacy reader along with ajax calls
     Given I am on site homepage
     When I navigate to "Reports > Live logs" in site administration

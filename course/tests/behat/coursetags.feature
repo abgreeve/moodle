@@ -65,7 +65,6 @@ Feature: Tagging courses
     And I should see "Course 2"
     And I log out
 
-  @matt
   Scenario: User can set course tags using separate form
     Given I log in as "admin"
     And I set the following system permissions of "Non-editing teacher" role:

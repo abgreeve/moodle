@@ -99,7 +99,7 @@ Feature: Edit quiz page - adding things
     And I should see "Essay 04 new" on quiz page "2"
     And I should see "Essay for page 2" on quiz page "2"
 
-  @javascript @matt
+  @javascript
   Scenario: Add questions from question bank to the quiz. In order to be able to
       add questions from question bank to the quiz, first we create some new questions
       in various categories and add them to the question bank.

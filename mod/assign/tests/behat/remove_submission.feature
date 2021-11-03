@@ -31,7 +31,7 @@ Feature: Remove a submission
       | student1 | G1 |
       | student2 | G1 |
 
-  @javascript @skip_chrome_zerosize @migrationissue
+  @javascript @skip_chrome_zerosize
   Scenario: Remove a submission should remove the data that was submitted
     Given the following "activity" exists:
       | activity                             | assign                |
@@ -86,7 +86,7 @@ Feature: Remove a submission
     And I should not see "I'm the student submission"
     And I should see "Nothing has been submitted for this assignment" in the "Submission status" "table_row"
 
-  @javascript @skip_chrome_zerosize @migrationissue
+  @javascript @skip_chrome_zerosize
   Scenario: A student can remove their own submission
     Given the following "activity" exists:
       | activity                             | assign                |

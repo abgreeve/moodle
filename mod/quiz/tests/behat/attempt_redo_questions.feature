@@ -64,7 +64,7 @@ Feature: Allow students to redo questions in a practice quiz, without starting a
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     Then "Try another question like this one" "button" should not exist
 
-  @javascript @_switch_window @matt
+  @javascript @_switch_window
   Scenario: Teachers reviewing can see all the questions attempted in a slot
     Given I am on the "Quiz 1" "mod_quiz > View" page logged in as "student"
     When I press "Attempt quiz now"

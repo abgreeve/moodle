@@ -1,4 +1,4 @@
-@mod @mod_forum @migrationissue
+@mod @mod_forum @matt
 Feature: A teacher can control the subscription to a forum
   In order to change individual user's subscriptions
   As a course administrator

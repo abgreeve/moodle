@@ -99,7 +99,7 @@ Feature: Edit quiz page - adding things
     And I should see "Essay 04 new" on quiz page "2"
     And I should see "Essay for page 2" on quiz page "2"
 
-  @javascript @migrationissue
+  @javascript @matt
   Scenario: Add questions from question bank to the quiz. In order to be able to
       add questions from question bank to the quiz, first we create some new questions
       in various categories and add them to the question bank.
@@ -120,7 +120,7 @@ Feature: Edit quiz page - adding things
     Then I press "id_submitbutton"
     And I should see "Subcat 2"
 
-    And I follow "Question bank"
+    And I click on "Questions" "link"
     Then I should see "Question bank"
     And I should see "Select a category"
 

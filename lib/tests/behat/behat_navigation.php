@@ -444,7 +444,9 @@ class behat_navigation extends behat_base {
         $nodetext = end($nodes);
 
         // Find administration menu.
-        $menuxpath = $this->find_header_administration_menu() ?: $this->find_page_administration_menu(true);
+        if (!$menuxpath = $this->find_page_administration_menu_backup()) {
+            $menuxpath = $this->find_header_administration_menu() ?: $this->find_page_administration_menu(true);
+        }
 
         $this->toggle_page_administration_menu($menuxpath);
         $this->execute('behat_general::should_exist_in_the', [$nodetext, $selectortype, $menuxpath, 'xpath_element']);
@@ -1094,7 +1096,7 @@ class behat_navigation extends behat_base {
         if ($menuxpath = $this->find_header_administration_menu()) {
             $isheader = true;
         } else if ($menuxpath = $this->find_page_administration_menu_backup(true)) {
-            $isheader = true;
+            $isheader = false;
         } else {
             $menuxpath = $this->find_page_administration_menu(true);
             $isheader = false;

@@ -64,7 +64,7 @@ Feature: Allow students to redo questions in a practice quiz, without starting a
     And I click on "Submit all and finish" "button" in the "Confirmation" "dialogue"
     Then "Try another question like this one" "button" should not exist
 
-  @javascript @_switch_window @migrationissue
+  @javascript @_switch_window @matt
   Scenario: Teachers reviewing can see all the questions attempted in a slot
     Given I am on the "Quiz 1" "mod_quiz > View" page logged in as "student"
     When I press "Attempt quiz now"
@@ -86,6 +86,7 @@ Feature: Allow students to redo questions in a practice quiz, without starting a
     And I switch to the main window
     And the state of "First question" question is shown as "Not answered"
     And I should not see "Submit" in the ".history" "css_element"
+    And I am on the "Quiz 1" "mod_quiz > View" page
     And I navigate to "Results > Statistics" in current page administration
     And I follow "TF1"
     And "False" row "Frequency" column of "quizresponseanalysis" table should contain "100.00%"

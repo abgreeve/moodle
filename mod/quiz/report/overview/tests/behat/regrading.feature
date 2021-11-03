@@ -73,10 +73,10 @@ Feature: Regrading quiz attempts using the Grades report
     And I should see "Quiz for testing regrading"
     And I should see "Overall number of students achieving grade ranges"
 
-  @migrationissue
+  @matt
   Scenario: Dry-run a full regrade, then regrade the attempts that will need it.
     Given I am on the "Quiz for testing regrading" "quiz activity" page logged in as teacher
-    When I press "Edit quiz"
+    When I navigate to "Edit quiz" in current page administration
     And I follow "Edit question SA"
     And I set the field "id_fraction_1" to "50%"
     And I press "id_submitbutton"

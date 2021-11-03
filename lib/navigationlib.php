@@ -4490,6 +4490,7 @@ class settings_navigation extends navigation_node {
         if (!$adminoptions->update && $adminoptions->tags) {
             $url = new moodle_url('/course/tags.php', array('id' => $course->id));
             $coursenode->add(get_string('coursetags', 'tag'), $url, self::TYPE_SETTING, null, 'coursetags', new pix_icon('i/settings', ''));
+            $coursenode->get('coursetags')->set_force_into_more_menu();
         }
 
         // add enrol nodes

@@ -128,7 +128,7 @@ Feature: Users can auto-enrol themself in courses where self enrolment is allowe
     And I click on "Unenrol" "button" in the "Unenrol" "dialogue"
     Then I should not see "Student 1" in the "participants" "table"
 
-  @javascript @migrationissue
+  @javascript @matt
   Scenario: Self unenrol as a self-enrolled student from the course
     Given the "multilang" filter is "on"
     And the "multilang" filter applies to "content and headings"

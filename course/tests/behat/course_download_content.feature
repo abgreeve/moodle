@@ -36,7 +36,7 @@ Feature: Course content can be downloaded
     # Without the ability to check the downloaded file, the absence of an exception being thrown here is considered a success.
     And I click on "Download" "button" in the "Download course content" "dialogue"
 
-  @javascript @migrationissue
+  @javascript @matt
   Scenario: A teacher can download course content when the feature is enabled in their course
     Given I log in as "teacher1"
     When I am on "Hockey 101" course homepage

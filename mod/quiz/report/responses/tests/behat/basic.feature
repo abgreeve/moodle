@@ -1,4 +1,4 @@
-@mod @mod_quiz @quiz @quiz_reponses @migrationissue
+@mod @mod_quiz @quiz @quiz_reponses @matt
 Feature: Basic use of the Responses report
   In order to see how my students are progressing
   As a teacher

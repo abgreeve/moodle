@@ -22,7 +22,7 @@ Feature: Settings form fields disabled if not required
     And I am on "Course 1" course homepage with editing mode on
     And I change window size to "large"
 
-  @javascript @migrationissue
+  @javascript @matt
   Scenario: Depending on the number of attempts, different form fields are disabled.
     When I add a "Quiz" to section "1"
     And I expand all fieldsets
@@ -58,7 +58,6 @@ Feature: Settings form fields disabled if not required
         | Override user    | Student1 |
         | Attempts allowed | 3        |
     And I press "Save"
-    And I follow "Test quiz"
     And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     And I set the field "Attempts allowed" to "1"
@@ -72,7 +71,6 @@ Feature: Settings form fields disabled if not required
     And I click on "Edit" "link" in the "region-main" "region"
     And I set the field "Attempts allowed" to "2"
     And I press "Save"
-    And I follow "Test quiz"
     And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     And I set the field "Attempts allowed" to "1"
@@ -88,7 +86,6 @@ Feature: Settings form fields disabled if not required
         | Override user    | Student2  |
         | Attempts allowed | Unlimited |
     And I press "Save"
-    And I follow "Test quiz"
     And I navigate to "Settings" in current page administration
     And I expand all fieldsets
     And I set the field "Attempts allowed" to "1"

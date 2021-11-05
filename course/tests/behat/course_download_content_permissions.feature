@@ -64,7 +64,7 @@ Feature: Access to downloading course content can be controlled
     And I navigate to "Course administration" in current page administration
     And "Download course content" "link" should not exist
 
-  Scenario: Teachers require a capability to anot ccess the download course content feature or modify its availability in a course
+  Scenario: Teachers require a capability to access the download course content feature or modify its availability in a course
     Given I log in as "admin"
     And I navigate to "Courses > Course default settings" in site administration
     And I set the field "Enable download course content" to "Yes"

@@ -18,7 +18,6 @@ Feature: Page administration menu
       | activity | name        | intro                   | course | idnumber | option |
       | choice   | Choice name | Test choice description | C1     | choice1  | Option 1, Option 2, Option 3 |
 
-  @matt
   Scenario: Teacher can access activity administration menus
     And I log in as "teacher1"
     And I am on "Course 1" course homepage

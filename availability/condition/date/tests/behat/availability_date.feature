@@ -17,7 +17,7 @@ Feature: availability_date
       | teacher1 | C1     | editingteacher |
       | student1 | C1     | student        |
 
-  @javascript @matt
+  @javascript
   Scenario: Test condition
     # Basic setup.
     Given I log in as "teacher1"

@@ -37,7 +37,7 @@ Feature: Basic use of the Statistics report
       | Question B | 1    |
       | Question C | 2    |
 
-  @javascript @matt
+  @javascript
   Scenario: Report works when there are no attempts
     Given I am on the "Quiz 1" "quiz activity" page logged in as teacher1
     And I navigate to "Results > Statistics" in current page administration

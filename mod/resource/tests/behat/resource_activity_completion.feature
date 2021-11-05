@@ -27,7 +27,7 @@ Feature: View activity completion information for file resources
       | Show activity completion conditions | No  |
     And I press "Save and display"
 
-  @javascript @matt
+  @javascript
   Scenario Outline: The manual completion button will be shown on the course page for Open, In pop-up, New window and Force download display mode if Show activity completion conditions is set to No
     Given I am on "Course 1" course homepage with editing mode on
     And I add a "File" to section "1"

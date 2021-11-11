@@ -107,10 +107,14 @@ $PAGE->add_body_class('forumtype-' . $forum->get_type());
 $PAGE->set_heading($course->fullname);
 
 // MDL-XXXXX: Sujith to remove this place holder.
-if (defined('BEHAT_SITE_RUNNING')) {
-    $PAGE->has_secondary_navigation_setter(false);
+$PAGE->has_secondary_navigation_setter(false);
+if ($PAGE->theme->name == 'classic') {
+    // This is the only line to stay. Please indent it back when the if else parts are removed.
+    $PAGE->add_header_action(forum_search_form($course, $search));
+} else {
+    $PAGE->add_header_action(forum_search_form($course, $search).$OUTPUT->region_main_settings_menu());
 }
-$PAGE->add_header_action(forum_search_form($course, $search).$OUTPUT->region_main_settings_menu());
+// End of 'place holder'.
 
 if ($istypesingle && $displaymode == FORUM_MODE_NESTED_V2) {
     $PAGE->add_body_class('nested-v2-display-mode reset-style');

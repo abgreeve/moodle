@@ -389,6 +389,7 @@ $string['none'] = 'None';
 $string['noonlinesubmissions'] = 'This assignment does not require you to submit anything online';
 $string['noopen'] = 'No open date';
 $string['nooverridedata'] = 'You must override at least one of the assignment settings.';
+$string['nooverrides'] = 'There are currently no overrides.';
 $string['nosavebutnext'] = 'Next';
 $string['nosubmission'] = 'Nothing has been submitted for this assignment';
 $string['nosubmissionyet'] = 'No submissions have been made yet';

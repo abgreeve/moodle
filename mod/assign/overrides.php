@@ -298,7 +298,10 @@ foreach ($overrides as $override) {
 echo html_writer::start_tag('div', array('id' => 'assignoverrides'));
 if (count($table->data)) {
     echo html_writer::table($table);
+} else {
+    echo $OUTPUT->notification(get_string('nooverrides', 'mod_assign'), 'info');
 }
+
 if ($hasinactive) {
     echo $OUTPUT->notification(get_string('inactiveoverridehelp', 'assign'), 'dimmed_text');
 }

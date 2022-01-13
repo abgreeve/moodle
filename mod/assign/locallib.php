@@ -4657,6 +4657,7 @@ class assign {
                                     $currenturl);
         $o .= $this->get_renderer()->render($header);
 
+        $o .= $this->get_renderer()->heading(get_string('gradeitem:submissions', 'mod_assign'), 2);
 
         $o .= groups_print_activity_menu($this->get_course_module(), $currenturl, true);
 

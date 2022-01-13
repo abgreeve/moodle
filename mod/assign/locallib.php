@@ -4521,7 +4521,7 @@ class assign {
      * @return string
      */
     protected function view_grading_table() {
-        global $USER, $CFG, $SESSION;
+        global $USER, $CFG, $SESSION, $PAGE;
 
         // Include grading options form.
         require_once($CFG->dirroot . '/mod/assign/gradingoptionsform.php');
@@ -4643,6 +4643,7 @@ class assign {
         $buttons = new \mod_assign\output\grading_actionmenu($this->get_course_module()->id);
         $actionformtext = $this->get_renderer()->render($buttons);
         $actionformtext .= $this->get_renderer()->render($gradingactions);
+        $PAGE->activityheader->set_attrs(['hidecompletion' => true]);
 
         $currenturl = new moodle_url('/mod/assign/view.php', ['id' => $this->get_course_module()->id, 'action' => 'grading']);
 

@@ -89,6 +89,7 @@ $activityheader->set_attrs([
     'title' => $activityheader->is_title_allowed() ? format_string($assign->name, true, ['context' => $context]) : ""
 ]);
 echo $OUTPUT->header();
+echo $OUTPUT->heading(get_string('overrides', 'mod_assign'), 2);
 $overridemenu = new \mod_assign\output\override_actionmenu($url, $cm);
 $renderer = $PAGE->get_renderer('mod_assign');
 echo $renderer->render($overridemenu);

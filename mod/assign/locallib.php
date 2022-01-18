@@ -5839,7 +5839,8 @@ class assign {
                 $course->relativedatesmode,
                 $course->startdate,
                 $this->can_grade(),
-                $isvisible
+                $isvisible,
+                $this->get_course_module()
             );
         } else {
             // The active group has already been updated in groups_print_activity_menu().
@@ -5860,7 +5861,8 @@ class assign {
                 $course->relativedatesmode,
                 $course->startdate,
                 $this->can_grade(),
-                $isvisible
+                $isvisible,
+                $this->get_course_module()
             );
         }
 
@@ -5925,10 +5927,6 @@ class assign {
         if ($this->can_view_grades()) {
             $actionbuttons = new \mod_assign\output\actionmenu($this->get_course_module()->id);
             $o .= $this->get_renderer()->submission_actionmenu($actionbuttons);
-
-            // Group selector will only be displayed if necessary.
-            $currenturl = new moodle_url('/mod/assign/view.php', array('id' => $this->get_course_module()->id));
-            $o .= groups_print_activity_menu($this->get_course_module(), $currenturl->out(), true);
 
             $summary = $this->get_assign_grading_summary_renderable();
             $o .= $this->get_renderer()->render($summary);

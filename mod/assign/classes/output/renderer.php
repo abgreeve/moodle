@@ -286,6 +286,12 @@ class renderer extends \plugin_renderer_base {
         $o = '';
         $o .= $this->output->container_start('gradingsummary');
         $o .= $this->output->heading(get_string('gradingsummary', 'assign'), 3);
+
+        if (isset($summary->cm)) {
+            $currenturl = new \moodle_url('/mod/assign/view.php', array('id' => $summary->cm->id));
+            $o .= groups_print_activity_menu($summary->cm, $currenturl->out(), true);
+        }
+
         $o .= $this->output->box_start('boxaligncenter gradingsummarytable');
         $t = new \html_table();
         $t->attributes['class'] = 'generaltable table-bordered';

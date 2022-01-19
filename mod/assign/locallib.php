@@ -8212,6 +8212,8 @@ class assign {
             $requiresubmissionstatement = false;
         }
 
+        $mform->addElement('header', 'submission header', get_string('addsubmission', 'mod_assign'));
+
         // Only show submission statement if we are editing our own submission.
         if ($requiresubmissionstatement && !$draftsenabled && $userid == $USER->id) {
             $mform->addElement('checkbox', 'submissionstatement', '', $submissionstatement);

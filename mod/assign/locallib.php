@@ -4563,6 +4563,7 @@ class assign {
 
         $gradingactions = new url_select($links);
         $gradingactions->set_label(get_string('choosegradingaction', 'assign'));
+        $gradingactions->class .= ' mb-1';
 
         $gradingmanager = get_grading_manager($this->get_context(), 'mod_assign', 'submissions');
 
@@ -4652,10 +4653,12 @@ class assign {
                                     false,
                                     $this->get_course_module()->id,
                                     get_string('grading', 'assign'),
-                                    $actionformtext,
+                                    '',
                                     '',
                                     $currenturl);
         $o .= $this->get_renderer()->render($header);
+
+        $o .= $actionformtext;
 
         $o .= $this->get_renderer()->heading(get_string('gradeitem:submissions', 'mod_assign'), 2);
 

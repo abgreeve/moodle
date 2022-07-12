@@ -119,5 +119,35 @@ function xmldb_assignfeedback_editpdf_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2022061000, 'assignfeedback', 'editpdf');
     }
 
+    if ($oldversion < 2022061001) {
+        // Patiently remove all orphaned temporary pdf files.
+        $sql = "SELECT f.contextid, f.component, f.filearea, f.itemid
+                  FROM {files} f
+             LEFT JOIN {assign_grades} g ON g.id = f.itemid
+                 WHERE f.component = :assigneditpdf
+                   AND g.id IS NULL";
+
+        // Does this need to be chunked?
+        $records = $DB->get_recordset_sql($sql, ['assigneditpdf' => 'assignfeedback_editpdf']);
+
+        $fs = get_file_storage();
+        foreach ($records as $record) {
+            $fs->delete_area_files($record->contextid, $record->component, $record->filearea, $record->itemid);
+        }
+        $records->close();
+
+        // Remove orphaned rotation entries.
+        // How big could this be? Should this also be chunked?
+        $sql = "DELETE
+                  FROM {assignfeedback_editpdf_rot}
+                 WHERE id IN (SELECT er.id
+                                FROM {assignfeedback_editpdf_rot} er
+                           LEFT JOIN {assign_grades} g ON g.id = er.gradeid
+                               WHERE g.id IS NULL)";
+        $DB->execute($sql);
+
+        upgrade_plugin_savepoint(true, 2022061001, 'assignfeedback', 'editpdf');
+    }
+
     return true;
 }

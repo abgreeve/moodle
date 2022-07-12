@@ -123,7 +123,7 @@ class provider implements
 
         $assign = $requestdata->get_assign();
         $plugin = $assign->get_plugin_by_type('assignfeedback', 'editpdf');
-        $fileareas = $plugin->get_file_areas();
+        $fileareas = $plugin->get_all_file_areas();
         $fs = get_file_storage();
         foreach ($fileareas as $filearea => $notused) {
             // Delete pdf files.
@@ -163,7 +163,7 @@ class provider implements
 
         $assign = $deletedata->get_assign();
         $plugin = $assign->get_plugin_by_type('assignfeedback', 'editpdf');
-        $fileareas = $plugin->get_file_areas();
+        $fileareas = $plugin->get_all_file_areas();
         $fs = get_file_storage();
         list($sql, $params) = $DB->get_in_or_equal($deletedata->get_gradeids(), SQL_PARAMS_NAMED);
         foreach ($fileareas as $filearea => $notused) {

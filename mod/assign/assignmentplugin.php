@@ -564,6 +564,16 @@ abstract class assign_plugin {
         return array();
     }
 
+    /**
+     * Get all file areas related to this plugin (including temporary files). Override
+     * this method if get_file_areas does not return all file areas related to this plugin.
+     *
+     * @return array - An array of all fileareas (keys) and descriptions (values)
+     */
+    public function get_all_file_areas(): array {
+        return $this->get_file_areas();
+    }
+
 
     /**
      * Default implementation of file_get_info for plugins.

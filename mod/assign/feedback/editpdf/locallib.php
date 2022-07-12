@@ -405,6 +405,7 @@ class assign_feedback_editpdf extends assign_feedback_plugin {
             list($gradeids, $params) = $DB->get_in_or_equal(array_keys($grades), SQL_PARAMS_NAMED);
             $DB->delete_records_select('assignfeedback_editpdf_annot', 'gradeid ' . $gradeids, $params);
             $DB->delete_records_select('assignfeedback_editpdf_cmnt', 'gradeid ' . $gradeids, $params);
+            $DB->delete_records_select('assignfeedback_editpdf_rot', 'gradeid ' . $gradeids, $params);
         }
         return true;
     }
@@ -437,6 +438,20 @@ class assign_feedback_editpdf extends assign_feedback_plugin {
      */
     public function get_file_areas() {
         return array(document_services::FINAL_PDF_FILEAREA => $this->get_name());
+    }
+
+    public function get_all_file_areas() {
+        return [
+            document_services::FINAL_PDF_FILEAREA => $this->get_name(),
+            document_services::COMBINED_PDF_FILEAREA => $this->get_name(),
+            document_services::PARTIAL_PDF_FILEAREA => $this->get_name(),
+            document_services::IMPORT_HTML_FILEAREA => $this->get_name(),
+            document_services::PAGE_IMAGE_FILEAREA => $this->get_name(),
+            document_services::PAGE_IMAGE_READONLY_FILEAREA => $this->get_name(),
+            document_services::STAMPS_FILEAREA => $this->get_name(),
+            document_services::TMP_JPG_TO_PDF_FILEAREA => $this->get_name(),
+            document_services::TMP_ROTATED_JPG_FILEAREA => $this->get_name(),
+        ];
     }
 
     /**

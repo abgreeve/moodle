@@ -284,10 +284,12 @@ define([
         var container = $(event.target).closest('.fitem');
         if (container.hasClass('popout')) {
             $('.popout').removeClass('popout');
+            container.removeClass('overflow-auto');
         } else {
             $('.popout').removeClass('popout');
             container.addClass('popout');
             container.addClass('moodle-has-zindex');
+            container.addClass('overflow-auto');
         }
     };
 

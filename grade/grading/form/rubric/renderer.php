@@ -97,7 +97,7 @@ class gradingform_rubric_renderer extends plugin_renderer_base {
             }
             $description = s($criterion['description']);
         }
-        $descriptionclass = 'description';
+        $descriptionclass = 'description w-25';
         if (isset($criterion['error_description'])) {
             $descriptionclass .= ' error';
         }

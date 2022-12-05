@@ -1,0 +1,196 @@
+{
+    "Identifier": "c320e4f3-043a-11e7-a400-12c6ab5e124d",
+    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubric/c320e4f3-043a-11e7-a400-12c6ab5e124d",
+    "Title": "Performance Improvement Projects Scoring Guide",
+    "lastChangeDateTime": "2017-03-10T20:06:27Z",
+    "CFRubricCriterion": [
+        {
+            "Identifier": "fbb63c02-05b3-11e7-a400-12c6ab5e124d",
+            "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterion/fbb63c02-05b3-11e7-a400-12c6ab5e124d",
+            "lastChangeDateTime": "2017-03-23T18:11:08Z",
+            "weight": 30,
+            "position": 1,
+            "CFItemURI": {
+                "fullstatement": "Articulate strategies for querying and generating reports from health information system databases",
+                "identifier": "cec23936-4f81-11e6-9639-12c6ab5e124d",
+                "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFItem/cec23936-4f81-11e6-9639-12c6ab5e124d"
+            },
+            "Description": "Identify a performance improvement issue\r\nwithin a health care organization that needs\r\nimprovement and provide its relevant\r\n background information",
+            "CFRubricCriterionLevels": [
+                {
+                    "score": "0",
+                    "Identifier": "f2439cb5-05c3-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/f2439cb5-05c3-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:42Z",
+                    "position": "0",
+                    "Description": "Does not identify a performance improvement issue within a health care organization that needs improvement and does not provide relevant background information."
+                },
+                {
+                    "score": "70",
+                    "Identifier": "5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:47Z",
+                    "position": "1",
+                    "Description": "Outlines a performance improvement issue within a health care organization that needs improvement and provides some relevant background information."
+                },
+                {
+                    "score": "85",
+                    "Identifier": "5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:47Z",
+                    "position": "2",
+                    "Description": "Identifies a performance improvement issue within a health care organization that needs improvement and provides its relevant background information."
+                },
+                {
+                    "score": "100",
+                    "Identifier": "5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:47Z",
+                    "position": "3",
+                    "Description": "Identifies a performance improvement issue within a health care organization that needs improvement, and provides its relevant background information and identifies criteria that could be used to evaluate the issue"
+                }
+            ]
+        },
+        {
+            "Identifier": "fbb63c02-05b3-11e7-a400-12c6ab5e124d",
+            "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterion/fbb63c02-05b3-11e7-a400-12c6ab5e124d",
+            "lastChangeDateTime": "2017-03-10T20:11:47Z",
+            "weight": 30,
+            "position": 2,
+            "CFItemURI": {
+                "fullstatement": "Articulate strategies for querying and generating reports from health information system databases",
+                "identifier": "cec23936-4f81-11e6-9639-12c6ab5e124d",
+                "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFItem/cec23936-4f81-11e6-9639-12c6ab5e124d"
+            },
+            "Description": "Provide solid and relevant reasons for why a performance improvement problem is an issue worth fixing in a health care organization.",
+            "CFRubricCriterionLevels": [
+                {
+                    "score": "0",
+                    "Identifier": "f2439cb5-05c3-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/f2439cb5-05c3-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:42Z",
+                    "position": "0",
+                    "Description": "Does not provide solid and relevant reasons for why a performance improvement problem is an issue worth fixing in a health care organization."
+                },
+                {
+                    "score": "70",
+                    "Identifier": "5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:47Z",
+                    "position": "1",
+                    "Description": "Outlines some basic reasons for why a performance improvement problem is an issue worth fixing in a health care organization."
+                },
+                {
+                    "score": "85",
+                    "Identifier": "5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:47Z",
+                    "position": "2",
+                    "Description": "Provides solid and relevant reasons for why a performance improvement problem is an issue worth fixing in a health care organization."
+                },
+                {
+                    "score": "100",
+                    "Identifier": "5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:47Z",
+                    "position": "3",
+                    "Description": "Provides solid and relevant reasons for why a performance improvement problem is an issue worth fixing in a health care organization and identifies assumptions on which the analysis is based."
+                }
+            ]
+        },
+        {
+            "Identifier": "fbb63c02-05b3-11e7-a400-12c6ab5e124d",
+            "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterion/fbb63c02-05b3-11e7-a400-12c6ab5e124d",
+            "lastChangeDateTime": "2017-03-23T18:11:08Z",
+            "weight": 30,
+            "position": 3,
+            "CFItemURI": {
+                "fullstatement": "Create various data representation methods for reporting and professional communications",
+                "identifier": "cec23936-4f81-11e6-9639-12c6ab5e124d",
+                "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFItem/cec23936-4f81-11e6-9639-12c6ab5e124d"
+            },
+            "Description": "Use raw data and data representation method to show how data helps justify the need to fix a performance improvement issue in a health care organization",
+            "CFRubricCriterionLevels": [
+                {
+                    "score": "0",
+                    "Identifier": "f2439cb5-05c3-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/f2439cb5-05c3-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:47Z",
+                    "position": "0",
+                    "Description": "Does not use raw data and data representation method to show how data helps justify the need to fix a performance improvement issue in a health care organization."
+                },
+                {
+                    "score": "70",
+                    "Identifier": "5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:47Z",
+                    "position": "1",
+                    "Description": "Recognizes how raw data and data representation method could show how data helps justify the need to fix a performance improvement issue in a health care organization, but does not accurately use that information."
+                },
+                {
+                    "score": "85",
+                    "Identifier": "5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:47Z",
+                    "position": "2",
+                    "Description": "Uses raw data and data representation method to show how data helps justify the need to fix a performance improvement issue in a health care organization"
+                },
+                {
+                    "score": "100",
+                    "Identifier": "56a24b92-61f3-4f53-a34b-d107481313a5",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:47Z",
+                    "position": "3",
+                    "Description": "Uses raw data and data representation method to show how data helps justify the need to fix a performance improvement issue in a health care organization and evaluates the relevance, currency, sufficiency, and trustworthiness of the evidence."
+                }
+            ]
+        },
+        {
+            "Identifier": "fbb63c02-05b3-11e7-a400-12c6ab5e124d",
+            "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterion/fbb63c02-05b3-11e7-a400-12c6ab5e124d",
+            "lastChangeDateTime": "2017-03-23T18:11:08Z",
+            "weight": 10,
+            "position": 4,
+            "CFItemURI": {
+                "fullstatement": "Communicate as a practitioner-scholar, consistent with the expectations of a nursing professional",
+                "identifier": "cec23936-4f81-11e6-9639-12c6ab5e124d",
+                "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFItem/cec23936-4f81-11e6-9639-12c6ab5e124d"
+            },
+            "Description": "Write clearly and logically with correct use of spelling, grammar, punctuation and mechanics\u00cd\u00be and correctly format citations using APA style",
+            "CFRubricCriterionLevels": [
+                {
+                    "score": "0",
+                    "Identifier": "f2439cb5-05c3-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/f2439cb5-05c3-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:42Z",
+                    "position": "0",
+                    "Description": "Does not write clearly and logically\u00cd\u00be writing shows little attention to spelling, grammar, punctuation, and mechanics\u00cd\u00be and does not correctly format citations using APA style"
+                },
+                {
+                    "score": "70",
+                    "Identifier": "5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:47Z",
+                    "position": "1",
+                    "Description": "Uses sentence structure that is mostly clear with a few minor spelling or grammatical errors\u00cd\u00be but fails to attribute quotes and citations in a few places, or allows some inconsistencies in APA style."
+                },
+                {
+                    "score": "85",
+                    "Identifier": "5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:47Z",
+                    "position": "2",
+                    "Description": "Writes clearly and logically with correct use of spelling, grammar, punctuation, and mechanics\u00cd\u00be and formats citations correctly using APA style."
+                },
+                {
+                    "score": "100",
+                    "Identifier": "5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "URI": "http://axiom.cs.hmhco.com/ims/mrflsc/v1p0/CFRubricCriterionLevel/5a68203f-05c4-11e7-a400-12c6ab5e124d",
+                    "lastChangeDateTime": "2017-03-10T20:11:47Z",
+                    "position": "3",
+                    "Description": "Writes clearly and logically with correct use of spelling, grammar, punctuation, and mechanics with no errors\u00cd\u00be formats citations correctly using APA style\u00cd\u00be and all information is accurate and uptodate."
+                }
+            ]
+        }
+    ]
+}

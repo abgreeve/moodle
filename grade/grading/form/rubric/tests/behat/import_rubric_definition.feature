@@ -1,8 +1,8 @@
-@gradingform @gradingform_rubric @javascript
-Feature: Rubrics can be exported
-  In order to export a rubric
+@gradingform @gradingform_rubric @_file_upload @javascript
+Feature: Rubrics can be imported
+  In order to import a rubric
   As a teacher
-  I need to enable advanced grading and create a rubric
+  I need to enable advanced grading and select a valid file
 
   Scenario: I can import a rubric definition into an assignment
     Given the following "users" exist:
@@ -23,18 +23,10 @@ Feature: Rubrics can be exported
       | assignfeedback_comments_enabled   | 1                           |
       | assignfeedback_editpdf_enabled    | 1                           |
       | advancedgradingmethod_submissions | rubric                      |
-    And I am on the "Test assignment 1 name" "Activity" page logged in as "teacher1"
+    When I am on the "Test assignment 1 name" "Activity" page logged in as "teacher1"
     And I click on "Advanced grading" "link"
-    And I click on "Define new grading form from scratch" "link"
-    And I set the following fields to these values:
-      | Name | Assignment 1 rubric |
-      | Description | Rubric test description |
-    And I define the following rubric:
-      | TMP Criterion 1 | TMP Level 11 | 11 | TMP Level 12 | 12 |
-      | TMP Criterion 2 | TMP Level 21 | 21 | TMP Level 22 | 22 |
-      | TMP Criterion 3 | TMP Level 31 | 31 | TMP Level 32 | 32 |
-      | TMP Criterion 4 | TMP Level 41 | 41 | TMP Level 42 | 42 |
-    And I press "Save rubric and make it ready"
-    When I click on "Export this form definition" "link"
-    # There should be no exception thrown.
-    Then I should see "Assignment 1 rubric Ready for use"
+    # Importing a rubric.
+    And I click on "Import form definition" "link"
+    And I upload "grade/grading/form/rubric/tests/fixtures/rubric-import.json" file to "Grading method import file" filemanager
+    And I click on "Import file" "button"
+    Then I should see "Performance Improvement Projects Scoring Guide Ready for use"

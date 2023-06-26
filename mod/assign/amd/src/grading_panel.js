@@ -253,6 +253,17 @@ define([
         }.bind(this)).fail(notification.exception);
     };
 
+    GradingPanel.prototype._removeLastAttempt = function() {
+        let assignmentid = this._region.attr('data-assignmentid');
+        assignmentid = parseInt(assignmentid, 10);
+        ajax.call([{
+            methodname: 'mod_assign_remove_last_attempt',
+            args: {assignid: assignmentid, userid: this._lastUserId},
+            done: this._resetForm(),
+            // fail: notification.exception
+        }]);
+    };
+
     /**
      * Add popout buttons
      *
@@ -336,6 +347,10 @@ define([
                                 checker.saveFormState('[data-region="grade-panel"] .gradeform');
                             });
                             $('[data-region="attempt-chooser"]').on('click', this._chooseAttempt.bind(this));
+                            let node = document.querySelector('[data-region="attempt-remove"');
+                            if (node) {
+                                node.addEventListener('click', this._removeLastAttempt.bind(this));
+                            }
                             this._addPopoutButtons('[data-region="grade-panel"] .gradeform');
                             $(document).trigger('finish-loading-user');
                             // Tell behat we are friends again.

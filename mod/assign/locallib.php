@@ -8972,6 +8972,53 @@ class assign {
         return true;
     }
 
+    public function remove_last_attempt(int $userid) {
+        global $DB;
+
+        error_log('remove that attempt please');
+        require_capability('mod/assign:grade', $this->context);
+
+        if ($this->get_instance()->teamsubmission) {
+            $oldsubmission = $this->get_group_submission($userid, 0, false);
+        } else {
+            $oldsubmission = $this->get_user_submission($userid, false);
+        }
+
+        if (!$oldsubmission) {
+            return false;
+        }
+
+        // Give each submission plugin a chance to process the attempt_removal.
+        $plugins = $this->get_submission_plugins();
+        foreach ($plugins as $plugin) {
+            if ($plugin->is_enabled() && $plugin->is_visible()) {
+                // TODO add a new method to remove attempts for submission plugins.
+                // $plugin->add_attempt($oldsubmission, $newsubmission);
+            }
+        }
+
+        // Once plugins are finished, do core internal stuff here.
+
+        // Determine if the query needs to be different for group submissions compared to single submissions.
+        // Check if there is an entry in the assing_grades table that needs to be removed.
+        error_log($oldsubmission->attemptnumber);
+        // Code for single user as follows:
+        $data = ['assignment' => $this->get_instance()->id, 'userid' => $userid , 'attemptnumber' => $oldsubmission->attemptnumber];
+        // Need to let feedback plugins remove entries related to this grade >_>.
+        $DB->delete_records('assign_grades', $data);
+        // Set the previous attempt as current. Then delete the current attempt.
+        $data['attemptnumber'] = $oldsubmission->attemptnumber - 1;
+        $previoussubmission = $DB->get_record('assign_submission', $data);
+        $previoussubmission->latest = 1;
+        $DB->update_record('assign_submission', $previoussubmission);
+        $data['attemptnumber'] = $oldsubmission->attemptnumber;
+        $DB->delete_records('assign_submission', ['attemptnumber' => $oldsubmission->attemptnumber]);
+        // Update the gradebook with the previous grade.
+        // Update completion tracking (revert back to completed?).
+
+        // Absolutely need to fire off an event.
+    }
+
     /**
      * Get an upto date list of user grades and feedback for the gradebook.
      *

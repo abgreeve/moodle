@@ -248,4 +248,13 @@ $functions = array(
             'capabilities'  => 'mod/assign:view',
             'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
         ],
+        'mod_assign_remove_last_attempt' => [
+            'classname'     => 'mod_assign\external\remove_last_attempt',
+            'methodname'    => 'execute',
+            'description'   => 'Remove the last attempt for the user.',
+            'type'          => 'write',
+            'ajax'          => true,
+            'capabilities'  => 'mod/assign:view', //TODO change this to the correct capability.
+            'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
+        ]
 );

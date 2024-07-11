@@ -543,6 +543,10 @@ class assign {
             $this->process_add_attempt(required_param('userid', PARAM_INT));
             $action = 'redirect';
             $nextpageparams['action'] = 'grading';
+        } else if ($action == 'revokeattempt') {
+            $this->revoke_attempt(required_param('userid', PARAM_INT));
+            $action = 'redirect';
+            $nextpageparams['action'] = 'grading';
         } else if ($action == 'reverttodraft') {
             $this->process_revert_to_draft();
             $action = 'redirect';
@@ -9030,6 +9034,152 @@ class assign {
             $this->process_unlock_submission($userid);
         }
         return true;
+    }
+
+    public function revoke_attempt($userid): void {
+        global $DB, $USER;
+
+        $instance = $this->get_instance();
+
+        if ($instance->teamsubmission) {
+            $submission = $this->get_group_submission($userid, 0, false);
+        } else {
+            // Get latest submission for this user
+            $submission = $this->get_user_submission($userid, false);
+        }
+        // Probably should be in a transaction to ensure everything is done or none of it is done.
+        $allowcommit = true;
+        $transaction = $DB->start_delegated_transaction();
+
+        // Ask submission plugins to remove the attempt
+        $plugins = $this->get_submission_plugins();
+        foreach ($plugins as $plugin) {
+            if ($plugin->is_enabled() && $plugin->is_visible()) {
+                $result = $plugin->remove($submission);
+                if ($result === false) {
+                    $allowcommit = false;
+                }
+            }
+        }
+        // Should remove feedback related to this grade as well.
+        // No current methods for feedback removal.
+
+
+        // Get the previous submission and update to be latest
+        if ($instance->teamsubmission) {
+
+            $team = $this->get_submission_group_members($submission->groupid, true);
+            $group = $this->get_submission_group($userid);
+
+            // Group entry in assign_submissions needs to be removed.
+            $DB->delete_records('assign_submission', [
+                'assignment' => $instance->id,
+                'groupid' => $group->id,
+                'attemptnumber' => $submission->attemptnumber
+            ]);
+
+            foreach ($team as $member) {
+                $thissubmission = $this->get_user_submission($member->id, false, $submission->attemptnumber);
+                $this->update_submission_and_grades($member->id, $submission, $thissubmission);
+            }
+        } else {
+            $this->update_submission_and_grades($userid, $submission, $submission);
+        }
+
+        if ($allowcommit) {
+            $transaction->allow_commit();
+        } else {
+            $exception = new moodle_exception('attemptrevokeproblem', 'assign');
+            $transaction->rollback($exception);
+            // Let the user know that we didn't revoke the attempt.
+        }
+        // Log the attempt revocation
+
+    }
+
+    private function update_submission_and_grades($userid, $submission, $thissubmission): void {
+        global $DB;
+
+        $instance = $this->get_instance();
+
+        // Find the attempt in the assign_grades table
+        $result = $DB->get_record('assign_grades', [
+            'userid' => $userid,
+            'assignment' => $instance->id,
+            'attemptnumber' => $submission->attemptnumber
+        ]);
+
+        if ($result) {
+            // Remove the assign_grades entry if there is one.
+            $DB->delete_records('assign_grades', ['id' => $result->id]);
+        }
+        // Get latest submission for this user
+        $lastsubmission = $this->get_user_submission($userid, false, $submission->attemptnumber - 1);
+
+        $lastsubmission->latest = 1;
+        $DB->update_record('assign_submission', $lastsubmission);
+
+        // Remove the assign_submission entry
+        $DB->delete_records('assign_submission', ['id' => $thissubmission->id]);
+
+        $this->update_to_previous_grade($userid, $lastsubmission);
+
+        // Outcomes update?
+        // Outcomes are not tied to a submission nor an assign_grade. It is totally separate, stored in grade_grades. No way to
+        // return to the previous value, that information is not stored in grade_grades.
+
+        // Not sure of timing:
+
+        // Update activity completion
+        // It looks like competencies are only updated with activity completion.
+        $completion = new completion_info($this->get_course());
+        if ($completion->is_enabled($this->get_course_module())) {
+            $this->update_activity_completion_records($instance->teamsubmission, $instance->requireallteammemberssubmit,
+                $lastsubmission, $userid, COMPLETION_UNKNOWN, $completion);
+        }
+    }
+
+    private function update_to_previous_grade($userid, $submission): void {
+        global $DB;
+
+        // Gradebook needs to be updated. To do this you need to resend the feedback!
+        $latestgrade = $DB->get_record('assign_grades', [
+            'userid' => $userid,
+            'assignment' => $this->get_instance()->id,
+            'attemptnumber' => $submission->attemptnumber
+        ]);
+
+        if ($latestgrade) {
+
+            $feedbackplugins = $this->get_feedback_plugins();
+            $feedbackdata = [];
+            $feedbackgrade = (object) ['id' => $latestgrade->id];
+            foreach ($feedbackplugins as $plugin) {
+                if ($plugin->is_enabled() && $plugin->is_visible() && $plugin->format_for_gradebook($feedbackgrade) != 0) {
+                    $feedbackdata['format'] = $plugin->format_for_gradebook($feedbackgrade);
+                    $feedbackdata['text'] = $plugin->text_for_gradebook($feedbackgrade);
+                    $feedbackdata['files'] = $plugin->files_for_gradebook($feedbackgrade);
+                }
+            }
+
+            $gradeobject = (object) [
+                'grade' => $latestgrade->grade,
+                'userid' => $userid,
+                'grader' => $latestgrade->grader,
+                'timemodified' => time()
+            ];
+            if (isset($feedbackdata['format'])) {
+                $gradeobject->feedbackformat = $feedbackdata['format'];
+            }
+            if (isset($feedbackdata['text'])) {
+                $gradeobject->feedbacktext = $feedbackdata['text'];
+            }
+            if (isset($feedbackdata['files'])) {
+                $gradeobject->feedbackfiles = $feedbackdata['files'];
+            }
+
+            $this->gradebook_item_update(null, $gradeobject);
+        }
     }
 
     /**

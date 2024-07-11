@@ -945,7 +945,7 @@
     margin-bottom: 0;
 }
 
-.path-mod-assign [data-region="grade-panel"] [data-region="attempt-chooser"] {
+.path-mod-assign [data-region="grade-panel"] [data-region="attempt-chooser"] [data-region="attempt-remover"] {
     margin-bottom: 10px;
     vertical-align: text-bottom;
 }

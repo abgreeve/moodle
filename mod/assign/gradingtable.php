@@ -1423,6 +1423,20 @@ class assign_grading_table extends table_sql implements renderable {
                 $description
             );
         }
+        if ($hassubmission && $hasattempts) {
+            $urlparams = array('id' => $this->assignment->get_course_module()->id,
+                               'userid' => $row->id,
+                               'action' => 'revokeattempt',
+                               'sesskey' => sesskey(),
+                               'page' => $this->currpage);
+            $url = new moodle_url('/mod/assign/view.php', $urlparams);
+            $description = get_string('revokeattempt', 'assign');
+            $actions['revokeattempt'] = new action_menu_link_secondary(
+                $url,
+                $noimage,
+                $description
+            );
+        }
 
         $menu = new action_menu();
         $menu->set_owner_selector('.gradingtable-actionmenu');

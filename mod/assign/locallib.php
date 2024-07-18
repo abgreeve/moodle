@@ -9061,6 +9061,9 @@ class assign {
                 }
             }
         }
+
+        $event = \mod_assign\event\attempt_removed::create_from_submission($this, $submission);
+
         // Should remove feedback related to this grade as well.
         // No current methods for feedback removal.
 
@@ -9080,10 +9083,10 @@ class assign {
 
             foreach ($team as $member) {
                 $thissubmission = $this->get_user_submission($member->id, false, $submission->attemptnumber);
-                $this->update_submission_and_grades($member->id, $submission, $thissubmission);
+                $this->update_submission_and_grades($member->id, $submission, $thissubmission, $event);
             }
         } else {
-            $this->update_submission_and_grades($userid, $submission, $submission);
+            $this->update_submission_and_grades($userid, $submission, $submission, $event);
         }
 
         if ($allowcommit) {
@@ -9094,10 +9097,10 @@ class assign {
             // Let the user know that we didn't revoke the attempt.
         }
         // Log the attempt revocation
-
+        $event->trigger();
     }
 
-    private function update_submission_and_grades($userid, $submission, $thissubmission): void {
+    private function update_submission_and_grades($userid, $submission, $thissubmission, $event): void {
         global $DB;
 
         $instance = $this->get_instance();
@@ -9108,6 +9111,7 @@ class assign {
             'assignment' => $instance->id,
             'attemptnumber' => $submission->attemptnumber
         ]);
+        $event->add_record_snapshot('assign_grades', $result);
 
         if ($result) {
             // Remove the assign_grades entry if there is one.

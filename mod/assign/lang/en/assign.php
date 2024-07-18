@@ -204,6 +204,7 @@ $string['enabletimelimit'] = 'Enable timed assignments';
 $string['enabletimelimit_help'] = 'If enabled, you can set a time limit on assignment settings page.';
 $string['eventallsubmissionsdownloaded'] = 'All the submissions are being downloaded.';
 $string['eventassessablesubmitted'] = 'A submission has been submitted.';
+$string['eventattemptremoved'] = 'Attempt revoked';
 $string['eventbatchsetmarkerallocationviewed'] = 'Batch set marker allocation viewed';
 $string['eventbatchsetworkflowstateviewed'] = 'Batch set workflow state viewed.';
 $string['eventextensiongranted'] = 'An extension has been granted.';

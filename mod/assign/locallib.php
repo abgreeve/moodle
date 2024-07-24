@@ -9037,7 +9037,7 @@ class assign {
     }
 
     public function revoke_attempt($userid): void {
-        global $DB, $USER;
+        global $DB;
 
         $instance = $this->get_instance();
 
@@ -9047,6 +9047,11 @@ class assign {
             // Get latest submission for this user
             $submission = $this->get_user_submission($userid, false);
         }
+
+        if ($submission->attemptnumber <= 0) {
+            return;
+        }
+
         // Probably should be in a transaction to ensure everything is done or none of it is done.
         $allowcommit = true;
         $transaction = $DB->start_delegated_transaction();

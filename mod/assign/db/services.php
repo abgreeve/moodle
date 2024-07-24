@@ -248,4 +248,11 @@ $functions = array(
             'capabilities'  => 'mod/assign:view',
             'services'      => array(MOODLE_OFFICIAL_MOBILE_SERVICE)
         ],
+        'mod_assign_revoke_attempt' => [
+            'classname' => 'mod_assign\external\revoke_attempt',
+            'methodname' => 'execute',
+            'description' => 'Revoke an assignment attempt',
+            'type' => 'write',
+            'ajax' => true
+        ]
 );

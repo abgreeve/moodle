@@ -254,6 +254,23 @@ define([
     };
 
     /**
+     * Revoke the last attempt for this assignment.
+     *
+     * @private
+     * @param {Number} userid
+     * @param {Number} attemptnumber
+     */
+    GradingPanel.prototype._revokeAttempt = function(userid, attemptnumber) {
+        var assignmentid = this._region.attr('data-assignmentid');
+        ajax.call([{
+            methodname: 'mod_assign_revoke_attempt',
+            args: {assignid: assignmentid, userid: userid},
+        }])[0].then(function() {
+            this._refreshGradingPanel(null, userid, '', attemptnumber);
+        }.bind(this)).fail(notification.exception);
+    };
+
+    /**
      * Add popout buttons
      *
      * @private
@@ -310,9 +327,9 @@ define([
             attemptnumber = -1;
         }
         // Skip reloading if it is the same user.
-        if (this._lastUserId == userid && this._lastAttemptNumber == attemptnumber && submissiondata === '') {
-            return;
-        }
+        // if (this._lastUserId == userid && this._lastAttemptNumber == attemptnumber && submissiondata === '') {
+        //     return;
+        // }
         this._lastUserId = userid;
         this._lastAttemptNumber = attemptnumber;
         $(document).trigger('start-loading-user');
@@ -336,6 +353,13 @@ define([
                                 checker.saveFormState('[data-region="grade-panel"] .gradeform');
                             });
                             $('[data-region="attempt-chooser"]').on('click', this._chooseAttempt.bind(this));
+
+                            // revoke attempt
+                            let button = document.querySelector('[data-region="attempt-remover"]');
+                            if (button) {
+                                button.addEventListener('click', this._revokeAttempt.bind(this, userid, attemptnumber));
+                            }
+
                             this._addPopoutButtons('[data-region="grade-panel"] .gradeform');
                             $(document).trigger('finish-loading-user');
                             // Tell behat we are friends again.

@@ -461,6 +461,7 @@ class assign_attempt_history_chooser implements renderable, templatable {
         $export = (object) $this;
         $export->submissions = array_reverse($export->submissions);
         $export->submissioncount = count($export->submissions);
+        $export->showrevert = $export->submissioncount > 1 && ($export->submissioncount == $this->submissions[0]->attemptnumber + 1);
 
         foreach ($export->submissions as $i => $submission) {
             $grade = null;

@@ -1,8 +1,9 @@
 {{#submissioncount}}
 <div>
     <a class="btn btn-secondary" href="#" data-region="attempt-chooser" data-submissions="submissions-list-{{uniqid}}">{{#str}}viewadifferentattempt, mod_assign{{/str}}</a>
-    <!-- Show this if it is the most current attempt -->
+    {{#showrevert}}
     <a class="btn btn-secondary" href="#" data-region="attempt-remover" data-submissions="submissions-list-{{uniqid}}">{{#str}}revokeattempt, mod_assign{{/str}}</a>
+    {{/showrevert}}
     <div class="hide" id="submissions-list-{{uniqid}}">
         <div data-region="submissions-list">
         {{#submissions}}

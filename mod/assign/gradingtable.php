@@ -1423,7 +1423,7 @@ class assign_grading_table extends table_sql implements renderable {
                 $description
             );
         }
-        if ($hassubmission && $hasattempts) {
+        if ($hassubmission && $hasattempts && $row->attemptnumber > 0) {
             $urlparams = array('id' => $this->assignment->get_course_module()->id,
                                'userid' => $row->id,
                                'action' => 'revokeattempt',

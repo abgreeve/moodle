@@ -9036,7 +9036,7 @@ class assign {
         return true;
     }
 
-    public function revoke_attempt($userid): void {
+    public function revoke_attempt(int $userid): void {
         global $DB;
 
         $instance = $this->get_instance();
@@ -9052,7 +9052,6 @@ class assign {
             return;
         }
 
-        // Probably should be in a transaction to ensure everything is done or none of it is done.
         $allowcommit = true;
         $transaction = $DB->start_delegated_transaction();
 
@@ -9068,10 +9067,6 @@ class assign {
         }
 
         $event = \mod_assign\event\attempt_removed::create_from_submission($this, $submission);
-
-        // Should remove feedback related to this grade as well.
-        // No current methods for feedback removal.
-
 
         // Get the previous submission and update to be latest
         if ($instance->teamsubmission) {
@@ -9105,7 +9100,12 @@ class assign {
         $event->trigger();
     }
 
-    private function update_submission_and_grades($userid, $submission, $thissubmission, $event): void {
+    private function update_submission_and_grades(
+        int $userid,
+        stdClass $submission,
+        stdClass $thissubmission,
+        \mod_assign\event\attempt_removed $event
+    ): void {
         global $DB;
 
         $instance = $this->get_instance();
@@ -9116,9 +9116,13 @@ class assign {
             'assignment' => $instance->id,
             'attemptnumber' => $submission->attemptnumber
         ]);
-        $event->add_record_snapshot('assign_grades', $result);
 
         if ($result) {
+            $event->add_record_snapshot('assign_grades', $result);
+
+            // Should remove feedback related to this grade as well.
+            // No current methods for feedback removal.
+
             // Remove the assign_grades entry if there is one.
             $DB->delete_records('assign_grades', ['id' => $result->id]);
         }
@@ -9148,7 +9152,7 @@ class assign {
         }
     }
 
-    private function update_to_previous_grade($userid, $submission): void {
+    private function update_to_previous_grade(int $userid, stdClass $submission): void {
         global $DB;
 
         // Gradebook needs to be updated. To do this you need to resend the feedback!

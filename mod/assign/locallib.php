@@ -9053,6 +9053,9 @@ class assign {
     public function revoke_attempt(int $userid): void {
         global $DB;
 
+        // This is the same capability to create a new attempt.
+        require_capability('mod/assign:grade', $this->context);
+
         $instance = $this->get_instance();
 
         if ($instance->teamsubmission) {
@@ -9097,15 +9100,14 @@ class assign {
 
             $allokay = true;
             foreach ($team as $member) {
-                $thissubmission = $this->get_user_submission($member->id, false, $submission->attemptnumber);
-                $allokay = $this->update_submission_and_grades($member->id, $submission, $thissubmission, $event);
+                $allokay = $this->update_submission_and_grades($member->id, $submission, $event);
                 if ($allokay === false) {
                     $allowcommit = false;
                     break;
                 }
             }
         } else {
-            $allokay = $this->update_submission_and_grades($userid, $submission, $submission, $event);
+            $allokay = $this->update_submission_and_grades($userid, $submission, $event);
             if ($allokay === false) {
                 $allowcommit = false;
             }
@@ -9129,15 +9131,13 @@ class assign {
      * Updates the submission and grades for a user.
      *
      * @param int $userid
-     * @param stdClass $submission
-     * @param stdClass $thissubmission
+     * @param stdClass $submission Submission for team or user
      * @param \mod_assign\event\attempt_removed $event
      * @return bool
      */
     private function update_submission_and_grades(
         int $userid,
         stdClass $submission,
-        stdClass $thissubmission,
         \mod_assign\event\attempt_removed $event
     ): bool {
         global $DB;
@@ -9174,7 +9174,12 @@ class assign {
         $lastsubmission->latest = 1;
         $DB->update_record('assign_submission', $lastsubmission);
 
-        // Remove the assign_submission entry
+        $thissubmission = $submission;
+        if ($instance->teamsubmission) {
+            $thissubmission = $this->get_user_submission($userid, false, $submission->attemptnumber);
+        }
+
+        // Remove the assign_submission entry for the user.
         $DB->delete_records('assign_submission', ['id' => $thissubmission->id]);
 
         $this->update_to_previous_grade($userid, $lastsubmission);

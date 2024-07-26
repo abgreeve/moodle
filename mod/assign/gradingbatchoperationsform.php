@@ -69,6 +69,10 @@ class mod_assign_grading_batch_operations_form extends moodleform {
             $options['addattempt'] = get_string('addattempt', 'assign');
         }
 
+        if ($multipleattemptsallowed) {
+            $options['revokeattempt'] = get_string('revokeattempt', 'assign');
+        }
+
         foreach ($instance['feedbackplugins'] as $plugin) {
             if ($plugin->is_visible() && $plugin->is_enabled()) {
                 foreach ($plugin->get_grading_batch_operations() as $action => $description) {

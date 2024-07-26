@@ -616,6 +616,30 @@ class assign_feedback_comments extends assign_feedback_plugin {
     }
 
     /**
+     * Remove the feedback related to the grade entry.
+     *
+     * @param int $gradeid Related assign_grade id.
+     * @return bool True on success.
+     */
+    public function remove_feedback(int $gradeid): bool {
+        global $DB;
+
+        // Remove any entries in the filesystem.
+        $fs = get_file_storage();
+        $component = ASSIGNFEEDBACK_COMMENTS_COMPONENT;
+        $filearea = ASSIGNFEEDBACK_COMMENTS_FILEAREA;
+        $itemid = $gradeid;
+        $fs->delete_area_files($this->assignment->get_context()->id, $component, $filearea, $itemid);
+        // Remove the db entry.
+        $DB->delete_records('assignfeedback_comments', [
+            'assignment' => $this->assignment->get_instance()->id,
+            'grade' => $gradeid
+        ]);
+
+        return true;
+    }
+
+    /**
      * Return a description of external params suitable for uploading an feedback comment from a webservice.
      *
      * @return \core_external\external_description|null

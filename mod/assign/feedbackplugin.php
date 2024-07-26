@@ -208,4 +208,14 @@ abstract class assign_feedback_plugin extends assign_plugin {
     public function grading_batch_operation($action, $users) {
         return '';
     }
+
+    /**
+     * Remove feedback related to a grade entry.
+     *
+     * @param int $gradeid The grade id that relates the the grade entry to remove feedback for.
+     * @return bool
+     */
+    public function remove_feedback(int $gradeid): bool {
+        return true;
+    }
 }

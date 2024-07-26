@@ -5087,6 +5087,8 @@ class assign {
                         if (!$this->get_instance()->teamsubmission) {
                             $this->process_add_attempt($userid);
                         }
+                    } else if ($data->operation == 'revokeattempt') {
+                        $this->revoke_attempt($userid);
                     }
                 }
             }
@@ -9036,6 +9038,18 @@ class assign {
         return true;
     }
 
+    /**
+     * Removes the last attempt which does the following:
+     * - Notifies plugins to remove any submissions associated with the attempt
+     * - Notifies plugins to remove any feedback associated with an assign_grade linked to an attempt
+     * - Updates the grade book with grades and feedback of the previous attempt
+     * - Deletes the assign_submission
+     * - Deletes the assign_grade
+     * - Creates a log entry (event)
+     * Outcomes and the marking workflow are not tied to attempts and so there is no way to revert these to a previous state.
+     *
+     * @param int $userid The user id to identify the attempt
+     */
     public function revoke_attempt(int $userid): void {
         global $DB;
 
@@ -9081,31 +9095,51 @@ class assign {
                 'attemptnumber' => $submission->attemptnumber
             ]);
 
+            $allokay = true;
             foreach ($team as $member) {
                 $thissubmission = $this->get_user_submission($member->id, false, $submission->attemptnumber);
-                $this->update_submission_and_grades($member->id, $submission, $thissubmission, $event);
+                $allokay = $this->update_submission_and_grades($member->id, $submission, $thissubmission, $event);
+                if ($allokay === false) {
+                    $allowcommit = false;
+                    break;
+                }
             }
         } else {
-            $this->update_submission_and_grades($userid, $submission, $submission, $event);
+            $allokay = $this->update_submission_and_grades($userid, $submission, $submission, $event);
+            if ($allokay === false) {
+                $allowcommit = false;
+            }
         }
 
-        if ($allowcommit) {
-            $transaction->allow_commit();
-        } else {
-            $exception = new moodle_exception('attemptrevokeproblem', 'assign');
-            $transaction->rollback($exception);
-            // Let the user know that we didn't revoke the attempt.
+        try {
+            if ($allowcommit) {
+                $transaction->allow_commit();
+            } else {
+                throw new moodle_exception('attemptrevokeproblem', 'assign');
+            }
+        } catch (Exception $e) {
+            $transaction->rollback($e);
+            $notification = \core\notification::error('There was a problem with revoking the error.');
         }
         // Log the attempt revocation
         $event->trigger();
     }
 
+    /**
+     * Updates the submission and grades for a user.
+     *
+     * @param int $userid
+     * @param stdClass $submission
+     * @param stdClass $thissubmission
+     * @param \mod_assign\event\attempt_removed $event
+     * @return bool
+     */
     private function update_submission_and_grades(
         int $userid,
         stdClass $submission,
         stdClass $thissubmission,
         \mod_assign\event\attempt_removed $event
-    ): void {
+    ): bool {
         global $DB;
 
         $instance = $this->get_instance();
@@ -9122,8 +9156,16 @@ class assign {
 
             // Should remove feedback related to this grade as well.
             // No current methods for feedback removal.
+            $plugins = $this->get_feedback_plugins();
+            foreach ($plugins as $plugin) {
+                if ($plugin->is_enabled() && $plugin->is_visible()) {
+                    $allokay = $plugin->remove_feedback($result->id);
+                    if ($allokay === false) {
+                        return false;
+                    }
+                }
+            }
 
-            // Remove the assign_grades entry if there is one.
             $DB->delete_records('assign_grades', ['id' => $result->id]);
         }
         // Get latest submission for this user
@@ -9137,12 +9179,6 @@ class assign {
 
         $this->update_to_previous_grade($userid, $lastsubmission);
 
-        // Outcomes update?
-        // Outcomes are not tied to a submission nor an assign_grade. It is totally separate, stored in grade_grades. No way to
-        // return to the previous value, that information is not stored in grade_grades.
-
-        // Not sure of timing:
-
         // Update activity completion
         // It looks like competencies are only updated with activity completion.
         $completion = new completion_info($this->get_course());
@@ -9150,8 +9186,15 @@ class assign {
             $this->update_activity_completion_records($instance->teamsubmission, $instance->requireallteammemberssubmit,
                 $lastsubmission, $userid, COMPLETION_UNKNOWN, $completion);
         }
+        return true;
     }
 
+    /**
+     * Updates the gradebook with the previous grade.
+     *
+     * @param int $userid
+     * @param stdClass $submission
+     */
     private function update_to_previous_grade(int $userid, stdClass $submission): void {
         global $DB;
 

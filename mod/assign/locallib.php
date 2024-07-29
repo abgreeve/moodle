@@ -9215,8 +9215,11 @@ class assign {
             $feedbackplugins = $this->get_feedback_plugins();
             $feedbackdata = [];
             $feedbackgrade = (object) ['id' => $latestgrade->id];
+            $adminconfig = $this->get_admin_config();
+            $gradebookplugin = $adminconfig->feedback_plugin_for_gradebook;
             foreach ($feedbackplugins as $plugin) {
-                if ($plugin->is_enabled() && $plugin->is_visible() && $plugin->format_for_gradebook($feedbackgrade) != 0) {
+                if ($plugin->is_enabled() && $plugin->is_visible()
+                    && ('assignfeedback_' . $plugin->get_type()) == $gradebookplugin) {
                     $feedbackdata['format'] = $plugin->format_for_gradebook($feedbackgrade);
                     $feedbackdata['text'] = $plugin->text_for_gradebook($feedbackgrade);
                     $feedbackdata['files'] = $plugin->files_for_gradebook($feedbackgrade);

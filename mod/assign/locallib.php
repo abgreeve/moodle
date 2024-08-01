@@ -544,6 +544,7 @@ class assign {
             $action = 'redirect';
             $nextpageparams['action'] = 'grading';
         } else if ($action == 'revokeattempt') {
+            require_sesskey();
             $this->revoke_attempt(required_param('userid', PARAM_INT));
             $action = 'redirect';
             $nextpageparams['action'] = 'grading';

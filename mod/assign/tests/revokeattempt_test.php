@@ -23,6 +23,11 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 require_once(__DIR__ . '/../locallib.php');
 require_once($CFG->dirroot . '/mod/assign/tests/generator.php');
+require_once($CFG->libdir.'/completionlib.php');
+
+use cm_info;
+use completion_info;
+use stdClass;
 
 /**
  * Unit tests for revoking attempts in mod/assign/locallib.php.
@@ -37,75 +42,82 @@ class revokeattempt_test extends \advanced_testcase {
 
     protected function revoke_attempt_dataprovider() {
         return [
-            // Attempt single submission no additional grading, no feedback.
+            // Attempt single submission no additional grading.
             'Single attempt' => [
                 'type' => 'single',
-                'grade' => false,
-                'feedback' => false,
-                'activitycompletion' => 'none'
+                'firstgrade' => 45.0,
+                'grade' => 0,
+                'activitycompletion' => [],
+                'result' => []
             ],
-            // Attempt single submission, additional grade, no feedback.
+            // Attempt single submission, additional grade.
             'Single attempt with grade' => [
                 'type' => 'single',
-                'grade' => true,
-                'feedback' => false,
-                'activitycompletion' => 'none'
+                'firstgrade' => 45.0,
+                'grade' => 51.0,
+                'activitycompletion' => [],
+                'result' => []
             ],
-            // Attempt single submission, additional grade, feedback.
-            'Single attempt with grade and feedback' => [
-                'type' => 'single',
-                'grade' => true,
-                'feedback' => true,
-                'activitycompletion' => 'none'
-            ],
-            // Attempt single submission no additional grading, no feedback, activity was complete, now is not.
+            // Attempt single submission no additional grading, activity was complete, now is not.
             'Single attempt with past completed activity' => [
                 'type' => 'single',
-                'grade' => false,
-                'feedback' => false,
-                'activitycompletion' => 'past'
+                'firstgrade' => 54.0,
+                'grade' => 0,
+                'activitycompletion' => [
+                    'type' => 'past',
+                    'thing' => ['requires_submission']
+                ],
+                'result' => ['completion' => 'incomplete']
             ],
-            // Attempt single submission, additional grade, no feedback, activity was not complete, now is.
+            // Attempt single submission, additional grade, activity was not complete, now is.
             'Single attempt with future completed activity' => [
                 'type' => 'single',
-                'grade' => true,
-                'feedback' => false,
-                'activitycompletion' => 'future'
+                'firstgrade' => 45.0,
+                'grade' => 51.0,
+                'activitycompletion' => [
+                    'type' => 'future',
+                    'thing' => ['requires_submission']
+                ],
+                'result' => ['completion' => 'complete']
             ],
-            // Group attempt, no additional grading, no feedback.
+            // Activity completion requires submission, requires grade, requires passing grade.
+            // Group attempt, no additional grading.
             'Group attempt' => [
                 'type' => 'group',
-                'grade' => false,
-                'feedback' => false,
-                'activitycompletion' => 'none'
+                'firstgrade' => 45.0,
+                'grade' => 0,
+                'activitycompletion' => [],
+                'result' => []
             ],
-            // Group attempt, additional grade, no feedback.
+            // Group attempt, additional grade.
             'Group attempt with grade' => [
                 'type' => 'group',
-                'grade' => true,
-                'feedback' => false,
-                'activitycompletion' => 'none'
+                'firstgrade' => 45.0,
+                'grade' => 51.0,
+                'activitycompletion' => [],
+                'result' => []
             ],
-            // Group attempt, additional grade, feedback.
-            'Group attempt with grade and feedback' => [
-                'type' => 'group',
-                'grade' => true,
-                'feedback' => true,
-                'activitycompletion' => 'none'
-            ],
-            // Group attempt, no additional grading, no feedback, activity was complete, now is not.
+            // Group attempt, no additional grading, activity was complete, now is not.
             'Group attempt with past completed activity' => [
                 'type' => 'group',
-                'grade' => false,
-                'feedback' => false,
-                'activitycompletion' => 'past'
+                'firstgrade' => 54.0,
+                'grade' => 0,
+                'activitycompletion' => [
+                    'type' => 'past',
+                    'thing' => ['requires_submission']
+                ],
+                'result' => ['completion' => 'incomplete']
             ],
-            // Group attempt, additional grade, no feedback, activity was not complete, now is.
+            // Group attempt, additional grade, activity was not complete, now is.
             'Group attempt with future completed activity' => [
                 'type' => 'group',
-                'grade' => true,
-                'feedback' => false,
-                'activitycompletion' => 'future'
+                'firstgrade' => 45.0,
+                'grade' => 51.0,
+                'activitycompletion' => [
+                    'type' => 'future',
+                    'thing' => ['requires_submission']
+                ],
+                'result' => ['completion' => 'complete']
             ],
         ];
     }
@@ -115,11 +127,11 @@ class revokeattempt_test extends \advanced_testcase {
      *
      * @dataProvider revoke_attempt_dataprovider
      */
-    public function test_revoke_attempt($type, $grade, $feedback, $activitycompletion) {
+    public function test_revoke_attempt($type, $initialgrade, $grade, $activitycompletion, $result) {
         $this->resetAfterTest();
 
         $generator = $this->getDataGenerator();
-        $course = $generator->create_course();
+        $course = $generator->create_course(['enablecompletion' => 1]);
         // user creation to be moved.
         $teacher = $this->getDataGenerator()->create_and_enrol($course, 'teacher');
         $student = $this->getDataGenerator()->create_and_enrol($course, 'student');
@@ -136,33 +148,46 @@ class revokeattempt_test extends \advanced_testcase {
         $data = [
             'assignfeedbackcomments_editor' => ['text' => $initialfeedback, 'format' => 1]
         ];
-        $this->mark_submission($teacher, $assign, $student, 45.0, $data);
+        $this->mark_submission($teacher, $assign, $student, $initialgrade, $data);
 
         $assign->testable_process_add_attempt($student->id);
-        if ($grade) {
-            if ($feedback) {
-                $data = [
-                    'assignfeedbackcomments_editor' => ['text' => 'Feedback!', 'format' => 1]
-                ];
-            } else {
-                $data = [
-                    'assignfeedbackcomments_editor' => ['text' => '', 'format' => 1]
-                ];
-            }
-            $this->mark_submission($teacher, $assign, $student, 51.0, $data, 1);
+        $submission = $assign->get_user_submission($student->id, false);
+        $this->assertEquals(ASSIGN_SUBMISSION_STATUS_REOPENED, $submission->status);
+
+        if ($grade != 0) {
+            $data = [
+                'assignfeedbackcomments_editor' => ['text' => 'Feedback!', 'format' => 1]
+            ];
+            $this->mark_submission($teacher, $assign, $student, $grade, $data, 1);
             $gradeinfo = $assign->get_user_grade($student->id, true);
-            $this->assertEquals(51.0, $gradeinfo->grade);
+            $this->assertEquals($grade, $gradeinfo->grade);
         }
 
         $assign->revoke_attempt($student->id);
+        // submission
+        $submission = $assign->get_user_submission($student->id, false);
+        // print_object($submission->status);
         $gradeinfo = $assign->get_user_grade($student->id, true);
-        $this->assertEquals(45.0, $gradeinfo->grade);
+        $this->assertEquals($initialgrade, $gradeinfo->grade);
+
+        $cm = cm_info::create($assign->get_course_module());
+        $completioninfo = new completion_info($course);
+        // $customcompletion = new custom_completion($cm, (int)$student->id);
+        $current = new stdClass();
+        // Try internal_get_grade_state instead.
+        print_object($completioninfo->get_grade_completion($cm, $student->id));
     }
 
     protected function create_assignment($generator, $type, $course) {
         $data = [
+            'maxattempts' => -1,
+            'attemptreopenmethod' => 'manual',
             'assignsubmission_onlinetext_enabled' => 1,
             'assignfeedback_comments_enabled' => 1,
+            'completion' => COMPLETION_TRACKING_AUTOMATIC,
+            'completionsubmit' => COMPLETION_ENABLED,
+            'completionpassgrade' => 1,
+            'gradepass' => 50.0
         ];
 
         $assign = $this->create_instance($course, $data);

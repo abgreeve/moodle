@@ -31,10 +31,10 @@ use core_external\external_warnings;
 class revoke_attempt extends external_api {
 
     /**
-     * Describes the parameters for submission_start.
+     * Describes the parameters for revoke_attempt.
      *
      * @return external_function_parameters
-     * @since Moodle 4.0
+     * @since Moodle 4.5
      */
     public static function execute_parameters(): external_function_parameters {
         return new external_function_parameters ([
@@ -45,11 +45,11 @@ class revoke_attempt extends external_api {
     }
 
     /**
-     * Call to start an assignment submission.
+     * Call to revoke an assignment attempt.
      *
      * @param int $assignid Assignment ID.
      * @return array
-     * @since Moodle 4.0
+     * @since Moodle 4.5
      */
     public static function execute(int $assignid, int $userid): array {
         global $DB, $USER;
@@ -73,14 +73,14 @@ class revoke_attempt extends external_api {
     }
 
     /**
-     * Describes the submission_start return value.
+     * Describes the revoke attempt return value.
      *
      * @return external_single_structure
-     * @since Moodle 4.0
+     * @since Moodle 4.5
      */
     public static function execute_returns(): external_single_structure {
         return new external_single_structure([
-            'submissionid' => new external_value(PARAM_INT, 'New submission ID.'),
+            'submissionid' => new external_value(PARAM_INT, 'Current submission ID.'),
             'warnings' => new external_warnings(),
         ]);
     }

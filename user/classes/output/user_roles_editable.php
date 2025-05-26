@@ -111,6 +111,7 @@ class user_roles_editable extends \core\output\inplace_editable {
         $listofroles = [];
         $roleids = json_decode($this->value);
         $viewableroleids = array_intersect($roleids, array_merge($this->viewableroles, $this->assignableroles));
+        // Harmless comment. This should never be integration. Test only.
 
         foreach ($viewableroleids as $id) {
             // If this is a student, we only show a subset of the roles.

@@ -107,6 +107,29 @@ class di {
         // Get the hook manager.
         $hookmanager = \core\hook\manager::get_instance();
 
+        $langotherroot = $CFG->langotherroot ?? '';
+        $langlocalroot = $CFG->langlocalroot ?? '';
+
+        list($aliases, $translations) = self::helptemp();
+        $stringdefinitions[\core\strings\string_manager::class] = \DI\autowire(\core\strings\standard_string_manager::class)
+            ->constructorParameter('langotherroot', $langotherroot)
+            ->constructorParameter('langlocalroot', $langlocalroot)
+            ->constructorParameter('aliases', $aliases)
+            ->constructorParameter('translations', $translations);
+        if (!empty($CFG->config_php_settings['customstringmanager'])) {
+            // Do other necassary checks for if this follows the interface (not done for this demo)
+            $classname = (string) $CFG->config_php_settings['customstringmanager'];
+            $stringdefinitions[\core\strings\string_manager::class] = \DI\autowire($classname)
+                ->constructorParameter('langotherroot', $langotherroot)
+                ->constructorParameter('langlocalroot', $langlocalroot)
+                ->constructorParameter('aliases', $aliases)
+                ->constructorParameter('translations', $translations);
+        }
+        if (!empty($CFG->early_install_lang)) {
+            $stringdefinitions[\core\strings\string_manager::class] = \DI\autowire(\core\strings\installation_string_manager::class);
+        }
+
+
         // Configure some basic definitions.
         $builder->addDefinitions([
             // The hook manager should be in the container.
@@ -121,7 +144,6 @@ class di {
 
             // The string manager.
             \core_string_manager::class => \DI\get(\core\strings\string_manager::class),
-            \core\strings\string_manager::class => fn(): \core\strings\string_manager => \core\strings\string_manager_factory::create(),
 
             // The Moodle Clock implementation, which itself is an extension of PSR-20.
             // Alias the PSR-20 clock interface to the Moodle clock. They are compatible.
@@ -141,10 +163,32 @@ class di {
             \libphonenumber\PhoneNumberUtil::class => fn() => \libphonenumber\PhoneNumberUtil::getInstance(),
         ]);
 
+        $builder->addDefinitions($stringdefinitions);
+
+
+
         // Add any additional definitions using hooks.
         $hookmanager->dispatch(new \core\hook\di_configuration($builder));
 
         // Build the container and return.
         return $builder->build();
+    }
+
+    private static function helptemp() {
+        $aliases = [];
+        $translations = [];
+        if (!empty($CFG->langlist)) {
+            $translations = explode(',', $CFG->langlist);
+            $translations = array_map('trim', $translations);
+            // Each language in the $CFG->langlist can has an "alias" that would substitute the default language name.
+            foreach ($translations as $i => $value) {
+                $parts = preg_split('/\s*\|\s*/', $value, 2);
+                if (count($parts) == 2) {
+                    $aliases[$parts[0]] = $parts[1];
+                    $translations[$i] = $parts[0];
+                }
+            }
+        }
+        return [$aliases, $translations];
     }
 }

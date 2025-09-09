@@ -59,21 +59,15 @@ class standard_string_manager implements string_manager {
     /**
      * Create new instance of string manager
      */
-    public function __construct() {
-        global $CFG;
-
-        [
-            'translations' => $translist,
-            'aliases' => $transaliases,
-        ] = self::get_translations_from_config();
+    public function __construct($langotherroot, $langlocalroot, $aliases, $translations) {
 
         // The translist is used for both get the list of available translations
         // and check for their existence. We use array_combine to make it easier to check.
-        $this->translist = array_combine($translist, $translist);
-        $this->transaliases = $transaliases;
+        $this->translist = array_combine($aliases, $translations);
+        $this->transaliases = $aliases;
 
-        $this->otherroot = $CFG->langotherroot;
-        $this->localroot = $CFG->langlocalroot;
+        $this->otherroot = $langotherroot;
+        $this->localroot = $langlocalroot;
 
         if ($this->get_revision() > 0) {
             // We can use a proper cache, establish the cache using the 'String cache' definition.

@@ -55,6 +55,7 @@ $string['compatibilitysettingshead'] = 'Checking your PHP settings ...';
 $string['compatibilitysettingssub'] = 'Your server should pass all these tests to make Moodle run properly';
 $string['configfilenotwritten'] = 'The installer script was not able to automatically create a config.php file containing your chosen settings, probably because the Moodle directory is not writeable. You can manually copy the following code into a file named config.php within the root directory of Moodle.';
 $string['configfilewritten'] = 'config.php has been successfully created';
+$string['configuration'] = 'Configuration';
 $string['configurationcomplete'] = 'Configuration completed';
 $string['configurationcompletehead'] = 'Configuration completed';
 $string['configurationcompletesub'] = 'Moodle made an attempt to save your configuration in a file in the root of your Moodle installation.';
@@ -199,6 +200,7 @@ $string['pathswrongadmindir'] = 'Admin directory does not exist';
 $string['pgsqlextensionisnotpresentinphp'] = 'PHP has not been properly configured with the PGSQL extension so that it can communicate with PostgreSQL.  Please check your php.ini file or recompile PHP.';
 $string['phpextension'] = '{$a} PHP extension';
 $string['phpversion'] = 'PHP version';
+$string['problemdetected'] = 'A problem was detected';
 $string['releasenoteslink'] = 'For information about this version of Moodle, please see the release notes at {$a}';
 $string['safemode'] = 'Safe mode';
 $string['safemodeerror'] = 'Moodle may have trouble with safe mode on';
@@ -215,6 +217,8 @@ $string['sessionautostarthelp'] = '<p>Moodle requires session support and will n
 
 <p>Sessions can be enabled in the php.ini file ... look for the session.auto_start parameter.</p>';
 $string['upgradingqtypeplugin'] = 'Upgrading question/type plugin';
+$string['webservernotconfigured'] = 'Web server not configured';
+$string['webserverconfigproblemdescription'] = 'Your web server is not configured to prevent access to files outside the /public directory. Please refer to <a href="https://moodledev.io/docs/5.1/guides/restructure">https://moodledev.io/docs/5.1/guides/restructure</a> for details on how to configure your web server. It is not recommended to proceed until this is addressed. Once reconfigured, please <a href="{$a}">revisit the web root</a>.';
 $string['welcomep10'] = '{$a->installername} ({$a->installerversion})';
 $string['welcomep20'] = 'You are seeing this page because you have successfully installed and
     launched the <strong>{$a->packname} {$a->packversion}</strong> package in your computer. Congratulations!';

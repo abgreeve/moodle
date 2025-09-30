@@ -221,6 +221,12 @@ function install_generate_configphp($database, $cfg) {
     $configphp .= 'global $CFG;' . PHP_EOL;
     $configphp .= '$CFG = new stdClass();' . PHP_EOL . PHP_EOL; // prevent PHP5 strict warnings
 
+    if (str_ends_with($cfg->wwwroot, '/public')) {
+        $wwwroot = substr($cfg->wwwroot, 0, -7);
+    } else {
+        $wwwroot = $cfg->wwwroot;
+    }
+
     $dbconfig = $database->export_dbconfig();
 
     foreach ($dbconfig as $key=>$value) {
@@ -229,7 +235,7 @@ function install_generate_configphp($database, $cfg) {
     }
     $configphp .= PHP_EOL;
 
-    $configphp .= '$CFG->wwwroot   = '.var_export($cfg->wwwroot, true) . ';' . PHP_EOL ;
+    $configphp .= '$CFG->wwwroot   = ' . var_export($wwwroot, true) . ';' . PHP_EOL;
 
     $configphp .= '$CFG->dataroot  = '.var_export($cfg->dataroot, true) . ';' . PHP_EOL;
 
@@ -267,9 +273,17 @@ function install_generate_configphp($database, $cfg) {
  * @param string $heading
  * @param string $stagetext
  * @param string $stageclass
+ * @param string $warning Additional information that is a warning
  * @return void
  */
-function install_print_header($config, $stagename, $heading, $stagetext, $stageclass = "alert-info") {
+function install_print_header(
+    $config,
+    $stagename,
+    $heading,
+    $stagetext,
+    $stageclass = "alert-info",
+    $warning = '',
+) {
     global $CFG;
 
     @header('Content-Type: text/html; charset=UTF-8');
@@ -285,7 +299,7 @@ function install_print_header($config, $stagename, $heading, $stagetext, $stagec
           <head>
           <link rel="shortcut icon" href="theme/clean/pix/favicon.ico" />';
 
-    echo '<link rel="stylesheet" type="text/css" href="'.$CFG->wwwroot.'/install/css.php" />
+    echo '<link rel="stylesheet" type="text/css" href="' . $CFG->wwwroot . '/install/css.php" />
           <title>'.get_string('installation', 'install') . moodle_page::TITLE_SEPARATOR . 'Moodle '.$CFG->target_release.'</title>
           <meta name="robots" content="noindex">
           <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
@@ -309,6 +323,11 @@ function install_print_header($config, $stagename, $heading, $stagetext, $stagec
     if ($stagetext !== '') {
         echo '<div class="alert ' . $stageclass . '">';
         echo $stagetext;
+        echo '</div>';
+    }
+    if ($warning !== '') {
+        echo '<div class="alert alert-warning">';
+        echo $warning;
         echo '</div>';
     }
     // main

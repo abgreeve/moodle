@@ -39,6 +39,13 @@ if (isset($_REQUEST['admin'])) {
 // If config.php exists we just created config.php and need to redirect to continue installation
 $configfile = dirname(__DIR__) . '/config.php';
 if (file_exists($configfile)) {
+    require_once(__DIR__ . '/config.php');
+    require_once(__DIR__ . '/lib/installlib.php');
+    $testurl = install_guess_wwwroot();
+    if (str_ends_with($testurl, '/public') && $CFG->wwwrootendsinpublic == false) {
+        header("Location: $testurl/install/configproblem.php");
+        die();
+    }
     header("Location: $admin/index.php?lang=$lang");
     die;
 }
@@ -557,6 +564,7 @@ if ($config->stage == INSTALL_PATHS) {
                    'dirroot'  => get_string('dirroot', 'install'),
                    'dataroot' => get_string('dataroot', 'install'));
 
+    $stageclass = "alert-info";
     $sub = '<dl>';
     foreach ($paths as $path=>$name) {
         $sub .= '<dt>'.$name.'</dt><dd>'.get_string('pathssub'.$path, 'install').'</dd>';
@@ -566,7 +574,22 @@ if ($config->stage == INSTALL_PATHS) {
     }
     $sub .= '</dl>';
 
-    install_print_header($config, get_string('paths', 'install'), get_string('pathshead', 'install'), $sub);
+    $warnings = '';
+    $wwwroot = $CFG->wwwroot;
+    if (str_ends_with($CFG->wwwroot, '/public')) {
+        $wwwroot = substr($CFG->wwwroot, 0, -7);
+        $warnings .= '<dt>' . get_string('webservernotconfigured', 'install') . '</dt>';
+        $warnings .= '<dd>' . get_string('webserverconfigproblemdescription', 'install', s($wwwroot)) . '</dd>';
+    }
+
+    install_print_header(
+        $config,
+        get_string('paths', 'install'),
+        get_string('pathshead', 'install'),
+        $sub,
+        $stageclass,
+        $warnings,
+    );
 
     $strwwwroot      = get_string('wwwroot', 'install');
     $strdirroot      = get_string('dirroot', 'install');
@@ -576,7 +599,8 @@ if ($config->stage == INSTALL_PATHS) {
     echo '<div class="row mb-4">';
     echo '<div class="col-md-3 text-md-end pt-1"><label for="id_wwwroot">'.$paths['wwwroot'].'</label></div>';
     echo '<div class="col-md-9" data-fieldtype="text">';
-    echo '<input id="id_wwwroot" name="wwwroot" type="text" class="form-control text-ltr" value="'.s($CFG->wwwroot).'" disabled="disabled" size="70" /></div>';
+    echo '<input id="id_wwwroot" name="wwwroot" type="text" class="form-control text-ltr" value="' . s($wwwroot) . '"
+        disabled="disabled" size="70" /></div>';
     echo '</div>';
 
     echo '<div class="row mb-4">';

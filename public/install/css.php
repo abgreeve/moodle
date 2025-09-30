@@ -22,10 +22,6 @@
  * @copyright  2011 Petr Skoda (http://skodak.org)
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-if (file_exists(__DIR__.'/../../config.php')) {
-    // Site is already installed.
-    die;
-}
 
 // Remove some of the CSS in $content.
 $files = array('boost/style/moodle.css');

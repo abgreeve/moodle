@@ -9,7 +9,7 @@ import "./styles.css";
 import Home from "./component/home";
 import { ThemeProvider } from "./context/themeProvider";
 
-function init(selector, props) {
+function init(selector, props = {}) {
     const container = document.querySelector(selector);
     if (container) {
         const root = createRoot(container);

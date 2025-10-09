@@ -159,7 +159,10 @@ echo $OUTPUT->header();
 echo html_writer::tag('h3', "React component", ['class' => 'calendar-title']);
 echo '<div id="react-root"></div>';
 $PAGE->requires->js('/calendar/build/app.iife.js');
-$PAGE->requires->js_call_amd('core_calendar/shim', 'init', ['#react-root']);
+$PAGE->requires->js_call_amd('core_calendar/shim', 'init', ['#react-root', [
+    'courseId' => $courseid,
+    'categoryId' => $categoryid,
+]]);
 
 echo html_writer::div('<hr/>', 'calendar-separator');
 echo html_writer::tag('h3', "Moodle calendar", ['class' => 'calendar-title']);

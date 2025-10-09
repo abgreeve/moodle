@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useCallback } from 'react';
+import React, { Fragment, useState, useCallback, useEffect } from 'react';
 
 // Pseudo design system imports.
 import CalendarShim from './design-system/calendar.jsx';
@@ -7,15 +7,21 @@ import CalendarForm from "./design-system/form";
 
 // Standard Bootstrap imports.
 import Button from 'react-bootstrap/Button';
+import useUpcomingEvents from './hooks/useUpcomingEvents.js';
 
-export default function App({ events }) {
+export default function App({ courseId, categoryId }) {
     const newEventString = "New Event";
 
-    const [myEvents, setEvents] = useState(events);
+    const { events: upcomingEvents, loading, error } = useUpcomingEvents(courseId, categoryId);
+    const [myEvents, setEvents] = useState([]);
     const [modalShow, setModalShow] = useState(false);
     const [title, setTitle] = useState(newEventString);
     const [body, setBody] = useState("");
     const [footer, setFooter] = useState("");
+
+    useEffect(() => {
+        setEvents(upcomingEvents);
+    }, [upcomingEvents]);
 
     const handleSelectSlot = useCallback(
         ({ start }) => {
@@ -102,11 +108,19 @@ export default function App({ events }) {
                 Add Event
             </Button>
         );
-        setModalShow(true)
+            setModalShow(true)
     };
 
     return (
         <>
+            {loading && (
+                <p className="text-muted">Loading events…</p>
+            )}
+            {error && (
+                <p className="text-danger">
+                    {error.message || 'Unable to load upcoming events.'}
+                </p>
+            )}
             <Button className="mb-3" variant="primary" onClick={onClickHandler}>
                 {newEventString}
             </Button>

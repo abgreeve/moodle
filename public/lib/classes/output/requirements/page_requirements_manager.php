@@ -1045,6 +1045,14 @@ class page_requirements_manager {
         $this->skiplinks[$target] = $linktext;
     }
 
+    public function js_react_init(string $component, string $selector = null, array $props = []): void {
+
+        $bundleurl = new \moodle_url($component);
+        $this->js($bundleurl);
+
+        $this->js_call_amd('core/react_shim', 'init', [$selector, $props]);
+    }
+
     /**
      * !!!DEPRECATED!!! please use js_init_call() if possible
      * Ensure that the specified JavaScript function is called from an inline script

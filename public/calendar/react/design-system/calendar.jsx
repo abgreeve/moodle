@@ -85,7 +85,7 @@ export default function CalendarShim(props) {
 
     const { defaultDate, messages } = useMemo(
         () => ({
-            defaultDate: new Date(2015, 3, 1),
+            defaultDate: new Date(),
             messages: lang[culture],
         }),
         [culture]

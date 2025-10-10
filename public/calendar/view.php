@@ -154,11 +154,11 @@ $PAGE->set_heading($headingstr, false);
 $renderer = $PAGE->get_renderer('core_calendar');
 $calendar->add_sidecalendar_blocks($renderer, true, $view);
 
-$PAGE->requires->css('/calendar/build/app.css');
+$PAGE->requires->css('/calendar/react/build/app.css');
 echo $OUTPUT->header();
 echo html_writer::tag('h3', "React component", ['class' => 'calendar-title']);
 echo '<div id="react-root"></div>';
-$PAGE->requires->js_react_init('/calendar/build/app.iife.js', '#react-root', [
+$PAGE->requires->js_react_init('/calendar/react/build/app.iife.js', '#react-root', [
     'courseId' => $courseid,
     'categoryId' => $categoryid,
 ]);

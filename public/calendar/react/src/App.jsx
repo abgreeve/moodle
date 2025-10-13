@@ -9,6 +9,8 @@ import CalendarForm from "./design-system/form";
 import Button from 'react-bootstrap/Button';
 import useUpcomingEvents from './hooks/useUpcomingEvents.js';
 
+let modalFormLoader;
+
 export default function App({ courseId, categoryId }) {
     const newEventString = "New Event";
 
@@ -111,6 +113,47 @@ export default function App({ courseId, categoryId }) {
             setModalShow(true)
     };
 
+    const modalThing = async (event) => {
+        event?.preventDefault?.();
+        try {
+            const ModalForm = await loadModalForm();
+            const contextId = window.M?.cfg?.contextid ?? 1;
+            // window.console.log(contextId);
+            const form = new ModalForm({
+                formClass: 'core_calendar\\output\\simple2complex_form',
+                args: {
+                    contextid: contextId,
+                },
+                modalConfig: {
+                    title: 'Simple to complex form',
+                },
+                returnFocus: event?.currentTarget ?? null,
+            });
+            form.addEventListener(form.events.FORM_SUBMITTED, (submissionEvent) => {
+                window.console.log('simple2complex submitted', submissionEvent.detail);
+            });
+            form.addEventListener(form.events.CANCELLED, () => {
+                window.console.log('simple2complex cancelled');
+            });
+            form.show();
+        } catch (err) {
+            window.console.error('Unable to launch simple2complex modal form', err);
+        }
+    };
+
+    const loadModalForm = () => {
+        if (!modalFormLoader) {
+            modalFormLoader = new Promise((resolve, reject) => {
+                require(
+                    ['core_form/modalform'],
+                    (ModalForm) => resolve(ModalForm),
+                    (error) => reject(error)
+                );
+            });
+        }
+        return modalFormLoader;
+    }
+
     return (
         <>
             {loading && (
@@ -123,6 +166,9 @@ export default function App({ courseId, categoryId }) {
             )}
             <Button className="mb-3" variant="primary" onClick={onClickHandler}>
                 {newEventString}
+            </Button>
+            <Button className="mb-3"variant="primary" onClick={modalThing}>
+                Modal test
             </Button>
             <EventModal
                 show={modalShow}

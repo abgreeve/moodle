@@ -62,6 +62,8 @@ export const useUpcomingEvents = (courseId = 0, categoryId = 0) => {
                     return;
                 }
 
+                window.console.log('Fetched upcoming events:', context);
+
                 setEvents(normaliseUpcomingEvents(context));
             } catch (err) {
                 if (!mounted) {

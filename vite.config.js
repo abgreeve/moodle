@@ -4,86 +4,152 @@ import { globSync } from "glob";
 import path from "path";
 import fs from "fs-extra";
 
-// --- Step 1: Find only React entry files ---
-const reactEntries = globSync("**/react/src/**/*.{js,jsx,ts,tsx}", {
-  ignore: ["node_modules/**", "**/build/**", "vite_build/**"],
-});
+const rootDir = process.cwd();
+const publicRoot = path.resolve(rootDir, "public");
+const buildRoot = path.resolve(publicRoot, "react_build");
 
-console.log("Found React entry files:", reactEntries);
+const entryPattern = "public/**/react/src/{main,index}.{js,jsx,ts,tsx}";
+const ignorePatterns = [
+  "**/node_modules/**",
+  "**/public/react_build/**",
+  "**/vite_build/**",
+];
 
-const input = {};
-reactEntries.forEach((file) => {
-  const pluginName = path.basename(path.dirname(path.dirname(file))); // parent folder of react
-  const baseName = path.basename(file, path.extname(file));
-  const entryKey = `${pluginName}/${baseName}`;
-  input[entryKey] = path.resolve(file);
-});
+const reactSegment = "/react/src/";
 
-console.log("Rollup input keys:", Object.keys(input));
+const toPosix = (value) => value.split(path.sep).join(path.posix.sep);
+const joinPosix = (...parts) => parts.filter(Boolean).join("/");
 
-// --- Step 2: Copy plugin build files ---
-function copyToPluginBuild() {
-  return {
-    name: "copy-to-plugin-build",
-    writeBundle(options, bundle) {
-      Object.values(bundle).forEach((chunk) => {
-        if (!chunk.facadeModuleId) return; // skip non-entry/chunk files
+function collectReactEntries() {
+  const entries = globSync(entryPattern, { ignore: ignorePatterns });
 
-        const srcFile = chunk.facadeModuleId;
-        if (!srcFile.includes("/react/src/")) return; // only react code
-
-        // build folder inside the plugin
-        const pluginBuildDir = path.join(
-          srcFile.split("/react/src/")[0],
-          "react/build"
-        );
-        fs.ensureDirSync(pluginBuildDir);
-        fs.copyFileSync(
-          path.join(options.dir || "vite_build", chunk.fileName),
-          path.join(pluginBuildDir, path.basename(chunk.fileName))
-        );
-      });
-    },
-  };
-}
-
-// --- Step 3: Fix chunk imports in entry files ---
-function fixChunkImports() {
-  return {
-    name: "fix-chunk-imports",
-    generateBundle(_, bundle) {
-      for (const [fileName, chunk] of Object.entries(bundle)) {
-        if (chunk.type === "chunk" && chunk.isEntry) {
-          // Replace ../../../chunks/... with ./chunks/...
-          chunk.code = chunk.code.replace(
-            /((?:\.\.\/)+)chunks\//g,
-            "./chunks/"
-          );
-        }
+  return entries
+    .map((entryPath) => {
+      const absoluteEntry = path.resolve(rootDir, entryPath);
+      const relativeToPublic = toPosix(
+        path.relative(publicRoot, absoluteEntry)
+      );
+      const segmentIndex = relativeToPublic.indexOf(reactSegment);
+      if (segmentIndex === -1) {
+        return null;
       }
-    },
-  };
+
+      const appPath = relativeToPublic.slice(0, segmentIndex);
+      const relativeWithinSrc = relativeToPublic.slice(
+        segmentIndex + reactSegment.length
+      );
+      if (!relativeWithinSrc) {
+        return null;
+      }
+
+      const parsed = path.posix.parse(relativeWithinSrc);
+      const entryKey = joinPosix(parsed.dir, parsed.name);
+
+      return {
+        absoluteEntry,
+        appPath,
+        relativeDir: parsed.dir,
+        baseName: parsed.name,
+        entryKey,
+      };
+    })
+    .filter(Boolean);
 }
 
-// --- Step 4: Vite config ---
-export default defineConfig({
-    root: process.cwd(),
+function groupEntriesByApp(definitions) {
+  return definitions.reduce((map, definition) => {
+    const key = definition.appPath;
+    if (!map.has(key)) {
+      map.set(key, []);
+    }
+    map.get(key).push(definition);
+    return map;
+  }, new Map());
+}
+
+function createEmptyBuildConfig() {
+  return {
+    root: rootDir,
     publicDir: false,
-    plugins: [react(), copyToPluginBuild(), fixChunkImports()],
+    plugins: [react()],
     build: {
-        outDir: "vite_build",
-        emptyOutDir: true,
-        rollupOptions: {
-              input,
-              output: {
-                entryFileNames: "[name].js",        // flattened per plugin
-                chunkFileNames: "chunks/[name]-[hash].js", // shared React chunk
-                assetFileNames: "assets/[name]-[hash][extname]",
-                manualChunks: { react: ["react", "react-dom"] },
-              },
-        },
+      outDir: buildRoot,
+      emptyOutDir: true,
+      cssCodeSplit: false,
+      rollupOptions: {
+        input: {},
+      },
     },
     optimizeDeps: {
-        include: ["react", "react-dom"],
+      include: ["react", "react-dom"],
     },
-});
+  };
+}
+
+function createAppBuildConfig(appPath, entries) {
+  const input = {};
+
+  entries
+    .sort((left, right) => left.entryKey.localeCompare(right.entryKey))
+    .forEach((entry) => {
+      const alias = joinPosix(entry.relativeDir, entry.baseName) || entry.baseName;
+      input[alias] = entry.absoluteEntry;
+    });
+
+  const outDir = appPath ? path.join(buildRoot, appPath) : buildRoot;
+
+  return {
+    root: rootDir,
+    publicDir: false,
+    plugins: [react()],
+    build: {
+      outDir,
+      emptyOutDir: true,
+      cssCodeSplit: false,
+      rollupOptions: {
+        input,
+        output: {
+          entryFileNames: "[name].js",
+          chunkFileNames: "chunks/[name]-[hash].js",
+          assetFileNames: "assets/[name]-[hash][extname]",
+        },
+      },
+    },
+    optimizeDeps: {
+      include: ["react", "react-dom"],
+    },
+  };
+}
+
+const isBuildCommand = process.argv.includes("build");
+const definitions = collectReactEntries();
+const grouped = groupEntriesByApp(definitions);
+
+let finalConfig;
+
+if (isBuildCommand) {
+  if (definitions.length > 0) {
+    fs.ensureDirSync(buildRoot);
+    fs.emptyDirSync(buildRoot);
+  }
+
+  const buildConfigs = grouped.size
+    ? Array.from(grouped.entries()).map(([appPath, entries]) =>
+        createAppBuildConfig(appPath, entries)
+      )
+    : [createEmptyBuildConfig()];
+
+  finalConfig =
+    buildConfigs.length === 1 ? buildConfigs[0] : buildConfigs;
+} else {
+  finalConfig = {
+    root: rootDir,
+    publicDir: false,
+    plugins: [react()],
+    optimizeDeps: {
+      include: ["react", "react-dom"],
+    },
+  };
+}
+
+export default defineConfig(finalConfig);

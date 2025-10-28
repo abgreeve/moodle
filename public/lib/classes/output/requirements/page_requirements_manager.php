@@ -1045,6 +1045,16 @@ class page_requirements_manager {
         $this->skiplinks[$target] = $linktext;
     }
 
+    /**
+     * Enqueues a React bundle and schedules the shim initialiser to mount it.
+     *
+     * The bundle is included via `js()` to make it available on the page, and the AMD shim
+     * initialises the component once the page is ready.
+     *
+     * @param string $component Path or URL for the compiled React bundle to include.
+     * @param string|null $selector CSS selector identifying the mount node for the component.
+     * @param array $props Data passed into the React component on initialisation.
+     */
     public function js_react_init(string $component, string $selector = null, array $props = []): void {
 
         $bundleurl = new \moodle_url($component);

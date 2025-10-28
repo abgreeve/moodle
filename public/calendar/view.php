@@ -154,9 +154,16 @@ $PAGE->set_heading($headingstr, false);
 $renderer = $PAGE->get_renderer('core_calendar');
 $calendar->add_sidecalendar_blocks($renderer, true, $view);
 
-// $PAGE->requires->css('/calendar/react/build/app.css');
-// Need a better way of including this. At the moment when react is built this file name will change.
 $PAGE->requires->css('/react_build/calendar/assets/style-DyQl4v7_.css');
+// Need a better way of including this. At the moment when react is built this file name will change.
+// $cssfiles = glob($CFG->dirroot . '/public/react_build/calendar/assets/*.css') ?: [];
+// foreach ($cssfiles as $buildcss) {
+//     $relativepath = substr($buildcss, strlen($CFG->dirroot . '/public'));
+//     if ($relativepath === false || $relativepath === '') {
+//         continue;
+//     }
+//     $PAGE->requires->css('/' . ltrim($relativepath, '/'));
+// }
 echo $OUTPUT->header();
 echo html_writer::tag('h3', "React component", ['class' => 'calendar-title']);
 echo '<div id="react-root"></div>';

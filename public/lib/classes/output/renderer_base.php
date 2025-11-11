@@ -101,19 +101,21 @@ class renderer_base {
             $pixhelper = new mustache_pix_helper($this);
             $shortentexthelper = new mustache_shorten_text_helper();
             $userdatehelper = new mustache_user_date_helper();
+            $reacthelper = new mustache_react_helper();
 
             // We only expose the variables that are exposed to JS templates.
             $safeconfig = $this->page->requires->get_config_for_javascript($this->page, $this);
 
             $helpers = ['config' => $safeconfig,
-                             'str' => [$stringhelper, 'str'],
-                             'cleanstr' => [$cleanstringhelper, 'cleanstr'],
-                             'quote' => [$quotehelper, 'quote'],
-                             'js' => [$jshelper, 'help'],
-                             'pix' => [$pixhelper, 'pix'],
-                             'shortentext' => [$shortentexthelper, 'shorten'],
-                             'userdate' => [$userdatehelper, 'transform'],
-                         ];
+                        'str' => [$stringhelper, 'str'],
+                        'cleanstr' => [$cleanstringhelper, 'cleanstr'],
+                        'quote' => [$quotehelper, 'quote'],
+                        'js' => [$jshelper, 'help'],
+                        'pix' => [$pixhelper, 'pix'],
+                        'shortentext' => [$shortentexthelper, 'shorten'],
+                        'userdate' => [$userdatehelper, 'transform'],
+                        'react' => [$reacthelper, 'react'],
+                    ];
 
             $this->mustache = new mustache_engine([
                 'cache' => $cachedir,

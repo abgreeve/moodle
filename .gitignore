@@ -60,3 +60,5 @@ phpcs.xml
 jsconfig.json
 UPGRADING-CURRENT.md
 .phpunit.cache
+/public/lib/react/node_modules
+/public/lib/react/package-lock.json

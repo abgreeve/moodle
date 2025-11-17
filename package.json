@@ -3,13 +3,17 @@
   "private": true,
   "description": "Moodle",
   "scripts": {
-    "upgradenote": "node .grunt/upgradenotes.mjs create"
+    "upgradenote": "node .grunt/upgradenotes.mjs create",
+    "lint": "eslint \"public/**/react/src/**/*.{ts,tsx}\"",
+    "build": "npm run lint && node build.mjs"
   },
   "devDependencies": {
     "@babel/core": "7.17.5",
     "@babel/eslint-parser": "^7.21.3",
     "@babel/eslint-plugin": "7.19.1",
     "@babel/preset-env": "7.16.11",
+    "@typescript-eslint/eslint-plugin": "^8.46.4",
+    "@typescript-eslint/parser": "^8.46.4",
     "@xmldom/xmldom": "^0.8.7",
     "ajv": "^8.12.0",
     "async": "^3.2.5",
@@ -20,7 +24,7 @@
     "commander": "^12.0.0",
     "cross-env": "^7.0.3",
     "docdash": "^2.0.2",
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.1",
     "eslint-plugin-jsdoc": "^48.0.4",
     "eslint-plugin-promise": "6.0.0",
     "fb-watchman": "^2.0.2",

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+
+    "paths": {
+      "@core/*": ["public/lib/react/src/*"],
+      "@mod/*": ["public/mod/*/react/src"],
+      "@block/*": ["public/blocks/*/react/src"],
+      "@calendar/*": ["public/calendar/react/src/*"],
+    },
+
+    "strict": true,
+    "skipLibCheck": true
+  },
+
+  "include": ["public/**/react/src/**/*"]
+}

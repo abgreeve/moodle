@@ -1104,7 +1104,6 @@ JSCODE;
         $this->jsmodulefiles[] = $componenturl;
     }
 
-
     /**
      * !!!DEPRECATED!!! please use js_init_call() if possible
      * Ensure that the specified JavaScript function is called from an inline script

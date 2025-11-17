@@ -62,5 +62,8 @@
     "not op_mini all",
     "not Opera > 0",
     "not dead"
-  ]
+  ],
+  "dependencies": {
+    "esbuild": "^0.27.0"
+  }
 }

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, {useState} from "react";
+=======
+import React, { useState } from "react";
+>>>>>>> 6e17c74f98b (AE-94 React Poc: Client-side init for React components in templates)
 
 type ButtonType = "button" | "submit" | "reset";
 

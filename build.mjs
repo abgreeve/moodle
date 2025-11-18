@@ -5,6 +5,15 @@ import fs from "fs";
 import {createAliasPlugin} from "./.esbuild/aliases.mjs";
 import {externalsPlugin} from "./.esbuild/externals.mjs";
 
+// Build the react-dom common file.
+esbuild.build({
+    entryPoints: ["public/lib/react/src/react.ts"],
+    bundle: true,
+    format: "esm",
+    outfile: "public/lib/react/build/react.js",
+    minify: true,
+});
+
 const entryPoints = glob.sync("public/**/react/src/**/*.tsx");
 console.log(entryPoints);
 

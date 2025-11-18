@@ -1045,6 +1045,10 @@ class page_requirements_manager {
         $this->skiplinks[$target] = $linktext;
     }
 
+    public function react(): void {
+        $this->js('/lib/react/build/react.js', true, ['type' => 'module']);
+    }
+
     /**
      * Enqueues a React bundle and schedules the shim initialiser to mount it.
      *
@@ -1726,6 +1730,8 @@ EOF;
             }
             $output .= html_writer::script($js);
         }
+
+        $this->react();
 
         // Mark head sending done, it is not possible to anything there.
         $this->headdone = true;

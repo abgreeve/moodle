@@ -1,0 +1,1 @@
+import{ReactDOM as n}from"lib/react/build/react.js";import{jsx as r}from"react/jsx-runtime";function c(o,t={}){let e=document.querySelector(o);n.createRoot(e).render(r(App,{...t}))}window.ReactApp.init=c;export{c as init};

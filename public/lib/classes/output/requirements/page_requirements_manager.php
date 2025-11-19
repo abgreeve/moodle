@@ -1062,10 +1062,26 @@ class page_requirements_manager {
     public function js_react_init(string $component, string $selector = null, array $props = []): void {
 
         $bundleurl = new \moodle_url($component);
-        $thing = "import('{$bundleurl->out()}')";
-        $this->js_init_code($thing);
+        $componenturl = $bundleurl->out(false);
+        $selectorjson = json_encode($selector);
+        $propsjson = json_encode($props);
 
-        $this->js_call_amd('core/react_shim', 'init', [$selector, $props]);
+        $componentjson = json_encode($componenturl);
+
+        // Quick and dirty code to get the ordering correct. Needs improving.
+        $import = <<<JSCODE
+import({$componentjson}).then(() => {
+    if (typeof require === 'function') {
+        require(['core/react_shim'], amd => amd.init({$selectorjson}, {$propsjson}));
+    } else {
+        window.console.error('RequireJS not available for React component: ' + {$componentjson});
+    }
+}).catch(error => {
+    window.console.error('Failed to load React component: ' + {$componentjson}, error);
+});
+JSCODE;
+
+        $this->js_init_code($import);
     }
 
     /**
@@ -1731,7 +1747,7 @@ EOF;
             $output .= html_writer::script($js);
         }
 
-        $this->react();
+        // $this->react();
 
         // Mark head sending done, it is not possible to anything there.
         $this->headdone = true;

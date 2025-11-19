@@ -30,6 +30,13 @@ const aliasMap = {
     "@calendar/": path.join(rootDir, "public/calendar/react/src"),
 };
 
+// Certain specifiers should never be bundled so we can share the compiled output.
+const staticModuleRemaps = {
+    "@core/react": "/lib/react/build/react.js",
+    "react/jsx-runtime": "/lib/react/build/jsx-runtime.js",
+    "react/jsx-dev-runtime": "/lib/react/build/jsx-dev-runtime.js",
+};
+
 function escapeRegExp(value) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
@@ -38,6 +45,14 @@ export function createAliasPlugin() {
     return {
         name: "moodle-aliases",
         setup(build) {
+            Object.entries(staticModuleRemaps).forEach(([specifier, target]) => {
+                const filter = new RegExp(`^${escapeRegExp(specifier)}$`);
+                build.onResolve({ filter }, () => ({
+                    path: target,
+                    external: true,
+                }));
+            });
+
             Object.entries(aliasMap).forEach(([alias, targetDir]) => {
                 const filter = new RegExp(`^${escapeRegExp(alias)}(.*)$`);
                 build.onResolve({ filter }, async args => {

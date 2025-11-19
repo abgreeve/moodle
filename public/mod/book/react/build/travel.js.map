@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/travel.tsx"],
+  "sourcesContent": ["import {React, ReactDOM} from '@core/react'\n\nexport default function App(props) {\n    window.console.log(props);\n    return (\n        <div>\n            Hello from my new file\n        </div>\n    )\n}\n\nexport function init(selector, props = {}) {\n    const container = document.querySelector(selector)\n    if (!container) {\n        window.console.warn(`React container not found for selector: ${selector}`)\n        return\n    }\n\n    window.ReactApp = window.ReactApp || {}\n    window.ReactApp.roots = window.ReactApp.roots || {}\n\n    let root = window.ReactApp.roots[selector]\n    if (!root) {\n        root = ReactDOM.createRoot(container)\n        window.ReactApp.roots[selector] = root\n    }\n\n    root.render(<App {...props} />)\n}\n\nif (!window.ReactApp) {\n    window.ReactApp = {}\n}\n\nwindow.ReactApp.init = init\n"],
+  "mappings": "AAAA,OAAe,YAAAA,MAAe,4BAKtB,cAAAC,MAAA,kCAHO,SAARC,EAAqBC,EAAO,CAC/B,cAAO,QAAQ,IAAIA,CAAK,EAEpBF,EAAC,OAAI,kCAEL,CAER,CAEO,SAASG,EAAKC,EAAUF,EAAQ,CAAC,EAAG,CACvC,IAAMG,EAAY,SAAS,cAAcD,CAAQ,EACjD,GAAI,CAACC,EAAW,CACZ,OAAO,QAAQ,KAAK,2CAA2CD,CAAQ,EAAE,EACzE,MACJ,CAEA,OAAO,SAAW,OAAO,UAAY,CAAC,EACtC,OAAO,SAAS,MAAQ,OAAO,SAAS,OAAS,CAAC,EAElD,IAAIE,EAAO,OAAO,SAAS,MAAMF,CAAQ,EACpCE,IACDA,EAAOP,EAAS,WAAWM,CAAS,EACpC,OAAO,SAAS,MAAMD,CAAQ,EAAIE,GAGtCA,EAAK,OAAON,EAACC,EAAA,CAAK,GAAGC,EAAO,CAAE,CAClC,CAEK,OAAO,WACR,OAAO,SAAW,CAAC,GAGvB,OAAO,SAAS,KAAOC",
+  "names": ["ReactDOM", "jsx", "App", "props", "init", "selector", "container", "root"]
+}

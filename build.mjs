@@ -5,13 +5,30 @@ import fs from "fs";
 import {createAliasPlugin} from "./.esbuild/aliases.mjs";
 import {externalsPlugin} from "./.esbuild/externals.mjs";
 
-// Build the react-dom common file.
-esbuild.build({
-    entryPoints: ["public/lib/react/src/react.ts"],
-    bundle: true,
-    format: "esm",
-    outfile: "public/lib/react/build/react.js",
-    minify: true,
+// Build the shared React runtime files.
+const sharedReactEntries = [
+    {
+        entry: "public/lib/react/src/react.ts",
+        outfile: "public/lib/react/build/react.js",
+    },
+    {
+        entry: "public/lib/react/src/jsx-runtime.ts",
+        outfile: "public/lib/react/build/jsx-runtime.js",
+    },
+    {
+        entry: "public/lib/react/src/jsx-dev-runtime.ts",
+        outfile: "public/lib/react/build/jsx-dev-runtime.js",
+    },
+];
+
+sharedReactEntries.forEach(({entry, outfile}) => {
+    esbuild.build({
+        entryPoints: [entry],
+        bundle: true,
+        format: "esm",
+        outfile,
+        minify: true,
+    });
 });
 
 const entryPoints = glob.sync("public/**/react/src/**/*.tsx");
@@ -42,6 +59,7 @@ for (const entry of entryPoints) {
         external: [],
         jsx: "automatic",
         minify: true,
+        sourcemap: true,
         plugins: [ createAliasPlugin(), externalsPlugin ],
     }).catch(() => process.exit(1));
 }

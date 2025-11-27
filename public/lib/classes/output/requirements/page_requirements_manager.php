@@ -168,6 +168,8 @@ class page_requirements_manager {
      */
     protected $jquerypluginoverrides = [];
 
+    protected $jsmodulefiles = [];
+
     /**
      * Page requirements constructor.
      */
@@ -1087,6 +1089,23 @@ JSCODE;
     }
 
     /**
+     * Queue an ES module script to be output at the end of the page.
+     *
+     * The provided path is resolved through {@see moodle_url} so both relative Moodle
+     * paths and absolute URLs are supported. Each queued module is rendered as
+     * `<script type="module" src="..."></script>` during {@see get_end_code()}.
+     *
+     * @param string $scriptlocation Local or absolute path to the module bundle.
+     */
+    public function js_type_module(string $scriptlocation): void {
+        // Change scriptlocation to the frankenstyle voodoo to simplify things
+        $bundleurl = new \core\url($scriptlocation);
+        $componenturl = $bundleurl->out(false);
+        $this->jsmodulefiles[] = $componenturl;
+    }
+
+
+    /**
      * !!!DEPRECATED!!! please use js_init_call() if possible
      * Ensure that the specified JavaScript function is called from an inline script
      * somewhere on this page.
@@ -1884,6 +1903,10 @@ EOF;
         $ondomreadyjs = $this->get_javascript_code(true);
         $jsinit = $this->get_javascript_init_code();
         $handlersjs = $this->get_event_handler_code();
+
+        foreach ($this->jsmodulefiles as $modulefile) {
+            $output .= "<script type=\"module\" src=\"$modulefile\"></script>";
+        }
 
         // There is a global Y, make sure it is available in your scope.
         $js = "(function() {{$inyuijs}{$ondomreadyjs}{$jsinit}{$handlersjs}})();";

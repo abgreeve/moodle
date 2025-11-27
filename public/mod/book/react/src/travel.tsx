@@ -1,10 +1,46 @@
-import {React, ReactDOM} from '@core/react'
+import {React, ReactDOM} from '@moodle/core/react'
+
+function requireAmd(mod) {
+    return new Promise((resolve, reject) => {
+        require([mod], resolve, reject);
+    });
+}
+
+async function getString(key, component, params = {}) {
+    const str = await requireAmd('core/str');
+    return str.get_string(key, component, params);
+}
+
+const loadModalForm = async (event) => {
+    event?.preventDefault()
+    window.console.log('Do I hit this?')
+    const ModalForm = await requireAmd('core_form/modalform')
+    const contextid = window.M.cfg.contextid ?? 1
+    const form = new ModalForm({
+        formClass: 'mod_book\\output\\simple2complex_form',
+        args: {contextid: contextid},
+        modalConfig: {title: 'Simple to complex form'},
+        returnFocus: event?.currentTarget ?? null,
+    })
+    form.show()
+}
 
 export default function App(props) {
     window.console.log(props);
+    const [label, setLabel] = React.useState("")
+
+    React.useEffect(() => {
+        async function load() {
+            const text = await getString("toc", "mod_book")
+            setLabel(text)
+        }
+        load().catch(error => window.console.error('Failed to load string', error))
+    }, [])
+
     return (
         <div>
-            Hello from my new file
+            {label || "Hello from my new file"}
+            <a href="#" onClick={loadModalForm}>Modal form?</a>
         </div>
     )
 }
@@ -16,20 +52,8 @@ export function init(selector, props = {}) {
         return
     }
 
-    window.ReactApp = window.ReactApp || {}
-    window.ReactApp.roots = window.ReactApp.roots || {}
-
-    let root = window.ReactApp.roots[selector]
-    if (!root) {
-        root = ReactDOM.createRoot(container)
-        window.ReactApp.roots[selector] = root
-    }
-
+    let root = ReactDOM.createRoot(container)
     root.render(<App {...props} />)
 }
 
-if (!window.ReactApp) {
-    window.ReactApp = {}
-}
-
-window.ReactApp.init = init
+init('#book-react-node', {})

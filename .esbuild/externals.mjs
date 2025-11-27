@@ -3,6 +3,7 @@ const INTERNAL_ALIASES = [
     "@core/",
     "@mod/",
     "@block/",
+    "@moodle/",
 ];
 
 export const externalsPlugin = {

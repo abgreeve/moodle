@@ -31,6 +31,15 @@ sharedReactEntries.forEach(({entry, outfile}) => {
     });
 });
 
+// Build special case files.
+esbuild.build({
+    entryPoints: ["public/lib/react_autoinit/src/index.ts"],
+    bundle: true,
+    format: "esm",
+    outfile: "public/lib/react_autoinit/build/index.js",
+    external: ["react", "react-dom", "react-dom/client"],
+});
+
 const entryPoints = glob.sync("public/**/react/src/**/*.tsx");
 console.log(entryPoints);
 
@@ -56,7 +65,7 @@ for (const entry of entryPoints) {
             ".js": "js",
         },
         resolveExtensions: [".tsx", ".ts", ".jsx", ".js"],
-        external: [],
+        external: ["react", "react-dom", "react-dom/client"],
         jsx: "automatic",
         minify: true,
         sourcemap: true,

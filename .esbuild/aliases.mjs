@@ -24,6 +24,7 @@
 import path from "path";
 
 const rootDir = process.cwd();
+const publicDir = path.join(rootDir, "public");
 
 const aliasMap = {
     "@core/": path.join(rootDir, "public/lib/react/src"),
@@ -32,10 +33,48 @@ const aliasMap = {
 
 // Certain specifiers should never be bundled so we can share the compiled output.
 const staticModuleRemaps = {
-    "@core/react": "/lib/react/build/react.js",
-    "react/jsx-runtime": "/lib/react/build/jsx-runtime.js",
-    "react/jsx-dev-runtime": "/lib/react/build/jsx-dev-runtime.js",
+    "@moodle/core/react": path.join(publicDir, "lib/react/build/react.js"),
+    "react/jsx-runtime": path.join(publicDir, "lib/react/build/jsx-runtime.js"),
+    "react/jsx-dev-runtime": path.join(publicDir, "lib/react/build/jsx-dev-runtime.js"),
 };
+
+function toBrowserPath(value) {
+    return value.split(path.sep).join("/");
+}
+
+function ensureRelativeSpecifier(specifier) {
+    if (specifier.startsWith(".") || specifier.startsWith("/")) {
+        return specifier;
+    }
+
+    return `./${specifier}`;
+}
+
+function getOutputDirForImporter(importer) {
+    const marker = `${path.sep}react${path.sep}src${path.sep}`;
+    const idx = importer.lastIndexOf(marker);
+
+    if (idx === -1) {
+        return path.dirname(importer);
+    }
+
+    const before = importer.slice(0, idx);
+    const after = importer.slice(idx + marker.length);
+    const subDir = path.dirname(after);
+
+    return path.join(before, "react", "build", subDir === "." ? "" : subDir);
+}
+
+function buildRelativeRuntimePath(importer, target) {
+    if (!importer) {
+        const relativeToPublic = path.relative(publicDir, target);
+        return ensureRelativeSpecifier(toBrowserPath(relativeToPublic));
+    }
+
+    const importerOutputDir = getOutputDirForImporter(importer);
+    const relativePath = path.relative(importerOutputDir, target);
+    return ensureRelativeSpecifier(toBrowserPath(relativePath));
+}
 
 function escapeRegExp(value) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -47,10 +86,13 @@ export function createAliasPlugin() {
         setup(build) {
             Object.entries(staticModuleRemaps).forEach(([specifier, target]) => {
                 const filter = new RegExp(`^${escapeRegExp(specifier)}$`);
-                build.onResolve({ filter }, () => ({
-                    path: target,
-                    external: true,
-                }));
+                build.onResolve({ filter }, args => {
+                    const runtimePath = buildRelativeRuntimePath(args.importer, target);
+                    return {
+                        path: runtimePath,
+                        external: true,
+                    };
+                });
             });
 
             Object.entries(aliasMap).forEach(([alias, targetDir]) => {

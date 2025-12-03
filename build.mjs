@@ -38,6 +38,7 @@ esbuild.build({
     format: "esm",
     outfile: "public/lib/react_autoinit/build/index.js",
     external: ["react", "react-dom", "react-dom/client"],
+    plugins: [ createAliasPlugin(), externalsPlugin ],
 });
 
 const entryPoints = glob.sync("public/**/react/src/**/*.tsx");

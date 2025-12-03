@@ -40,6 +40,7 @@ export default function App(props) {
     return (
         <div>
             {label || "Hello from my new file"}
+            <br />
             <a href="#" onClick={loadModalForm}>Modal form?</a>
         </div>
     )

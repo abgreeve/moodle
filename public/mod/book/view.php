@@ -123,6 +123,8 @@ if (!$chapterid) {
     echo $OUTPUT->render_from_template('mod_book/book-test', []);
     $PAGE->requires->js_type_module('./react/build/travel.js');
     // $PAGE->requires->js_react_init('./react/build/travel.js', '#book-react-node');
+    //
+    echo $OUTPUT->render_from_template('mod_book/jshelper-test', []);
 
     $renderer = $PAGE->get_renderer('mod_book');
     $actionmenu = new \mod_book\output\main_action_menu($cm->id, $chapters, $chapter, $book);

@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/mustache_test.tsx"],
+  "sourcesContent": ["export default function sayHello() {\n    window.console.log('Hello');\n}\n"],
+  "mappings": "AAAe,SAARA,GAA4B,CAC/B,OAAO,QAAQ,IAAI,OAAO,CAC9B",
+  "names": ["sayHello"]
+}

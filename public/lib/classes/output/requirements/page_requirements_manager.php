@@ -1051,6 +1051,12 @@ class page_requirements_manager {
         $this->js('/lib/react/build/react.js', true, ['type' => 'module']);
     }
 
+    public function react_mustache_thing() {
+        $path = new \core\url('/lib/react_autoinit/build/index.js');
+        $scripthtml = '<script type="module" src="' . $path->out() . '" />';
+        return $scripthtml;
+    }
+
     /**
      * Enqueues a React bundle and schedules the shim initialiser to mount it.
      *
@@ -1766,7 +1772,8 @@ EOF;
             $output .= html_writer::script($js);
         }
 
-        // $this->react();
+        $thing = $this->react_mustache_thing();
+        $output .= $thing;
 
         // Mark head sending done, it is not possible to anything there.
         $this->headdone = true;
@@ -1809,7 +1816,12 @@ EOF;
         }
 
         // Then the clever trick for hiding of things not needed when JS works.
-        $output .= html_writer::script("document.body.className += ' jsenabled';") . "\n";
+        // TODO: create a function for adding to the document.body classList. This currently only captures this one.
+        $output .= html_writer::script("
+            window.addEventListener('DOMContentLoaded', function() {
+                document.body.classList.add('jsenabled');
+            });
+        ") . "\n";
         $this->topofbodydone = true;
         return $output;
     }

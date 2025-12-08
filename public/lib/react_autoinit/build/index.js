@@ -6,7 +6,7 @@ var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require
 });
 
 // public/lib/react_autoinit/src/index.ts
-import { React, ReactDOMClient } from "../../react/build/react.js";
+import { React, ReactDOM } from "../../react/build/react.js";
 var SELECTOR = "[data-react-component]";
 var MOUNTED_FLAG = "reactMounted";
 var reactUnmountMap = /* @__PURE__ */ new WeakMap();
@@ -52,7 +52,8 @@ var resolveComponent = async (componentName) => {
   if (!componentName) return null;
   try {
     const url = new URL(
-      `../build/components/${componentName}.js`,
+      `../../../mod/book/react/build/mustache_test.js`,
+      // `../build/components/${componentName}.js`,
       import.meta.url
     ).href;
     const module = await import(url);
@@ -63,7 +64,7 @@ var resolveComponent = async (componentName) => {
   }
 };
 var mountReactComponent = (el, Component, props) => {
-  const root = ReactDOMClient.createRoot(el);
+  const root = ReactDOM.createRoot(el);
   root.render(React.createElement(Component, props));
   reactUnmountMap.set(el, () => root.unmount());
 };
@@ -137,6 +138,7 @@ var resolveRoot = (selectorOrRoot) => {
 };
 var init = async (selectorOrRoot = null) => {
   await domReady();
+  window.console.log("init of react auto");
   const root = resolveRoot(selectorOrRoot);
   await scanAndMount(root);
   if (!observer) observer = installObserver();
@@ -145,6 +147,7 @@ var unmount = (selectorOrRoot = null) => {
   const root = resolveRoot(selectorOrRoot);
   scanAndUnmount(root);
 };
+init();
 export {
   init,
   unmount

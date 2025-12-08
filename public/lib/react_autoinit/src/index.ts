@@ -1,6 +1,6 @@
 // public/lib/react/src/react_autoinit.js  (ESM)
 
-import { React, ReactDOMClient } from '@moodle/core/react';
+import { React, ReactDOM } from '@moodle/core/react';
 
 const SELECTOR = '[data-react-component]';
 const MOUNTED_FLAG = 'reactMounted';
@@ -76,7 +76,8 @@ const resolveComponent = async (componentName) => {
 
     try {
         const url = new URL(
-            `../build/components/${componentName}.js`,
+            `../../../mod/book/react/build/mustache_test.js`,
+            // `../build/components/${componentName}.js`,
             import.meta.url
         ).href;
 
@@ -92,7 +93,7 @@ const resolveComponent = async (componentName) => {
  * Mount a single React component.
  */
 const mountReactComponent = (el, Component, props) => {
-    const root = ReactDOMClient.createRoot(el);
+    const root = ReactDOM.createRoot(el);
     root.render(React.createElement(Component, props));
 
     reactUnmountMap.set(el, () => root.unmount());
@@ -196,6 +197,7 @@ const resolveRoot = (selectorOrRoot) => {
  */
 export const init = async (selectorOrRoot = null) => {
     await domReady();
+    window.console.log('init of react auto');
 
     const root = resolveRoot(selectorOrRoot);
     await scanAndMount(root);
@@ -210,3 +212,5 @@ export const unmount = (selectorOrRoot = null) => {
     const root = resolveRoot(selectorOrRoot);
     scanAndUnmount(root);
 };
+
+init();

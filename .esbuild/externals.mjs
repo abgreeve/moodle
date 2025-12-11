@@ -1,7 +1,7 @@
 const INTERNAL_ALIASES = [
     "@calendar/",
     "@core/",
-    "@mod/",
+    "@mod_book/",
     "@block/",
     "@moodle/",
 ];

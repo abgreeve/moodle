@@ -495,12 +495,16 @@ class html_writer {
      *
      * @param string $jscode the JavaScript code
      * @param moodle_url|string $url optional url of the external script, $code ignored if specified
+     * @param bool $module If the script is of type="module"
      * @return string HTML, the code wrapped in <script> tags.
      */
-    public static function script($jscode, $url = null) {
+    public static function script($jscode, $url = null, $module = false) {
         if ($jscode) {
             return self::tag('script', "\n//<![CDATA[\n$jscode\n//]]>\n") . "\n";
         } else if ($url) {
+            if ($module) {
+                return self::tag('script', '', ['type' => 'module', 'src' => $url]) . "\n";
+            }
             return self::tag('script', '', ['src' => $url]) . "\n";
         } else {
             return '';

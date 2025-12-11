@@ -1038,49 +1038,19 @@ class page_requirements_manager {
         $this->skiplinks[$target] = $linktext;
     }
 
-    public function react(): void {
-        $this->js('/lib/react/build/react.js', true, ['type' => 'module']);
-    }
-
-    public function react_mustache_thing() {
-        $path = new \core\url('/lib/react_autoinit/build/index.js');
-        $scripthtml = '<script type="module" src="' . $path->out() . '" />';
-        return $scripthtml;
-    }
-
     /**
-     * Enqueues a React bundle and schedules the shim initialiser to mount it.
+     * Returns the `<script>` tag used to load the React auto-init bundle for Mustache templates.
      *
-     * The bundle is included via `js()` to make it available on the page, and the AMD shim
-     * initialises the component once the page is ready.
+     * This bundle scans the page for React placeholders rendered by Mustache and bootstraps
+     * the registered components automatically so that calling code does not need to add its own
+     * inline initialisation script.
      *
-     * @param string $component Path or URL for the compiled React bundle to include.
-     * @param string|null $selector CSS selector identifying the mount node for the component.
-     * @param array $props Data passed into the React component on initialisation.
+     * @return string Returns the script html to include the react auto init code
      */
-    public function js_react_init(string $component, string $selector = null, array $props = []): void {
-
-        $bundleurl = new \moodle_url($component);
-        $componenturl = $bundleurl->out(false);
-        $selectorjson = json_encode($selector);
-        $propsjson = json_encode($props);
-
-        $componentjson = json_encode($componenturl);
-
-        // Quick and dirty code to get the ordering correct. Needs improving.
-        $import = <<<JSCODE
-import({$componentjson}).then(() => {
-    if (typeof require === 'function') {
-        require(['core/react_shim'], amd => amd.init({$selectorjson}, {$propsjson}));
-    } else {
-        window.console.error('RequireJS not available for React component: ' + {$componentjson});
-    }
-}).catch(error => {
-    window.console.error('Failed to load React component: ' + {$componentjson}, error);
-});
-JSCODE;
-
-        $this->js_init_code($import);
+    public function react_mustache_autoinit(): string {
+        $path = new \core\url('/lib/react_autoinit/build/index.js');
+        $scripthtml = html_writer::script('', $path->out(), true);
+        return $scripthtml;
     }
 
     /**
@@ -1762,9 +1732,8 @@ EOF;
             $output .= html_writer::script($js);
         }
 
-        // $this->react();
-        $thing = $this->react_mustache_thing();
-        $output .= $thing;
+        // Add the react auto initialisation script to mount react code from mustache templates.
+        $output .= $this->react_mustache_autoinit();
 
         // Mark head sending done, it is not possible to anything there.
         $this->headdone = true;
@@ -1906,7 +1875,7 @@ EOF;
         $handlersjs = $this->get_event_handler_code();
 
         foreach ($this->jsmodulefiles as $modulefile) {
-            $output .= "<script type=\"module\" src=\"$modulefile\"></script>";
+            $output .= html_writer::script('', $modulefile, true);
         }
 
         // There is a global Y, make sure it is available in your scope.

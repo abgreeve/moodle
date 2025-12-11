@@ -29,6 +29,7 @@ const publicDir = path.join(rootDir, "public");
 const aliasMap = {
     "@core/": path.join(rootDir, "public/lib/react/src"),
     "@calendar/": path.join(rootDir, "public/calendar/react/src"),
+    "@mod_book/": path.join(rootDir, "public/mod/book/react/src"),
 };
 
 // Certain specifiers should never be bundled so we can share the compiled output.

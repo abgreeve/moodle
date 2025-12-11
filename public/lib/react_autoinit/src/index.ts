@@ -168,10 +168,15 @@ const resolveComponent = async (name) => {
     if (!name) return null;
 
     try {
+        // const url = new URL(
+        //     `../build/components/${name}.js`,
+        //     import.meta.url
+        // ).href;
         const url = new URL(
-            `../build/components/${name}.js`,
+            `../../../mod/book/react/build/mustache_test.js`,
             import.meta.url
         ).href;
+
 
         const module = await import(url);
         return module.default || module;

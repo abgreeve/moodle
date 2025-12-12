@@ -40,365 +40,310 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import { React, ReactDOM } from '@moodle/core/react';
+import { React, ReactDOM } from "@moodle/core/react";
 
-const SELECTOR = '[data-react-component]';
-const MOUNTED_FLAG = 'reactMounted';
+import { onRenderCallback, isProfilerEnabled } from "@moodle/core/profiler";
 
-// For each DOM element we mount into, we keep a function that knows how
-// to unmount its React component later.
+const SELECTOR = "[data-react-component]";
+const MOUNTED_FLAG = "reactMounted";
 const reactUnmountMap = new WeakMap();
 
+const isDev = isProfilerEnabled();
+
 /**
- * Run code once the DOM is ready.
- *
- * @return {Promise<void>}
+ * DOM ready promise.
  */
-const domReady = () => {
-    new Promise(
-        // @ts-ignore TS can't infer resolve's type in JS
-        (resolve) => {
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', () => resolve(), { once: true });
-            } else {
-                resolve();
-            }
-        }
-    );
+const domReady = () =>
+  document.readyState === "loading"
+    ? new Promise((resolve) =>
+        document.addEventListener("DOMContentLoaded", resolve, { once: true })
+      )
+    : Promise.resolve();
+
+/**
+ * Safe JSON parsing from data-react-props.
+ */
+const parseProps = (el: Element): Record<string, any> => {
+  const raw = el.getAttribute("data-react-props") || "";
+  if (!raw) return {};
+  try {
+    return JSON.parse(raw);
+  } catch (e) {
+    console.error("[react_autoinit] invalid JSON", raw, e);
+    return {};
+  }
 };
 
 /**
- * Read and parse JSON from data-react-props.
- *
- * @param {HTMLElement} el
- * @return {Object}
+ * Normalise inline handlers + AMD handlers.
  */
-const parseProps = (el) => {
-    const raw = el.getAttribute('data-react-props') || '';
+const normalizeHandlers = (props: Record<string, any>): Record<string, any> => {
+  const out = { ...props };
 
-    if (!raw) {
-        return {};
+  for (const key of Object.keys(out)) {
+    if (!key.startsWith("on")) continue;
+
+    const value = out[key];
+
+    // Inline string handler: onClick="console.log('hi')"
+    if (typeof value === "string") {
+      out[key] = new Function("event", value);
+      continue;
     }
 
-    try {
-        return JSON.parse(raw);
-    } catch (e) {
-        window.console.error('[react_autoinit] invalid data-react-props JSON', raw, e);
-        return {};
-    }
-};
+    // AMD handler: { amd: "core/notification", method: "alert", args: [...] }
+    if (value && typeof value === "object" && value.amd) {
+      const { amd, method = null, args = [] } = value;
 
-/**
- * Wrap inline string handlers and AMD references into real functions.
- *
- * Supported:
- *  - "onClick": "console.log('hi')"
- *  - "onClick": { "amd": "core/notification", "method": "alert", "args": ["t", "m"] }
- *
- * Rules:
- *  - String handler:
- *      - becomes function(event) { /* string body *\/ }
- *  - AMD handler:
- *      - no args  → fn(event)
- *      - with args → fn(...args)  (event is NOT passed)
- *
- * @param {Object} props
- * @return {Object}
- */
-const normalizeHandlers = (props) => {
-    const normalized = { ...props };
-
-    Object.keys(normalized).forEach((key) => {
-        const value = normalized[key];
-
-        // Only touch handler-like props (onClick, onChange, etc.).
-        if (!key.startsWith('on')) {
+      out[key] = () => {
+        // @ts-ignore - RequireJS global.
+        require([amd], (mod: any) => {
+          const fn = method ? mod[method] : mod;
+          if (typeof fn !== "function") {
+            console.warn(`[react_autoinit] ${amd}.${method} is not callable`);
             return;
-        }
-
-        if (typeof value === 'string') {
-            // eslint-disable-next-line no-new-func
-            normalized[key] = new Function('event', value);
-            return;
-        }
-
-        // AMD reference object: { amd, method?, args? }
-        if (value && typeof value === 'object' && value.amd) {
-            const { amd, method = null, args = [] } = value;
-
-            normalized[key] = (event) => {
-                try {
-                    // @ts-ignore
-                    require([amd], (mod) => {
-                        const fn = method && mod[method] ? mod[method] : mod;
-
-                        if (typeof fn !== 'function') {
-                            window.console.warn(
-                                `[react_autoinit] ${amd} has no callable ${method || 'default export'}`
-                            );
-                            return;
-                        }
-
-                        if (!args || args.length === 0) {
-                            fn.call(mod, event);
-                            return;
-                        }
-
-                        fn.apply(mod, args);
-                    });
-                } catch (e) {
-                  window.console.error('[react_autoinit] failed to load AMD handler', amd, e);
-                }
-            };
-        }
-    });
-
-    return normalized;
-};
-
-/**
- * Resolve a component from the global registry.
- *
- * Expect something like: `window.ReactComponents["@core/button"] = Button;`
- *
- * @param {string|null} name
- * @return {Function|null}
- */
-const resolveComponent = async (name) => {
-    if (!name) return null;
-
-    try {
-        // const url = new URL(
-        //     `../build/components/${name}.js`,
-        //     import.meta.url
-        // ).href;
-        const url = new URL(
-            `../../../mod/book/react/build/mustache_test.js`,
-            import.meta.url
-        ).href;
-
-
-        const module = await import(url);
-        return module.default || module;
-    } catch (e) {
-        console.error(`[react_autoinit] failed to import component: ${name}`, e);
-        return null;
-    }
-};
-
-/**
- * Choose the mount strategy (React >= 18 only).
- *
- * @param {HTMLElement} el
- * @param {Function} Component
- * @param {Object} props
- */
-const mountReactComponent = (el, Component, props) => {
-    const root = ReactDOM.createRoot(el);
-    root.render(React.createElement(Component, props));
-
-    reactUnmountMap.set(el, () => root.unmount());
-};
-
-/**
- * Mount a single element with data-react-component.
- *
- * @param {HTMLElement} el
- */
-const mountOne = async (el) => {
-    if (el.dataset[MOUNTED_FLAG]) {
-        // Already mounted, nothing to do.
-        return;
-    }
-
-    const componentName = el.getAttribute('data-react-component');
-    const Component = await resolveComponent(componentName);
-
-    if (!Component) {
-        window.console.warn('[react_autoinit] component not found in registry:', componentName);
-        return;
-    }
-
-    const props = normalizeHandlers(parseProps(el));
-
-    try {
-        mountReactComponent(el, Component, props);
-        el.dataset[MOUNTED_FLAG] = '1';
-    } catch (e) {
-        window.console.error('[react_autoinit] mount failed:', componentName, e);
-    }
-};
-
-/**
- * Unmount a single element if it was previously mounted.
- *
- * @param {HTMLElement} el
- */
-const unmountOne = (el) => {
-    const unmount = reactUnmountMap.get(el);
-
-    if (unmount) {
-        try {
-            unmount();
-        } catch (e) {
-            // If unmount complains, we just move on.
-        }
-        reactUnmountMap.delete(el);
-    }
-
-    delete el.dataset[MOUNTED_FLAG];
-};
-
-/**
- * Scan inside the given root and mount all matching elements.
- *
- * @param {HTMLElement|Document} root
- */
-const scanAndMount = async (root) => {
-    const scope = root || document;
-    scope.querySelectorAll(SELECTOR).forEach(
-        async (el) => {
-            // We only mount into HTMLElements.
-            await mountOne(/** @type {HTMLElement} */ (el));
-        }
-    );
-};
-
-/**
- * Scan inside the given root and unmount all matching elements.
- *
- * @param {HTMLElement|Document} root
- */
-const scanAndUnmount = (root) => {
-    const scope = root || document;
-    scope.querySelectorAll(SELECTOR).forEach(
-        (el) => {
-            unmountOne(/** @type {HTMLElement} */ (el));
-        }
-    );
-};
-
-/**
- * Handle nodes added to the DOM (for MutationObserver).
- *
- * @param {Node} node
- */
-const handleAddedNode = (node) => {
-    if (!(node instanceof Element)) {
-        return;
-    }
-
-    // If the node itself is a React mount point.
-    if (node.matches && node.matches(SELECTOR)) {
-        mountOne(/** @type {HTMLElement} */ (node));
-    }
-
-    // Or if it contains any mount points deeper inside.
-    if (node.querySelectorAll) {
-        node.querySelectorAll(SELECTOR).forEach(
-            (el) => {
-                mountOne(/** @type {HTMLElement} */ (el));
-            }
-        );
-    }
-};
-
-/**
- * Handle nodes removed from the DOM (for MutationObserver).
- *
- * @param {Node} node
- */
-const handleRemovedNode = (node) => {
-    if (!(node instanceof Element)) {
-        return;
-    }
-
-    if (node.matches && node.matches(SELECTOR)) {
-        unmountOne(/** @type {HTMLElement} */ (node));
-    }
-
-    if (node.querySelectorAll) {
-        node.querySelectorAll(SELECTOR).forEach(
-            (el) => {
-                unmountOne(/** @type {HTMLElement} */ (el));
-            }
-        );
-    }
-};
-
-/**
- * Install a MutationObserver to automatically mount/unmount any
- * data-react-component nodes that are added/removed from the DOM.
- *
- * @return {MutationObserver}
- */
-const installObserver = () => {
-    const obs = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.addedNodes) {
-                mutation.addedNodes.forEach(handleAddedNode);
-            }
-            if (mutation.removedNodes) {
-                mutation.removedNodes.forEach(handleRemovedNode);
-            }
+          }
+          fn.apply(mod, args);
         });
-    });
-
-    obs.observe(document.documentElement, {
-        childList: true,
-        subtree: true,
-    });
-
-    return obs;
-};
-
-let observer = null;
-
-/**
- * Resolve a selector or element into a root node.
- *
- * @param {string|HTMLElement|Document|null|undefined} selectorOrRoot
- * @return {HTMLElement|Document}
- */
-const resolveRoot = (selectorOrRoot) => {
-    if (!selectorOrRoot) return document;
-    if (typeof selectorOrRoot === 'string') {
-        return document.querySelector(selectorOrRoot) || document;
+      };
     }
-    return selectorOrRoot;
+  }
+
+  return out;
 };
 
 /**
- * initialise React components inside an optional selector.
- *
- * Usage:
- *   import { init } from 'core/react_autoinit';
- *   init();               // whole document
- *   init('#region-main'); // or a specific container
- *
- * @param {string|HTMLElement|Document|null} selectorOrRoot
- * @return {Promise<void>}
+ * Dynamic import of a component using real ESM.
  */
-export const init = async (selectorOrRoot) => {
-    await domReady();
+const resolveComponent = async (componentName: string): Promise<any> => {
+  if (!componentName) return null;
 
-    const root = resolveRoot(selectorOrRoot);
-    await scanAndMount(root);
-
-    // Lazy-install the observer so we only pay the cost once.
-    if (!observer) {
-        observer = installObserver();
+  try {
+    // Parse @namespace/path format.
+    const match = componentName.match(/^@([^/]+)\/(.+)$/);
+    if (!match) {
+      console.error(
+        "[react_autoinit] Invalid component format:",
+        componentName
+      );
+      return null;
     }
+
+    const [, namespace, componentPath] = match;
+
+    // Build relative path from current location (/lib/react_autoinit/build/index.js)
+    // to the component location.
+    let relativePath: string;
+
+    // TODO: Not sure how to handle plugins correctly here.
+    if (namespace === "core") {
+      // @core/button to ../react/build/button.js.
+      relativePath = `../react/build/${componentPath}.js`;
+    } else if (namespace.startsWith("mod_")) {
+      // @mod_book/page to ../../../mod/book/react/build/page.js.
+      const modName = namespace.replace("mod_", "");
+      relativePath = `../../../mod/${modName}/react/build/${componentPath}.js`;
+    } else if (namespace.startsWith("block_")) {
+      // @block_html/settings to ../../../blocks/html/react/build/settings.js.
+      const blockName = namespace.replace("block_", "");
+      relativePath = `../../../blocks/${blockName}/react/build/${componentPath}.js`;
+    } else {
+      // Generic: @calendar/event to ../../../calendar/react/build/event.js.
+      relativePath = `../../../${namespace}/react/build/${componentPath}.js`;
+    }
+
+    // Resolve to absolute URL.
+    const url = new URL(relativePath, import.meta.url).href;
+
+    if (isDev) {
+      console.log(`[react_autoinit] Loading: ${componentName} → ${url}`);
+    }
+
+    const module = await import(url);
+    return module.default || module;
+  } catch (e) {
+    console.error(`[react_autoinit] Failed to import: ${componentName}`, e);
+    return null;
+  }
 };
 
 /**
- * Unmount React components inside a given region.
- *
- * @param {string|HTMLElement|Document|null} selectorOrRoot
+ * Mount a single React component with profiler support.
  */
-export const unmount = (selectorOrRoot) => {
-    const root = resolveRoot(selectorOrRoot);
-    scanAndUnmount(root);
+const mountReactComponent = (
+  el: Element,
+  Component: any,
+  props: Record<string, any>
+) => {
+  const root = ReactDOM.createRoot(el);
+
+  // Wrap with Profiler in dev mode using global callback.
+  if (isDev) {
+    const componentName = el.getAttribute("data-react-component") || "Unknown";
+    root.render(
+      React.createElement(
+        React.Profiler,
+        { id: componentName, onRender: onRenderCallback },
+        React.createElement(Component, props)
+      )
+    );
+  } else {
+    root.render(React.createElement(Component, props));
+  }
+
+  reactUnmountMap.set(el, () => root.unmount());
+};
+
+/**
+ * Mount an element with the `data-react-component` attribute.
+ */
+const mountOne = async (el: Element) => {
+  if ((el as any).dataset[MOUNTED_FLAG]) return;
+
+  const componentName = el.getAttribute("data-react-component");
+  if (!componentName) return;
+
+  const Component = await resolveComponent(componentName);
+
+  if (!Component) {
+    console.warn("[react_autoinit] Component not found:", componentName);
+    return;
+  }
+
+  const props = normalizeHandlers(parseProps(el));
+
+  try {
+    mountReactComponent(el, Component, props);
+    (el as any).dataset[MOUNTED_FLAG] = "1";
+
+    if (isDev) {
+      console.log(`[react_autoinit] Mounted: ${componentName}`);
+    }
+  } catch (e) {
+    console.error("[react_autoinit] Mount failed:", componentName, e);
+  }
+};
+
+/**
+ * Unmount a single element.
+ */
+const unmountOne = (el: Element) => {
+  const unmount = reactUnmountMap.get(el);
+  if (unmount) {
+    try {
+      unmount();
+      if (isDev) {
+        const componentName = el.getAttribute("data-react-component");
+        console.log(`[react_autoinit] Unmounted: ${componentName}`);
+      }
+    } catch (e) {
+      console.error("[react_autoinit] Error unmounting:", e);
+    }
+    reactUnmountMap.delete(el);
+  }
+  delete (el as any).dataset[MOUNTED_FLAG];
+};
+
+const scanAndMount = async (root: Element | Document) => {
+  const elements = root.querySelectorAll(SELECTOR);
+  if (isDev && elements.length > 0) {
+    console.log(
+      `[react_autoinit] Found ${elements.length} component(s) to mount`
+    );
+  }
+
+  for (const el of elements) {
+    await mountOne(el);
+  }
+};
+
+const scanAndUnmount = (root: Element | Document) => {
+  for (const el of root.querySelectorAll(SELECTOR)) {
+    unmountOne(el);
+  }
+};
+
+/**
+ * MutationObserver support.
+ */
+const handleAddedNode = (node: Node) => {
+  if (!(node instanceof Element)) return;
+
+  if (node.matches?.(SELECTOR)) {
+    if (isDev) {
+      console.log("[react_autoinit] New component detected");
+    }
+    mountOne(node);
+  }
+  node.querySelectorAll?.(SELECTOR).forEach(mountOne);
+};
+
+const handleRemovedNode = (node: Node) => {
+  if (!(node instanceof Element)) return;
+
+  if (node.matches?.(SELECTOR)) unmountOne(node);
+  node.querySelectorAll?.(SELECTOR).forEach(unmountOne);
+};
+
+const installObserver = () => {
+  const obs = new MutationObserver((mutations) => {
+    mutations.forEach((m) => {
+      m.addedNodes?.forEach(handleAddedNode);
+      m.removedNodes?.forEach(handleRemovedNode);
+    });
+  });
+
+  obs.observe(document.documentElement, {
+    childList: true,
+    subtree: true,
+  });
+
+  return obs;
+};
+
+let observer: MutationObserver | null = null;
+
+const resolveRoot = (
+  selectorOrRoot?: string | Element | null
+): Element | Document => {
+  if (!selectorOrRoot) return document;
+  if (typeof selectorOrRoot === "string") {
+    return document.querySelector(selectorOrRoot) || document;
+  }
+  return selectorOrRoot;
+};
+
+/**
+ * Main init.
+ */
+export const init = async (selectorOrRoot: string | Element | null = null) => {
+  await domReady();
+
+  if (isDev) {
+    console.log("[react_autoinit] Initializing (DEV MODE)...");
+  }
+
+  const root = resolveRoot(selectorOrRoot);
+  await scanAndMount(root);
+
+  if (!observer) {
+    observer = installObserver();
+    if (isDev) {
+      console.log("[react_autoinit] MutationObserver active");
+    }
+  }
+
+  if (isDev) {
+    console.log("[react_autoinit] Ready");
+  }
+};
+
+/**
+ * Manual unmount API.
+ */
+export const unmount = (selectorOrRoot: string | Element | null = null) => {
+  const root = resolveRoot(selectorOrRoot);
+  scanAndUnmount(root);
 };
 
 init();

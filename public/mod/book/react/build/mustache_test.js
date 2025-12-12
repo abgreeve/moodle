@@ -1,2 +1,2 @@
-function o(){window.console.log("Hello from book script called from react mustache helper")}export{o as default};
+import{React as t}from"../../../../lib/react/build/react.js";import{withProfiler as n}from"../../../../lib/react/build/profiler.js";function u({title:s="MustacheTest Component",message:o="Hello!"}){let[e,r]=t.useState(0);return t.createElement("div",{className:"alert alert-success"},t.createElement("h4",null,s),t.createElement("p",null,o),t.createElement("button",{className:"btn btn-primary",onClick:()=>r(e+1)},"Count: ",e))}var c=n(u,"MustacheTest");export{c as default};
 //# sourceMappingURL=mustache_test.js.map

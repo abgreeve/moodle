@@ -1,6 +1,8 @@
 import { React, ReactDOM } from "@moodle/core/react";
 import { withProfiler } from "@moodle/core/profiler";
 
+import * as mustacheTest from '@moodle/mod_book/mustache_test';
+
 function requireAmd(mod) {
   return new Promise((resolve, reject) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports

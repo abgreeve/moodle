@@ -6,6 +6,8 @@ import fs from "fs";
 import chalk from 'chalk';
 import { createAliasPlugin } from "./.esbuild/aliases.mjs";
 import { externalsPlugin } from "./.esbuild/externals.mjs";
+import { generateAliases } from "./.esbuild/generate-aliases.mjs";
+await generateAliases();
 
 const args = process.argv.slice(2);
 const isDev = args.includes('--dev');

@@ -105,7 +105,7 @@ const buildConfig = {
     jsx: "automatic",
     jsxImportSource: "@moodle/core/react",
     minify: !isDev,
-    sourcemap: true,
+    sourcemap: isDev ? 'inline' : false,
     jsxDev: isDev,
     keepNames: isDev,
     treeShaking: !isDev,

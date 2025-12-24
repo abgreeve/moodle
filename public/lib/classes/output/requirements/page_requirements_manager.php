@@ -1063,10 +1063,39 @@ class page_requirements_manager {
      * @param string $scriptlocation Local or absolute path to the module bundle.
      */
     public function js_type_module(string $scriptlocation): void {
-        // Change scriptlocation to the frankenstyle voodoo to simplify things
-        $bundleurl = new \core\url($scriptlocation);
-        $componenturl = $bundleurl->out(false);
-        $this->jsmodulefiles[] = $componenturl;
+
+        $fileurl = $this->parse_module_identifier($scriptlocation);
+
+        $jsrev = $this->get_jsrev();
+        $jsserverfile = new \core\url('/lib/javascript.php');
+        $jsserverfile->set_slashargument('/' . $jsrev . $fileurl);
+        $this->jsmodulefiles[] = $jsserverfile->out(false);
+    }
+
+    /**
+     * Resolve a module identifier into the built JS file path within the plugin.
+     *
+     * @param string $identifier Component name followed by path segments (e.g. mod_example/foo).
+     * @return string Relative path to the built module file for use with the JS rev loader.
+     * @throws coding_exception If the referenced plugin cannot be found.
+     */
+    protected function parse_module_identifier(string $identifier): string {
+        global $CFG;
+
+        $modulepath = explode('/', $identifier);
+
+        $modname = clean_param(array_shift($modulepath), PARAM_COMPONENT);
+        $path = array_map(function($module) {
+            return clean_param($module, PARAM_ALPHANUMEXT);
+        }, $modulepath);
+
+        $dir = \core\component::get_component_directory($modname);
+        if (is_null($dir)) {
+            throw new coding_exception('plugin not found');
+        }
+
+        $scriptdir = explode($CFG->dirroot, $dir);
+        return $scriptdir[1] . '/react/build/' . implode('/', $path) . '.js';
     }
 
     /**

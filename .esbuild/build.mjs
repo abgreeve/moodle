@@ -9,6 +9,9 @@ import { externalsPlugin } from "./externals.mjs";
 import { generateAliases } from "./generate-aliases.mjs";
 await generateAliases();
 
+import { buildReact } from './platform/react.mjs';
+import { buildReactAutoInit } from './platform/react_autoinit.mjs';
+
 const args = process.argv.slice(2);
 const isDev = args.includes('--dev');
 const isWatch = args.includes('--watch');
@@ -24,58 +27,27 @@ const sharedDefine = {
     'process.env.NODE_ENV': isDev ? '"development"' : '"production"',
 };
 
-console.log(chalk.green('> Building shared React runtime...'));
+await buildReact();
+await buildReactAutoInit();
 
-const sharedReactEntries = [
-    {
-        entry: "public/lib/react/src/react.ts",
-        outfile: "public/lib/react/build/react.js",
-    },
-    {
-        entry: "public/lib/react/src/profiler.ts",
-        outfile: "public/lib/react/build/profiler.js",
-    },
-    {
-        entry: "public/lib/react/src/jsx-runtime.ts",
-        outfile: "public/lib/react/build/jsx-runtime.js",
-    },
-    {
-        entry: "public/lib/react/src/jsx-dev-runtime.ts",
-        outfile: "public/lib/react/build/jsx-dev-runtime.js",
-    },
-];
+// console.log('\n' + chalk.green('> Building react_autoinit...'));
 
-for (const { entry, outfile } of sharedReactEntries) {
-    await esbuild.build({
-        entryPoints: [entry],
-        bundle: true,
-        format: "esm",
-        outfile,
-        minify: !isDev,
-        sourcemap: false,
-        define: sharedDefine,
-    });
-    console.log(`${path.basename(outfile)}`);
-}
-
-console.log('\n' + chalk.green('> Building react_autoinit...'));
-
-await esbuild.build({
-    entryPoints: ["public/lib/react_autoinit/src/index.ts"],
-    bundle: true,
-    format: "esm",
-    outfile: "public/lib/react_autoinit/build/index.js",
-    external: ["react", "react-dom", "react-dom/client"],
-    minify: !isDev,
-    sourcemap: false,
-    jsx: "automatic",
-    jsxImportSource: "@moodle/core/react",
-    jsxDev: isDev,
-    loader: { ".ts": "tsx" },
-    plugins: [createAliasPlugin(), externalsPlugin],
-    define: sharedDefine,
-});
-console.log('react_autoinit/build/index.js');
+// await esbuild.build({
+//     entryPoints: ["public/lib/react_autoinit/src/index.ts"],
+//     bundle: true,
+//     format: "esm",
+//     outfile: "public/lib/react_autoinit/build/index.js",
+//     external: ["react", "react-dom", "react-dom/client"],
+//     minify: !isDev,
+//     sourcemap: false,
+//     jsx: "automatic",
+//     jsxImportSource: "@moodle/core/react",
+//     jsxDev: isDev,
+//     loader: { ".ts": "tsx" },
+//     plugins: [createAliasPlugin(), externalsPlugin],
+//     define: sharedDefine,
+// });
+// console.log('react_autoinit/build/index.js');
 
 console.log('\n' + chalk.green('> Building components...'));
 

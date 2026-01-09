@@ -4,7 +4,7 @@
   "description": "Moodle",
   "scripts": {
     "upgradenote": "node .grunt/upgradenotes.mjs create",
-    "build": "node build.mjs",
+    "build": "node .esbuild/build.mjs",
     "build:dev": "node build.mjs --dev",
     "watch": "node build.mjs --dev --watch"
   },

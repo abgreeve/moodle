@@ -4,9 +4,9 @@ import { glob } from "glob";
 import path from "path";
 import fs from "fs";
 import chalk from 'chalk';
-import { createAliasPlugin } from "./.esbuild/aliases.mjs";
-import { externalsPlugin } from "./.esbuild/externals.mjs";
-import { generateAliases } from "./.esbuild/generate-aliases.mjs";
+import { createAliasPlugin } from "./aliases.mjs";
+import { externalsPlugin } from "./externals.mjs";
+import { generateAliases } from "./generate-aliases.mjs";
 await generateAliases();
 
 const args = process.argv.slice(2);

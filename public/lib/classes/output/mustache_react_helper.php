@@ -16,7 +16,7 @@
 
 namespace core\output;
 
-use Mustache_LambdaHelper as LambdaHelper;
+use Mustache\LambdaHelper;
 
 /**
  * Mustache helper for rendering React component mount points.

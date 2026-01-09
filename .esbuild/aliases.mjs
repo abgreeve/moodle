@@ -119,31 +119,31 @@ export function createAliasPlugin() {
     return {
         name: "moodle-aliases",
         setup(build) {
-        // 1) Runtime remaps (external, rewritten to relative browser path)
-        Object.entries(staticModuleRemaps).forEach(([specifier, target]) => {
-            const filter = new RegExp(`^${escapeRegExp(specifier)}$`);
-            build.onResolve({ filter }, (args) => {
-            const runtimePath = buildRelativeRuntimePath(args.importer, target);
-            return {
-                path: runtimePath,
-                external: true,
-            };
+            // 1) Runtime remaps (external, rewritten to relative browser path)
+            Object.entries(staticModuleRemaps).forEach(([specifier, target]) => {
+                const filter = new RegExp(`^${escapeRegExp(specifier)}$`);
+                build.onResolve({ filter }, (args) => {
+                const runtimePath = buildRelativeRuntimePath(args.importer, target);
+                return {
+                    path: runtimePath,
+                    external: true,
+                };
+                });
             });
-        });
 
-        // 2) Component alias resolution (internal, resolved to real files)
-        aliasEntries.forEach(([aliasPrefix, targetDir]) => {
-            const filter = new RegExp(`^${escapeRegExp(aliasPrefix)}(.*)$`);
+            // 2) Component alias resolution (internal, resolved to real files)
+            aliasEntries.forEach(([aliasPrefix, targetDir]) => {
+                const filter = new RegExp(`^${escapeRegExp(aliasPrefix)}(.*)$`);
 
-            build.onResolve({ filter }, async (args) => {
-            const relPath = args.path.slice(aliasPrefix.length);
+                build.onResolve({ filter }, async (args) => {
+                    const relPath = args.path.slice(aliasPrefix.length);
 
-            return await build.resolve(`./${relPath}`, {
-                resolveDir: targetDir,
-                kind: args.kind,
+                    return await build.resolve(`./${relPath}`, {
+                        resolveDir: targetDir,
+                        kind: args.kind,
+                    });
+                });
             });
-            });
-        });
         },
     };
 }

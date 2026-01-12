@@ -22,6 +22,7 @@
 
 import esbuild from "esbuild";
 import chalk from 'chalk';
+import path from "node:path";
 import { externalsPlugin } from "./../externals.mjs";
 import { createAliasPlugin } from "./../aliases.mjs";
 
@@ -29,11 +30,13 @@ export async function buildReactAutoInit() {
 
     console.log('\n' + chalk.green('> Building react_autoinit...'));
 
+    const projectroot = process.cwd();
+
     await esbuild.build({
-        entryPoints: ["public/lib/react_autoinit/src/index.ts"],
+        entryPoints: [ path.resolve(projectroot, "public/lib/react_autoinit/src/index.ts") ],
         bundle: true,
         format: "esm",
-        outfile: "public/lib/react_autoinit/build/index.js",
+        outfile: path.resolve(projectroot, "public/lib/react_autoinit/build/index.js"),
         external: ["react", "react-dom", "react-dom/client"],
         minify: true,
         sourcemap: false,
@@ -46,4 +49,3 @@ export async function buildReactAutoInit() {
     });
     console.log('react_autoinit/build/index.js');
 }
-

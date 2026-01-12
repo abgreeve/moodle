@@ -28,22 +28,23 @@ export async function buildReact() {
 
     console.log(chalk.green('> Building shared React runtime...'));
 
+    const projectroot = process.cwd();
     const sharedReactEntries = [
         {
-            entry: "public/lib/react/src/react.ts",
-            outfile: "public/lib/react/build/react.js",
+            entry: path.resolve(projectroot, "public/lib/react/src/react.ts"),
+            outfile: path.resolve(projectroot, "public/lib/react/build/react.js"),
         },
         {
-            entry: "public/lib/react/src/profiler.ts",
-            outfile: "public/lib/react/build/profiler.js",
+            entry: path.resolve(projectroot, "public/lib/react/src/profiler.ts"),
+            outfile: path.resolve(projectroot, "public/lib/react/build/profiler.js"),
         },
         {
-            entry: "public/lib/react/src/jsx-runtime.ts",
-            outfile: "public/lib/react/build/jsx-runtime.js",
+            entry: path.resolve(projectroot, "public/lib/react/src/jsx-runtime.ts"),
+            outfile: path.resolve(projectroot, "public/lib/react/build/jsx-runtime.js"),
         },
         {
-            entry: "public/lib/react/src/jsx-dev-runtime.ts",
-            outfile: "public/lib/react/build/jsx-dev-runtime.js",
+            entry: path.resolve(projectroot, "public/lib/react/src/jsx-dev-runtime.ts"),
+            outfile: path.resolve(projectroot, "public/lib/react/build/jsx-dev-runtime.js"),
         },
     ];
 

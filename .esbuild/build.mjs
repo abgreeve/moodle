@@ -24,9 +24,9 @@
 import { generateAliases } from "./generate-aliases.mjs";
 await generateAliases();
 
-import { buildReact } from './platform/react.mjs';
 import { buildReactAutoInit } from './platform/react_autoinit.mjs';
 import { buildPluginComponents } from "./plugin/plugincomponents.mjs";
+import { buildMoodleDesignSystem } from "./platform/moodle_design_system.mjs";
 
 const args = process.argv.slice(2);
 const isDev = args.includes('--dev');
@@ -43,6 +43,6 @@ const sharedDefine = {
     'process.env.NODE_ENV': isDev ? '"development"' : '"production"',
 };
 
-await buildReact();
 await buildReactAutoInit();
+await buildMoodleDesignSystem();
 await buildPluginComponents(isDev, sharedDefine, isWatch);

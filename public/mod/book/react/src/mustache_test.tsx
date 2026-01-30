@@ -1,12 +1,11 @@
-import { React } from "@moodle/core/react";
-import { withProfiler } from "@moodle/core/profiler";
+import React from "react";
 
 interface MustacheTestProps {
   title?: string;
   message?: string;
 }
 
-function MustacheTest({
+export default function MustacheTest({
   title = "MustacheTest Component",
   message = "Hello!",
 }: MustacheTestProps) {
@@ -22,6 +21,3 @@ function MustacheTest({
     </div>
   );
 }
-
-// Export with Profiler wrapper.
-export default withProfiler(MustacheTest, "MustacheTest");

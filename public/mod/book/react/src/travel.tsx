@@ -1,5 +1,6 @@
-import { React, ReactDOM } from "@moodle/core/react";
-import { withProfiler } from "@moodle/core/profiler";
+import React from "react";
+import {createRoot} from "react-dom/client";
+import {Button} from "@moodlehq/design-system";
 
 import * as mustacheTest from '@moodle/mod_book/mustache_test';
 
@@ -47,17 +48,12 @@ function App(props) {
     <div>
       {label || "Hello from my new file"}
       <br />
-      <a href="#" onClick={loadModalForm}>
-        Modal form?
-      </a>
+      <Button label="Modal form?" onClick={loadModalForm} />
     </div>
   );
 }
 
 // Wrap with profiler.
-const ProfiledApp = withProfiler(App, "BookTravelApp");
-
-export default ProfiledApp;
 
 export function init(selector, props = {}) {
   const container = document.querySelector(selector);
@@ -66,8 +62,8 @@ export function init(selector, props = {}) {
     return;
   }
 
-  const root = ReactDOM.createRoot(container);
-  root.render(<ProfiledApp {...props} />);
+  const root = createRoot(container);
+  root.render(<App {...props} />);
 }
 
 init("#book-react-node", {});

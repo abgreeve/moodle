@@ -1039,6 +1039,31 @@ class page_requirements_manager {
     }
 
     /**
+     * Returns the import map script tag for React platform files.
+     */
+    public function get_import_map(): string {
+        /**
+         * React ESM is vendored from esm.sh as precompiled bundles.
+         * Do not rebuild with esbuild/webpack — esm.sh output is required
+         * to avoid CommonJS/RequireJS conflicts in Moodle.
+         */
+        $output = html_writer::start_tag('script', ['type' => 'importmap']);
+        $importmap = (object) [
+            'imports' => (object) [
+                'react' => (new \core\url('/esm-test/react/19.1.1/react.js'))->out(false),
+                'react-dom/client' => (new \core\url('/esm-test/react/19.1.1/react-dom-client.js'))->out(false),
+                'react/jsx-runtime' => (new \core\url('/esm-test/react/19.1.1/jsx-runtime.js'))->out(false),
+                'react/jsx-dev-runtime' => (new \core\url('/esm-test/react/19.1.1/jsx-dev-runtime.js'))->out(false),
+                '/stable/react@19.1.1/es2022/react.mjs' => (new \core\url('/esm-test/react/19.1.1/react.js'))->out(false),
+                '@moodlehq/design-system' => (new \core\url('/esm-test/moodle-design-system/0.1.0/index.js'))->out(false),
+            ]
+        ];
+        $output .= json_encode($importmap, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        $output .= html_writer::end_tag('script');
+        return $output;
+    }
+
+    /**
      * Returns the `<script>` tag used to load the React auto-init bundle for Mustache templates.
      *
      * This bundle scans the page for React placeholders rendered by Mustache and bootstraps
@@ -1761,8 +1786,7 @@ EOF;
             $output .= html_writer::script($js);
         }
 
-        // Add the react auto initialisation script to mount react code from mustache templates.
-        $output .= $this->react_mustache_autoinit();
+        $output .= $this->get_import_map();
 
         // Mark head sending done, it is not possible to anything there.
         $this->headdone = true;
@@ -1794,6 +1818,9 @@ EOF;
         // Add hacked jQuery support, it is not intended for standard Moodle distribution!
         $output .= $this->get_jquery_headcode();
 
+        $designsystemcss = new \core\url('/esm-test/moodle-design-system/0.1.0/index.css');
+        $output .= '<link rel="stylesheet" href="' . $designsystemcss->out(false) . '">';
+
         // Link our main JS file, all core stuff should be there.
         $output .= html_writer::script('', $this->js_fix_url('/lib/javascript-static.js'));
 
@@ -1803,6 +1830,9 @@ EOF;
                 $output .= html_writer::script('', $url);
             }
         }
+
+        // Add the react auto initialisation script to mount react code from mustache templates.
+        $output .= $this->react_mustache_autoinit();
 
         // Then the clever trick for hiding of things not needed when JS works.
         // TODO: create a function for adding to the document.body classList. This currently only captures this one.

@@ -61,10 +61,10 @@ function loadAliasMap() {
  * These must resolve to browser-loadable ESM files (built outputs).
  */
 const staticModuleRemaps = {
-    "@moodle/core/react": path.join(publicDir, "lib/react/build/react.js"),
-    "react/jsx-runtime": path.join(publicDir, "lib/react/build/jsx-runtime.js"),
-    "react/jsx-dev-runtime": path.join(publicDir, "lib/react/build/jsx-dev-runtime.js"),
-    "@moodle/core/profiler": path.join(publicDir, "lib/react/build/profiler.js"),
+    // "@moodle/core/react": path.join(publicDir, "lib/react/build/react.js"),
+    // "react/jsx-runtime": path.join(publicDir, "lib/react/build/jsx-runtime.js"),
+    // "react/jsx-dev-runtime": path.join(publicDir, "lib/react/build/jsx-dev-runtime.js"),
+    // "@moodle/core/profiler": path.join(publicDir, "lib/react/build/profiler.js"),
 };
 
 function toBrowserPath(value) {

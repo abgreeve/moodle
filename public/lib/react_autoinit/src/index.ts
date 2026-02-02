@@ -37,17 +37,16 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-// import { React, ReactDOM } from "@moodle/core/react";
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-// import { onRenderCallback, isProfilerEnabled } from "@moodle/core/profiler";
+import { onRenderCallback, isProfilerEnabled } from "@moodle/core/profiler";
 
 const SELECTOR = "[data-react-component]";
 const MOUNTED_FLAG = "reactMounted";
 const reactUnmountMap = new WeakMap<Element, () => void>();
 
-const isDev = false;
+const isDev = isProfilerEnabled();
 
 /**
  * DOM ready promise.
@@ -194,15 +193,15 @@ const mountReactComponent = (
 
     // Wrap with Profiler in dev mode using global callback.
     if (isDev) {
-        // const componentName =
-        //     el.getAttribute("data-react-component") || "Unknown";
-        // root.render(
-        //     React.createElement(
-        //         React.Profiler,
-        //         { id: componentName, onRender: onRenderCallback },
-        //         React.createElement(Component, props)
-        //     )
-        // );
+        const componentName =
+            el.getAttribute("data-react-component") || "Unknown";
+        root.render(
+            React.createElement(
+                React.Profiler,
+                { id: componentName, onRender: onRenderCallback },
+                React.createElement(Component, props)
+            )
+        );
     } else {
         root.render(React.createElement(Component, props));
     }

@@ -339,6 +339,7 @@ class page_requirements_manager {
                 'templaterev'           => $this->get_templaterev(),
                 'siteId'                => (int) SITEID,
                 'userId'                => (int) $USER->id,
+                'reactprofiling'        => ($CFG->debugdeveloper),
             ];
             if ($CFG->debugdeveloper) {
                 $this->M_cfg['developerdebug'] = true;

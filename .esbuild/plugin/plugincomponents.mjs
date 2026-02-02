@@ -67,38 +67,18 @@ async function buildComponent(entry, isWatch, buildConfig) {
 function resolveComponentPaths(entry) {
     const rel = path.relative(projectroot, entry);
 
-    // Plugin components
-    if (rel.includes(path.join('react', 'src')) && !rel.startsWith(path.join('public', 'lib', 'react', 'src', 'components'))) {
+    // React components
+    // if (rel.includes(path.join('react', 'src')) && !rel.startsWith(path.join('public', 'lib', 'react', 'src'))) {
+    if (rel.includes(path.join('react', 'src'))) {
 
         const part = rel.split(path.join('react', 'src'))[0];
         const file = rel.split(path.join('react', 'src'))[1].replace(/^[\/\\]/, '');
 
         return {
             file,
-            output: fromroot(part, 'react', 'build', file.replace(/\.tsx$/, '.js')),
+            output: fromroot(part, 'react', 'build', file.replace(/\.(ts|tsx)$/, '.js')),
         };
     }
-
-    // Core components
-    if (rel.startsWith(path.join('public', 'lib', 'react', 'src', 'components'))) {
-        const relativePath = path.relative(
-            path.join('public', 'lib', 'react', 'src', 'components'),
-            rel
-        );
-
-        return {
-            file: `components/${relativePath}`,
-            output: fromroot(
-                'public',
-                'lib',
-                'react',
-                'build',
-                'components',
-                relativePath.replace(/\.tsx$/, '.js')
-            ),
-        };
-    }
-
     return null;
 }
 
@@ -111,7 +91,7 @@ export async function buildPluginComponents(isDev, sharedDefine, isWatch) {
         cwd: projectroot,
         absolute: true,
     });
-    const coreComponents = glob.sync("public/lib/react/src/components/**/*.tsx", {
+    const coreComponents = glob.sync("public/lib/react/src/**/*.{ts,tsx}", {
         cwd: projectroot,
         absolute: true,
     });

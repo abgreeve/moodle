@@ -38,7 +38,7 @@ export async function buildMoodleDesignSystem() {
         format: "esm",
         platform: 'browser',
         target: 'es2022',
-        outfile: path.resolve(projectroot, "public/esm-test/moodle-design-system/0.1.0/index.js"),
+        outfile: path.resolve(projectroot, "public/lib/js/platform_bundles/moodle-design-system/0.1.0/index.js"),
         external: [
             "react",
             "react-dom",

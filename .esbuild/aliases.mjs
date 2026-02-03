@@ -56,17 +56,6 @@ function loadAliasMap() {
     return map;
 }
 
-/**
- * Certain specifiers should never be bundled so we can share the compiled output.
- * These must resolve to browser-loadable ESM files (built outputs).
- */
-const staticModuleRemaps = {
-    // "@moodle/core/react": path.join(publicDir, "lib/react/build/react.js"),
-    // "react/jsx-runtime": path.join(publicDir, "lib/react/build/jsx-runtime.js"),
-    // "react/jsx-dev-runtime": path.join(publicDir, "lib/react/build/jsx-dev-runtime.js"),
-    // "@moodle/core/profiler": path.join(publicDir, "lib/react/build/profiler.js"),
-};
-
 function toBrowserPath(value) {
     return value.split(path.sep).join("/");
 }
@@ -119,19 +108,8 @@ export function createAliasPlugin() {
     return {
         name: "moodle-aliases",
         setup(build) {
-            // 1) Runtime remaps (external, rewritten to relative browser path)
-            Object.entries(staticModuleRemaps).forEach(([specifier, target]) => {
-                const filter = new RegExp(`^${escapeRegExp(specifier)}$`);
-                build.onResolve({ filter }, (args) => {
-                const runtimePath = buildRelativeRuntimePath(args.importer, target);
-                return {
-                    path: runtimePath,
-                    external: true,
-                };
-                });
-            });
 
-            // 2) Component alias resolution (internal, resolved to real files)
+            // Component alias resolution (internal, resolved to real files)
             aliasEntries.forEach(([aliasPrefix, targetDir]) => {
                 const filter = new RegExp(`^${escapeRegExp(aliasPrefix)}(.*)$`);
 

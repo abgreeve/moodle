@@ -54,5 +54,5 @@ export async function buildMoodleDesignSystem() {
         // plugins: [createAliasPlugin(), externalsPlugin],
         define: {'process.env.NODE_ENV': '"production"'},
     });
-    console.log('esm-test/moodle-design-system/0.1.0/index.js');
+    console.log('lib/js/platform_bundles/moodle-design-system/0.1.0/index.js');
 }

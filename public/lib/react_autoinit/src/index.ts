@@ -46,7 +46,7 @@ const SELECTOR = "[data-react-component]";
 const MOUNTED_FLAG = "reactMounted";
 const reactUnmountMap = new WeakMap<Element, () => void>();
 
-const isDev = isProfilerEnabled();
+const profilingEnabled = isProfilerEnabled();
 
 /**
  * DOM ready promise.
@@ -169,7 +169,7 @@ const resolveComponent = async (componentName: string): Promise<any> => {
         // Resolve to absolute URL.
         const url = new URL(relativePath, import.meta.url).href;
 
-        if (isDev) {
+        if (profilingEnabled) {
             console.log(`[react_autoinit] Loading: ${componentName} → ${url}`);
         }
 
@@ -191,8 +191,8 @@ const mountReactComponent = (
 ) => {
     const root = ReactDOM.createRoot(el);
 
-    // Wrap with Profiler in dev mode using global callback.
-    if (isDev) {
+    // Wrap with Profiler when profiling is enabled.
+    if (profilingEnabled) {
         const componentName =
             el.getAttribute("data-react-component") || "Unknown";
         root.render(
@@ -239,7 +239,7 @@ const mountOne = async (el: Element) => {
 
             (el as any).dataset[MOUNTED_FLAG] = "1";
 
-            if (isDev) {
+            if (profilingEnabled) {
                 console.log(
                     `[react_autoinit] Mounted via init(): ${componentName}`
                 );
@@ -262,7 +262,7 @@ const mountOne = async (el: Element) => {
         mountReactComponent(el, Component, props);
         (el as any).dataset[MOUNTED_FLAG] = "1";
 
-        if (isDev) {
+        if (profilingEnabled) {
             console.log(
                 `[react_autoinit] Mounted via default: ${componentName}`
             );
@@ -280,7 +280,7 @@ const unmountOne = (el: Element) => {
     if (unmount) {
         try {
             unmount();
-            if (isDev) {
+            if (profilingEnabled) {
                 const componentName = el.getAttribute("data-react-component");
                 console.log(`[react_autoinit] Unmounted: ${componentName}`);
             }
@@ -294,7 +294,7 @@ const unmountOne = (el: Element) => {
 
 const scanAndMount = async (root: Element | Document) => {
     const elements = root.querySelectorAll(SELECTOR);
-    if (isDev && elements.length > 0) {
+    if (profilingEnabled && elements.length > 0) {
         console.log(
             `[react_autoinit] Found ${elements.length} component(s) to mount`
         );
@@ -318,7 +318,7 @@ const handleAddedNode = (node: Node) => {
     if (!(node instanceof Element)) return;
 
     if (node.matches?.(SELECTOR)) {
-        if (isDev) {
+        if (profilingEnabled) {
             console.log("[react_autoinit] New component detected");
         }
         mountOne(node);
@@ -367,8 +367,8 @@ const resolveRoot = (
 export const init = async (selectorOrRoot: string | Element | null = null) => {
     await domReady();
 
-    if (isDev) {
-        console.log("[react_autoinit] Initializing (DEV MODE)...");
+    if (profilingEnabled) {
+        console.log("[react_autoinit] Initializing (profiling enabled)...");
     }
 
     const root = resolveRoot(selectorOrRoot);
@@ -376,12 +376,12 @@ export const init = async (selectorOrRoot: string | Element | null = null) => {
 
     if (!observer) {
         observer = installObserver();
-        if (isDev) {
+        if (profilingEnabled) {
             console.log("[react_autoinit] MutationObserver active");
         }
     }
 
-    if (isDev) {
+    if (profilingEnabled) {
         console.log("[react_autoinit] Ready");
     }
 };

@@ -109,13 +109,14 @@ module.exports = grunt => {
         const spawn = require('child_process').spawn;
 
         const isDev = mode === 'dev';
-        const args = isDev ? ['build.mjs', '--dev'] : ['build.mjs'];
+        const buildScript = path.join('.esbuild', 'build.mjs');
+        const args = isDev ? [buildScript, '--dev'] : [buildScript];
 
         grunt.log.writeln(`Building React components in ${isDev ? 'DEVELOPMENT' : 'PRODUCTION'} mode...`);
 
         const build = spawn('node', args, {
             stdio: 'inherit',
-            cwd: process.cwd()
+            cwd: grunt.moodleEnv.cwd,
         });
 
         build.on('close', (code) => {

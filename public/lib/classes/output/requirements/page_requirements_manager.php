@@ -1121,7 +1121,7 @@ class page_requirements_manager {
         }
 
         $scriptdir = explode($CFG->dirroot, $dir);
-        return $scriptdir[1] . '/react/build/' . implode('/', $path) . '.js';
+        return $scriptdir[1] . '/js/react/build/' . implode('/', $path) . '.js';
     }
 
     /**

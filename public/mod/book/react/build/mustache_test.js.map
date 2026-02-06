@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../src/mustache_test.tsx"],
-  "sourcesContent": ["import { React } from \"@moodle/core/react\";\nimport { withProfiler } from \"@moodle/core/profiler\";\n\ninterface MustacheTestProps {\n  title?: string;\n  message?: string;\n}\n\nfunction MustacheTest({\n  title = \"MustacheTest Component\",\n  message = \"Hello!\",\n}: MustacheTestProps) {\n  const [count, setCount] = React.useState(0);\n\n  return (\n    <div className=\"alert alert-success\">\n      <h4>{title}</h4>\n      <p>{message}</p>\n      <button className=\"btn btn-primary\" onClick={() => setCount(count + 1)}>\n        Count: {count}\n      </button>\n    </div>\n  );\n}\n\n// Export with Profiler wrapper.\nexport default withProfiler(MustacheTest, \"MustacheTest\");\n"],
-  "mappings": "AAAA,OAAS,SAAAA,MAAa,uCACtB,OAAS,gBAAAC,MAAoB,0CAO7B,SAASC,EAAa,CACpB,MAAAC,EAAQ,yBACR,QAAAC,EAAU,QACZ,EAAsB,CACpB,GAAM,CAACC,EAAOC,CAAQ,EAAIN,EAAM,SAAS,CAAC,EAE1C,OACEA,EAAA,cAAC,OAAI,UAAU,uBACbA,EAAA,cAAC,UAAIG,CAAM,EACXH,EAAA,cAAC,SAAGI,CAAQ,EACZJ,EAAA,cAAC,UAAO,UAAU,kBAAkB,QAAS,IAAMM,EAASD,EAAQ,CAAC,GAAG,UAC9DA,CACV,CACF,CAEJ,CAGA,IAAOE,EAAQN,EAAaC,EAAc,cAAc",
-  "names": ["React", "withProfiler", "MustacheTest", "title", "message", "count", "setCount", "mustache_test_default"]
-}

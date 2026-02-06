@@ -152,7 +152,7 @@ const resolveComponent = async (componentName: string): Promise<any> => {
         } else if (namespace.startsWith("mod_")) {
             // @mod_book/page to ../../../mod/book/react/build/page.js.
             const modName = namespace.replace("mod_", "");
-            relativePath = `../../../mod/${modName}/react/build/${componentPath}.js`;
+            relativePath = `../../../mod/${modName}/js/react/build/${componentPath}.js`;
         } else if (namespace.startsWith("block_")) {
             // @block_html/settings to ../../../blocks/html/react/build/settings.js.
             const blockName = namespace.replace("block_", "");

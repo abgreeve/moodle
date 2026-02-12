@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "paths": {
-      "@moodle/core/*": ["public/lib/react/src/*"],
-      "@moodle/local_multiplereact/*": ["public/local/multiplereact/react/src/*"]
+      "@moodle/lms/core/*": ["public/lib/js/react/src/*"],
+      "@moodle/lms/mod_book/*": ["public/mod/book/js/react/src/*"],
+      "@moodle/lms/local_multiplereact/*": ["public/local/multiplereact/js/react/src/*"]
     }
   }
 }

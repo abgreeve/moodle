@@ -89,7 +89,7 @@ export function generateAliases() {
         //   componentPath: "public/lib"
         //   componentName: "core"
 
-        const reactSrcDir = path.join(rootDir, componentPath, "react", "src");
+        const reactSrcDir = path.join(rootDir, componentPath, "js", "react", "src");
 
         // Skip any component that doesn't have React TSX code
         if (!hasTsx(reactSrcDir)) {
@@ -98,16 +98,16 @@ export function generateAliases() {
 
         // Alias key format: @moodle/<componentName>/*
         // Example:
-        //   @moodle/core/*
-        //   @moodle/core_ai/*
-        const aliasKey = `@moodle/${componentName}/*`;
+        //   @moodle/lms/core/*
+        //   @moodle/lms/core_ai/*
+        const aliasKey = `@moodle/lms/${componentName}/*`;
 
         // Target pattern: <componentPath>/react/src/*
         // Example:
         //   public/lib/react/src/*
-        //   public/ai/react/src/*
+        //   public/ai/js/react/src/*
         const targetPattern = path
-        .join(componentPath, "react", "src", "*")
+        .join(componentPath, "js", "react", "src", "*")
         .replace(/\\/g, "/");
 
         globalAliasMap[aliasKey] = targetPattern;
@@ -115,7 +115,7 @@ export function generateAliases() {
 
     // Build TS paths for tsconfig.aliases.json
     const tsPaths = {};
-    tsPaths["@moodle/core/*"] = ["public/lib/react/src/*"]; // Always include core alias.
+    tsPaths["@moodle/lms/core/*"] = ["public/lib/js/react/src/*"]; // Always include core alias.
     for (const [alias, target] of Object.entries(globalAliasMap)) {
         tsPaths[alias] = [target];
     }

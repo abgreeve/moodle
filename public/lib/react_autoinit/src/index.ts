@@ -40,7 +40,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 
-import { onRenderCallback, isProfilerEnabled } from "@moodle/core/profiler";
+import { onRenderCallback, isProfilerEnabled } from "@moodle/lms/core/profiler";
 
 const SELECTOR = "[data-react-component]";
 const MOUNTED_FLAG = "reactMounted";

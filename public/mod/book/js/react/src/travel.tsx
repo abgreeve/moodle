@@ -2,10 +2,10 @@ import React from "react";
 import {createRoot} from "react-dom/client";
 import {Button} from "@moodlehq/design-system";
 
-import { withProfiler } from "@moodle/core/profiler";
+import { withProfiler } from "@moodle/lms/core/profiler";
 
 
-import * as mustacheTest from '@moodle/mod_book/mustache_test';
+import * as mustacheTest from '@moodle/lms/mod_book/mustache_test';
 
 function requireAmd(mod) {
     return new Promise((resolve, reject) => {

@@ -1,14 +1,23 @@
-const INTERNAL_ALIASES = ["@moodle/"];
-
 export const externalsPlugin = {
     name: "externals",
     setup(build) {
-        build.onResolve({ filter: /^[^./].*/ }, args => {
-            if (INTERNAL_ALIASES.some(prefix => args.path.startsWith(prefix))) {
-                return;
+        // Everything else should be bundled by esbuild and fail fast if missing.
+        build.onResolve({ filter: /^[^./].*/ }, (args) => {
+            const path = args.path;
+
+            if (
+                path === "@moodle/lms" ||
+                path.startsWith("@moodle/lms/") ||
+                path === "react" ||
+                path.startsWith("react/") ||
+                path === "react-dom" ||
+                path.startsWith("react-dom/") ||
+                path === "@moodlehq/design-system"
+            ) {
+                return { path, external: true };
             }
 
-            return { path: args.path, external: true };
+            return;
         });
     }
 };

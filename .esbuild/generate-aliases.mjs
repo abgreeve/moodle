@@ -96,11 +96,9 @@ export function generateAliases() {
         continue;
         }
 
-        // Alias key format: @moodle/<componentName>/*
-        // Example:
-        //   @moodle/lms/core/*
-        //   @moodle/lms/core_ai/*
-        const aliasKey = `@moodle/lms/${componentName}/*`;
+        // Runtime alias key format: @moodle/lms/<componentName>/*
+        // Used with import maps and reactscript.php.
+        const runtimeAliasKey = `@moodle/lms/${componentName}/*`;
 
         // Target pattern: <componentPath>/react/src/*
         // Example:
@@ -110,7 +108,7 @@ export function generateAliases() {
         .join(componentPath, "js", "react", "src", "*")
         .replace(/\\/g, "/");
 
-        globalAliasMap[aliasKey] = targetPattern;
+        globalAliasMap[runtimeAliasKey] = targetPattern;
     }
 
     // Build TS paths for tsconfig.aliases.json

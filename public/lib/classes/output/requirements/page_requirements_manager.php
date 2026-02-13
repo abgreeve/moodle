@@ -1049,6 +1049,10 @@ class page_requirements_manager {
          * to avoid CommonJS/RequireJS conflicts in Moodle.
          */
         $output = html_writer::start_tag('script', ['type' => 'importmap']);
+        $jsrev = $this->get_jsrev();
+        $reactserver = new \core\url('/lib/reactscript.php');
+        // Trailing slash is required for import map prefix resolution.
+        $reactserver->set_slashargument('/' . $jsrev . '/');
         $importmap = (object) [
             'imports' => (object) [
                 'react' => (new \core\url('/lib/js/platform_bundles/react/19.1.1/react.js'))->out(false),
@@ -1057,7 +1061,8 @@ class page_requirements_manager {
                 'react/jsx-dev-runtime' => (new \core\url('/lib/js/platform_bundles/react/19.1.1/jsx-dev-runtime.js'))->out(false),
                 '/stable/react@19.1.1/es2022/react.mjs' => (new \core\url('/lib/js/platform_bundles/react/19.1.1/react.js'))->out(false),
                 '@moodlehq/design-system' => (new \core\url('/lib/js/platform_bundles/moodle-design-system/0.1.0/index.js'))->out(false),
-            ]
+                '@moodle/lms/' => $reactserver->out(false),
+            ],
         ];
         $output .= json_encode($importmap, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
         $output .= html_writer::end_tag('script');
@@ -1077,6 +1082,19 @@ class page_requirements_manager {
         $path = new \core\url('/lib/react_autoinit/build/index.js');
         $scripthtml = html_writer::script('', $path->out(), true);
         return $scripthtml;
+    }
+
+    /**
+     * Queue a React component module to be output at the end of the page.
+     *
+     * @param string $alias for example `mod_book/travel`.
+     */
+    public function react_type_module(string $alias): void {
+        $alias = ltrim(trim($alias), '/');
+        $jsrev = $this->get_jsrev();
+        $serverfile = new \core\url('/lib/reactscript.php');
+        $serverfile->set_slashargument('/' . $jsrev . '/' . $alias);
+        $this->jsmodulefiles[] = $serverfile->out(false);
     }
 
     /**

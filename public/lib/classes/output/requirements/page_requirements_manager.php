@@ -1061,6 +1061,7 @@ class page_requirements_manager {
                 'react/jsx-dev-runtime' => (new \core\url('/lib/js/platform_bundles/react/19.1.1/jsx-dev-runtime.js'))->out(false),
                 '/stable/react@19.1.1/es2022/react.mjs' => (new \core\url('/lib/js/platform_bundles/react/19.1.1/react.js'))->out(false),
                 '@moodlehq/design-system' => (new \core\url('/lib/js/platform_bundles/moodle-design-system/0.1.0/index.js'))->out(false),
+                '@moodle/lms/core/react_autoinit' => (new \core\url('/lib/react_autoinit/build/index.js'))->out(false),
                 '@moodle/lms/' => $reactserver->out(false),
             ],
         ];

@@ -114,6 +114,7 @@ export function generateAliases() {
     // Build TS paths for tsconfig.aliases.json
     const tsPaths = {};
     tsPaths["@moodle/lms/core/*"] = ["public/lib/js/react/src/*"]; // Always include core alias.
+    tsPaths["@moodle/lms/core/react_autoinit"] = ["public/lib/react_autoinit/src/index.ts"];
     for (const [alias, target] of Object.entries(globalAliasMap)) {
         tsPaths[alias] = [target];
     }

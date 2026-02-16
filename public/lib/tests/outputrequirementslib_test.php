@@ -366,4 +366,52 @@ final class outputrequirementslib_test extends \advanced_testcase {
             ],
         ];
     }
+
+    /**
+     * Test that the React import map uses the expected react-dom/client bundle based on developer debug mode.
+     *
+     * @param bool $debugdeveloper Whether developer debugging is enabled.
+     * @param string $expectedreactdompath The expected react-dom/client bundle path.
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('react_import_map_provider')]
+    public function test_react_import_map_uses_expected_react_dom_bundle(
+        bool $debugdeveloper,
+        string $expectedreactdompath
+    ): void {
+        global $CFG;
+
+        $originaldebugdeveloper = $CFG->debugdeveloper;
+
+        try {
+            $CFG->debugdeveloper = $debugdeveloper;
+
+            $page = new \moodle_page();
+            $renderer = $page->get_renderer('core', null, RENDERER_TARGET_MAINTENANCE);
+
+            $page->requires->get_config_for_javascript($page, $renderer);
+            $importmap = $page->requires->get_import_map();
+
+            $this->assertStringContainsString($expectedreactdompath, $importmap);
+        } finally {
+            $CFG->debugdeveloper = $originaldebugdeveloper;
+        }
+    }
+
+    /**
+     * Data provider for React import map bundle selection.
+     *
+     * @return array
+     */
+    public static function react_import_map_provider(): array {
+        return [
+            'Developer debug enabled uses profiling bundle' => [
+                true,
+                '/lib/js/platform_bundles/react/19.1.1/react-dom-client.profiling.js',
+            ],
+            'Developer debug disabled uses production bundle' => [
+                false,
+                '/lib/js/platform_bundles/react/19.1.1/react-dom-client.js',
+            ],
+        ];
+    }
 }

@@ -1056,7 +1056,10 @@ class page_requirements_manager {
         $importmap = (object) [
             'imports' => (object) [
                 'react' => (new \core\url('/lib/js/platform_bundles/react/19.1.1/react.js'))->out(false),
-                'react-dom/client' => (new \core\url('/lib/js/platform_bundles/react/19.1.1/react-dom-client.js'))->out(false),
+                'react-dom/client' => (new \core\url(!empty($this->M_cfg['reactprofiling'])
+                    ? '/lib/js/platform_bundles/react/19.1.1/react-dom-client.profiling.js'
+                    : '/lib/js/platform_bundles/react/19.1.1/react-dom-client.js'
+                ))->out(false),
                 'react/jsx-runtime' => (new \core\url('/lib/js/platform_bundles/react/19.1.1/jsx-runtime.js'))->out(false),
                 'react/jsx-dev-runtime' => (new \core\url('/lib/js/platform_bundles/react/19.1.1/jsx-dev-runtime.js'))->out(false),
                 '/stable/react@19.1.1/es2022/react.mjs' => (new \core\url('/lib/js/platform_bundles/react/19.1.1/react.js'))->out(false),

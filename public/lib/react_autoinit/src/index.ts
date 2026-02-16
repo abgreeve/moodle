@@ -37,10 +37,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-import React from "react";
-import ReactDOM from "react-dom/client";
-
-import { onRenderCallback, isProfilerEnabled } from "@moodle/lms/core/profiler";
+import { isProfilerEnabled } from "@moodle/lms/core/profiler";
+import { mountReactApp, unmountReactApp } from "@moodle/lms/core/mount";
 
 const SELECTOR = "[data-react-component]";
 const MOUNTED_FLAG = "reactMounted";
@@ -176,24 +174,11 @@ const mountReactComponent = (
     Component: any,
     props: Record<string, any>
 ) => {
-    const root = ReactDOM.createRoot(el);
-
-    // Wrap with Profiler when profiling is enabled.
-    if (profilingEnabled) {
-        const componentName =
-            el.getAttribute("data-react-component") || "Unknown";
-        root.render(
-            React.createElement(
-                React.Profiler,
-                { id: componentName, onRender: onRenderCallback },
-                React.createElement(Component, props)
-            )
-        );
-    } else {
-        root.render(React.createElement(Component, props));
-    }
-
-    reactUnmountMap.set(el, () => root.unmount());
+    const componentName = el.getAttribute("data-react-component") || "Unknown";
+    const unmount = mountReactApp(el, Component, props, {
+        id: componentName,
+    });
+    reactUnmountMap.set(el, unmount);
 };
 
 /**
@@ -263,7 +248,7 @@ const mountOne = async (el: Element) => {
  * Unmount a single element.
  */
 const unmountOne = (el: Element) => {
-    const unmount = reactUnmountMap.get(el);
+    const unmount = reactUnmountMap.get(el) ?? (() => unmountReactApp(el));
     if (unmount) {
         try {
             unmount();

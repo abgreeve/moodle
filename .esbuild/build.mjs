@@ -44,5 +44,6 @@ const sharedDefine = {
 };
 
 await buildReactAutoInit();
-await buildMoodleDesignSystem();
+// The design system shouldn't be constantly rebuilt every time. @TODO shift into a separate file.
+// await buildMoodleDesignSystem();
 await buildPluginComponents(isDev, sharedDefine, isWatch);

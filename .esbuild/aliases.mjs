@@ -36,6 +36,8 @@ const aliasesPath = path.join(esbuildDir, "react-aliases.json");
  *
  * And convert to a prefix map like:
  *   "@moodle/core/": "<root>/public/lib/react/src"
+ *
+ * @returns {Record<string, string>} Map of alias prefixes to absolute target directories.
  */
 function loadAliasMap() {
     if (!fs.existsSync(aliasesPath)) {
@@ -56,10 +58,22 @@ function loadAliasMap() {
     return map;
 }
 
+/**
+ * Normalize a filesystem path to browser import syntax.
+ *
+ * @param {string} value Path value to normalize.
+ * @returns {string} Path using forward slashes.
+ */
 function toBrowserPath(value) {
     return value.split(path.sep).join("/");
 }
 
+/**
+ * Ensure a module specifier is relative for browser/runtime imports.
+ *
+ * @param {string} specifier Import specifier.
+ * @returns {string} Relative import specifier.
+ */
 function ensureRelativeSpecifier(specifier) {
     if (specifier.startsWith(".") || specifier.startsWith("/")) {
         return specifier;
@@ -67,6 +81,12 @@ function ensureRelativeSpecifier(specifier) {
     return `./${specifier}`;
 }
 
+/**
+ * Calculate the build output directory matching an importer source path.
+ *
+ * @param {string} importer Absolute importer path.
+ * @returns {string} Output directory path for that importer.
+ */
 function getOutputDirForImporter(importer) {
     const marker = `${path.sep}react${path.sep}src${path.sep}`;
     const idx = importer.lastIndexOf(marker);
@@ -82,6 +102,13 @@ function getOutputDirForImporter(importer) {
     return path.join(before, "react", "build", subDir === "." ? "" : subDir);
 }
 
+/**
+ * Build a runtime import path from an importer to a resolved target file.
+ *
+ * @param {string | undefined} importer Absolute importer path, when available.
+ * @param {string} target Absolute target file path.
+ * @returns {string} Relative browser import path.
+ */
 function buildRelativeRuntimePath(importer, target) {
     if (!importer) {
         const relativeToPublic = path.relative(publicDir, target);
@@ -93,10 +120,21 @@ function buildRelativeRuntimePath(importer, target) {
     return ensureRelativeSpecifier(toBrowserPath(relativePath));
 }
 
+/**
+ * Escape a string for safe usage inside a RegExp pattern.
+ *
+ * @param {string} value Raw string value.
+ * @returns {string} Escaped regular expression fragment.
+ */
 function escapeRegExp(value) {
     return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+/**
+ * Create an esbuild plugin that resolves configured Moodle React aliases.
+ *
+ * @returns {import("esbuild").Plugin} Esbuild alias resolver plugin.
+ */
 export function createAliasPlugin() {
     const aliasMap = loadAliasMap();
 

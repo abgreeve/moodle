@@ -1,3 +1,24 @@
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Alias generation.
+ *
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
 import fs from "fs";
 import path from "path";
 import { createRequire } from "module";
@@ -7,6 +28,11 @@ const esbuildDir = path.join(rootDir, ".esbuild");
 
 const tsconfigOut = path.join(rootDir, "tsconfig.aliases.json");
 
+/**
+ * Load Moodle component paths from `.grunt/components.js`.
+ *
+ * @returns {Record<string, string>} Map of component paths to component names.
+ */
 function loadComponentPathMap() {
     const require = createRequire(import.meta.url);
 
@@ -23,7 +49,12 @@ function loadComponentPathMap() {
     return componentsData;
 }
 
-// Check whether a react/src directory has any .tsx file recursively.
+/**
+ * Check whether a directory contains at least one `.tsx` file recursively.
+ *
+ * @param {string} dir Directory path to inspect.
+ * @returns {boolean} True when at least one `.tsx` file is found.
+ */
 function hasTsx(dir) {
     if (!fs.existsSync(dir)) {
         return false;
@@ -48,7 +79,13 @@ function hasTsx(dir) {
     return false;
 }
 
-// Check whether two path maps are equal.
+/**
+ * Compare two TypeScript `paths` maps for exact equality.
+ *
+ * @param {Record<string, string[]>} a First paths map.
+ * @param {Record<string, string[]>} b Second paths map.
+ * @returns {boolean} True when keys and values match in order.
+ */
 function pathsEqual(a, b) {
     const aKeys = Object.keys(a);
     const bKeys = Object.keys(b);
@@ -77,6 +114,14 @@ function pathsEqual(a, b) {
     return true;
 }
 
+/**
+ * Generate `tsconfig.aliases.json` from Moodle component metadata.
+ *
+ * Includes core aliases, discovers plugin React source aliases, and skips
+ * rewriting when aliases have not changed.
+ *
+ * @returns {void}
+ */
 export function generateAliases() {
     const componentPathMap = loadComponentPathMap();
 
@@ -141,7 +186,12 @@ export function generateAliases() {
         return;
     }
 
-    // Collapse ["value"] onto one line
+    /**
+     * Convert JSON output so single-value arrays are rendered on one line.
+     *
+     * @param {unknown} obj Data to stringify.
+     * @returns {string} JSON string with flattened single-value arrays.
+     */
     function stringifyFlatArrays(obj) {
         const json = JSON.stringify(obj, null, 2);
         return json.replace(/\[\s+\"(.*?)\"\s+\]/g, '["$1"]');

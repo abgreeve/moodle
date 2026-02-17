@@ -26,6 +26,14 @@ import path from "node:path";
 import { externalsPlugin } from "./../externals.mjs";
 import { createAliasPlugin } from "./../aliases.mjs";
 
+/**
+ * Build and bundle the React auto-init runtime entrypoint.
+ *
+ * Writes the browser-ready ESM bundle to
+ * `public/lib/react_autoinit/build/index.js`.
+ *
+ * @returns {Promise<void>}
+ */
 export async function buildReactAutoInit() {
 
     console.log('\n' + chalk.green('> Building react_autoinit...'));

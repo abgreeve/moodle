@@ -30,9 +30,23 @@ import { createAliasPlugin } from "./../aliases.mjs";
 import { externalsPlugin } from "./../externals.mjs";
 
 const projectroot = process.cwd();
+
+/**
+ * Resolve a path from the current project root.
+ *
+ * @param {...string} segments Path segments to resolve.
+ * @returns {string} Absolute path from project root.
+ */
 const fromroot = (...segments) => path.resolve(projectroot, ...segments);
 
-// Build function
+/**
+ * Build a single React component entry file.
+ *
+ * @param {string} entry Absolute entry file path.
+ * @param {boolean} isWatch Whether watch mode is enabled.
+ * @param {import('esbuild').BuildOptions} buildConfig Shared esbuild configuration.
+ * @returns {Promise<void>}
+ */
 async function buildComponent(entry, isWatch, buildConfig) {
 
     const resolved = resolveComponentPaths(entry);
@@ -64,6 +78,12 @@ async function buildComponent(entry, isWatch, buildConfig) {
     }
 }
 
+/**
+ * Resolve source and output paths for a component entry.
+ *
+ * @param {string} entry Absolute component source path.
+ * @returns {{file: string, output: string} | null} Relative file info and output path, or null for unsupported paths.
+ */
 function resolveComponentPaths(entry) {
     const rel = path.relative(projectroot, entry);
 
@@ -83,6 +103,14 @@ function resolveComponentPaths(entry) {
 }
 
 
+/**
+ * Build all plugin and core React components.
+ *
+ * @param {boolean} isDev Whether development mode is enabled.
+ * @param {Record<string, string>} sharedDefine Shared define replacements for esbuild.
+ * @param {boolean} isWatch Whether to run in watch mode.
+ * @returns {Promise<void>}
+ */
 export async function buildPluginComponents(isDev, sharedDefine, isWatch) {
     console.log('\n' + chalk.green('> Building components...'));
 

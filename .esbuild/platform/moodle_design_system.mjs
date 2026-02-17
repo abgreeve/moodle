@@ -26,6 +26,14 @@ import path from "node:path";
 import { externalsPlugin } from "./../externals.mjs";
 import { createAliasPlugin } from "./../aliases.mjs";
 
+/**
+ * Build and bundle the Moodle Design System platform package.
+ *
+ * Writes the browser-ready ESM bundle to
+ * `public/lib/js/platform_bundles/moodle-design-system/0.1.0/index.js`.
+ *
+ * @returns {Promise<void>}
+ */
 export async function buildMoodleDesignSystem() {
 
     console.log('\n' + chalk.green('> Building moodle-design-system...'));

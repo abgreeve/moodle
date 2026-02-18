@@ -120,11 +120,6 @@ if (!$chapterid) {
 
     echo $OUTPUT->header();
 
-    echo $OUTPUT->render_from_template('mod_book/book-test', []);
-    $PAGE->requires->js_type_module('mod_book/travel');
-    $PAGE->requires->react_type_module('core_ai/aitravel');
-    echo $OUTPUT->render_from_template('mod_book/jshelper-test', []);
-
     $renderer = $PAGE->get_renderer('mod_book');
     $actionmenu = new \mod_book\output\main_action_menu($cm->id, $chapters, $chapter, $book);
     $renderedmenu = $renderer->render($actionmenu);

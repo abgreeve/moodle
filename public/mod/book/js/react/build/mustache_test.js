@@ -1,1 +1,0 @@
-import t from"react";function r({title:e="MustacheTest Component",message:n="Hello!"}){let[s,o]=t.useState(0);return t.createElement("div",{className:"alert alert-success"},t.createElement("h4",null,e),t.createElement("p",null,n),t.createElement("button",{className:"btn btn-primary",onClick:()=>o(s+1)},"Count: ",s))}export{r as default};

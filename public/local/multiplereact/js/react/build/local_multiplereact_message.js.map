@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../src/local_multiplereact_message.tsx"],
-  "sourcesContent": ["import { React } from \"@moodle/core/react\";\n\ntype Props = {\n    message: string;\n};\n\nexport default function Message({ message }: Props) {\n    return (\n        <div>\n            <strong>Message</strong>\n            <div>{message}</div>\n        </div>\n    );\n}\n"],
-  "mappings": "AAAA,OAAS,SAAAA,MAAa,uCAMP,SAARC,EAAyB,CAAE,QAAAC,CAAQ,EAAU,CAChD,OACIF,EAAA,cAAC,WACGA,EAAA,cAAC,cAAO,SAAO,EACfA,EAAA,cAAC,WAAKE,CAAQ,CAClB,CAER",
-  "names": ["React", "Message", "message"]
-}

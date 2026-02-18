@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../src/local_multiplereact_test.tsx"],
-  "sourcesContent": ["import { React } from \"@moodle/core/react\";\n\ntype Props = { who: string };\n\nexport default function LocalMultipleReactTest({ who }: Props) {\n    return (\n        <div>\n            <strong>Hello from local_multiplereact \uD83D\uDC4B</strong>\n            <div>User: {who}</div>\n        </div>\n    );\n}\n"],
-  "mappings": "AAAA,OAAS,SAAAA,MAAa,uCAIP,SAARC,EAAwC,CAAE,IAAAC,CAAI,EAAU,CAC3D,OACIF,EAAA,cAAC,WACGA,EAAA,cAAC,cAAO,0CAAiC,EACzCA,EAAA,cAAC,WAAI,SAAOE,CAAI,CACpB,CAER",
-  "names": ["React", "LocalMultipleReactTest", "who"]
-}

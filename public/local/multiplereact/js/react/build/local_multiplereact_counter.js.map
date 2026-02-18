@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../src/local_multiplereact_counter.tsx"],
-  "sourcesContent": ["import { React } from \"@moodle/core/react\";\n\ntype Props = {\n    initial: number;\n};\n\nexport default function Counter({ initial }: Props) {\n    const [count, setCount] = React.useState(initial);\n\n    return (\n        <div>\n            <strong>Counter</strong>\n            <div>Count: {count}</div>\n            <button type=\"button\" onClick={() => setCount((c) => c + 1)}>\n                +\n            </button>\n        </div>\n    );\n}\n"],
-  "mappings": "AAAA,OAAS,SAAAA,MAAa,uCAMP,SAARC,EAAyB,CAAE,QAAAC,CAAQ,EAAU,CAChD,GAAM,CAACC,EAAOC,CAAQ,EAAIJ,EAAM,SAASE,CAAO,EAEhD,OACIF,EAAA,cAAC,WACGA,EAAA,cAAC,cAAO,SAAO,EACfA,EAAA,cAAC,WAAI,UAAQG,CAAM,EACnBH,EAAA,cAAC,UAAO,KAAK,SAAS,QAAS,IAAMI,EAAUC,GAAMA,EAAI,CAAC,GAAG,GAE7D,CACJ,CAER",
-  "names": ["React", "Counter", "initial", "count", "setCount", "c"]
-}

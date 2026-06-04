@@ -197,11 +197,13 @@ class import_map implements \JsonSerializable {
      *
      * @param int $revision The JS revision number, used for modifier callables to determine if in developer mode.
      * @param string $requestedpath The bare specifier path (e.g. `react`, `@moodle/lms/mod_book/viewer`).
+     * @param string|null $themename The active theme context for request-time override resolution.
      * @return string|null Absolute filesystem path to the JS file, or null if unresolved.
      */
     public function get_path_for_script(
         int $revision,
         string $requestedpath,
+        ?string $themename = null,
     ): ?string {
         global $CFG;
 
@@ -224,7 +226,7 @@ class import_map implements \JsonSerializable {
 
             if ($importdata->loadfromcomponent) {
                 $subpath = substr($requestedpath, strlen($specifier));
-                $resolved = $this->resolve_module_identifier($importdata, $subpath);
+                $resolved = $this->resolve_module_identifier($importdata, $subpath, $themename);
                 if ($importdata->modifier !== null) {
                     $resolved = ($importdata->modifier)($revision, $requestedpath, $resolved);
                 }
@@ -268,6 +270,64 @@ class import_map implements \JsonSerializable {
     }
 
     /**
+     * Resolve a theme override for a component module, including parent themes.
+     *
+     * @param string $themename The active theme name to resolve from.
+     * @param string $component The owning component, for example `core` or `mod_forum`.
+     * @param string $modulerest The module path after the component name.
+     * @param object $importdata The import entry containing suffix information.
+     * @return string|null Absolute path to the override file, or null if no override exists.
+     */
+    protected function resolve_theme_module_override(
+        string $themename,
+        string $component,
+        string $modulerest,
+        object $importdata,
+    ): ?string {
+        $visited = [];
+        foreach ($this->get_theme_ancestry($themename, $visited) as $candidate) {
+            $theme = \theme_config::load($candidate);
+            $file = "{$theme->dir}/js/esm/{$component}/{$modulerest}";
+
+            foreach ($importdata->allowedsuffixes as $allowedsuffix) {
+                if (str_ends_with($file, $allowedsuffix) && file_exists($file)) {
+                    return $file;
+                }
+            }
+
+            $candidatefile = $file . $importdata->suffix;
+            if (file_exists($candidatefile)) {
+                return $candidatefile;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get a theme ancestry list in override precedence order.
+     *
+     * @param string $themename The theme to start from.
+     * @param array $visited A map of already-visited theme names.
+     * @return array
+     */
+    protected function get_theme_ancestry(string $themename, array &$visited = []): array {
+        if (isset($visited[$themename])) {
+            return [];
+        }
+
+        $visited[$themename] = true;
+        $themes = [$themename];
+        $theme = \theme_config::load($themename);
+
+        foreach ($theme->parents as $parent) {
+            $themes = array_merge($themes, $this->get_theme_ancestry($parent, $visited));
+        }
+
+        return $themes;
+    }
+
+    /**
      * Resolve a `<component>/<module>` subpath to an absolute filesystem path.
      *
      * For example, `mod_book/viewer` resolves to
@@ -275,11 +335,12 @@ class import_map implements \JsonSerializable {
      *
      * @param object $importdata The import entry containing the path and loadfromcomponent flag.
      * @param string $subpath The subpath after the specifier prefix (e.g. `mod_book/viewer`).
+     * @param string|null $themename The active theme context for request-time override resolution.
      * @return string Absolute path to the JS file.
      * @throws \core\exception\not_found_exception If the subpath is missing a slash, contains `..`,
      *   the component is unknown, or the resolved file does not exist.
      */
-    protected function resolve_module_identifier(object $importdata, string $subpath): string {
+    protected function resolve_module_identifier(object $importdata, string $subpath, ?string $themename = null): string {
         if (!str_contains($subpath, '/')) {
             throw new \core\exception\not_found_exception('component', $subpath);
         }
@@ -290,6 +351,13 @@ class import_map implements \JsonSerializable {
         // filename (e.g. 'button.small') is allowed because it is not a segment on its own.
         if (in_array('..', explode('/', $modulerest), true)) {
             throw new \core\exception\not_found_exception('script', $subpath);
+        }
+
+        if ($themename !== null) {
+            $override = $this->resolve_theme_module_override($themename, $component, $modulerest, $importdata);
+            if ($override !== null) {
+                return $override;
+            }
         }
 
         // Resolve the component directory; an unknown component name returns null.

@@ -26,6 +26,9 @@ namespace core\output\requirements;
  */
 #[\PHPUnit\Framework\Attributes\CoversClass(import_map::class)]
 final class import_map_test extends \advanced_testcase {
+    /** @var string[] Paths created during a test and removed afterwards. */
+    private array $pathstocleanup = [];
+
     /**
      * The constructor pre-populates the standard ESM specifiers.
      */
@@ -181,12 +184,12 @@ final class import_map_test extends \advanced_testcase {
 
         $CFG->root = $tempdir;
 
-        // Pass allowedsuffixes without .js — it should be auto-included because suffix defaults to .js.
+        // Pass allowedsuffixes without .js - it should be auto-included because suffix defaults to .js.
         $map = new import_map();
         $map->set_default_loader(new \core\url('https://example.com/'));
         $map->add_import('test/', path: 'testpath', allowedsuffixes: ['.js.map']);
 
-        // Request with .js suffix — should still detect it and not double-append.
+        // Request with .js suffix - should still detect it and not double-append.
         $result = $map->get_path_for_script(1, 'test/module.js');
         $this->assertEquals("{$tempdir}/testpath/module.js", $result);
     }
@@ -248,5 +251,185 @@ final class import_map_test extends \advanced_testcase {
 
         $this->expectException(\core\exception\not_found_exception::class);
         $map->get_path_for_script(1, '@moodle/lms/core/nonexistent_module_xyz_12345');
+    }
+
+    /**
+     * Theme-specific overrides are resolved before the component implementation.
+     */
+    public function test_component_resolve_uses_active_theme_override(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $CFG->themedir = make_request_directory() . '/themes';
+        $this->create_test_theme('testchild');
+
+        $override = "{$CFG->themedir}/testchild/js/esm/core/ajax.js";
+        $this->create_file($override, 'export default "theme override";');
+
+        $map = new import_map();
+        $map->set_default_loader(new \core\url('https://example.com/'));
+
+        $this->assertEquals($override, $map->get_path_for_script(1, '@moodle/lms/core/ajax', 'testchild'));
+    }
+
+    /**
+     * Parent theme overrides are resolved when the active theme does not provide one.
+     */
+    public function test_component_resolve_falls_back_to_parent_theme_override(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $CFG->themedir = make_request_directory() . '/themes';
+        $this->create_test_theme('testgrandchild', ['classic']);
+
+        $override = dirname(__DIR__, 4) . '/theme/boost/js/esm/core/ajax.js';
+        $this->create_file($override, 'export default "boost override";');
+
+        $map = new import_map();
+        $map->set_default_loader(new \core\url('https://example.com/'));
+
+        $this->assertEquals($override, $map->get_path_for_script(1, '@moodle/lms/core/ajax', 'testgrandchild'));
+    }
+
+    /**
+     * The original component implementation is used when no theme override exists.
+     */
+    public function test_component_resolve_falls_back_to_component_implementation(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $CFG->themedir = make_request_directory() . '/themes';
+        $this->create_test_theme('testchild');
+
+        $map = new import_map();
+        $map->set_default_loader(new \core\url('https://example.com/'));
+
+        $dir = \core\component::get_component_directory('core');
+        $this->assertEquals(
+            "{$dir}/js/esm/build/ajax.js",
+            $map->get_path_for_script(1, '@moodle/lms/core/ajax', 'testchild'),
+        );
+    }
+
+    /**
+     * Theme overrides support any Moodle component, including plugin components.
+     */
+    public function test_component_resolve_uses_plugin_theme_override(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $CFG->themedir = make_request_directory() . '/themes';
+        $this->create_test_theme('testchild');
+
+        $pluginroot = dirname(__DIR__, 4) . '/local/esmtest';
+        $this->create_file(
+            "{$pluginroot}/version.php",
+            <<<'PHP'
+<?php
+$plugin->component = 'local_esmtest';
+$plugin->version = 2026060400;
+PHP,
+        );
+        $this->create_file("{$pluginroot}/js/esm/build/example.js", 'export default "plugin";');
+        \core\component::reset();
+
+        $override = "{$CFG->themedir}/testchild/js/esm/local_esmtest/example.js";
+        $this->create_file($override, 'export default "plugin override";');
+
+        $map = new import_map();
+        $map->set_default_loader(new \core\url('https://example.com/'));
+
+        $this->assertEquals($override, $map->get_path_for_script(1, '@moodle/lms/local_esmtest/example', 'testchild'));
+    }
+
+    /**
+     * Legacy requests without a theme keep resolving directly to the component implementation.
+     */
+    public function test_component_resolve_without_theme_keeps_legacy_behaviour(): void {
+        global $CFG;
+
+        $this->resetAfterTest();
+        $CFG->themedir = make_request_directory() . '/themes';
+        $this->create_test_theme('testchild');
+        $this->create_file("{$CFG->themedir}/testchild/js/esm/core/ajax.js", 'export default "theme override";');
+
+        $map = new import_map();
+        $map->set_default_loader(new \core\url('https://example.com/'));
+
+        $dir = \core\component::get_component_directory('core');
+        $this->assertEquals("{$dir}/js/esm/build/ajax.js", $map->get_path_for_script(1, '@moodle/lms/core/ajax'));
+    }
+
+    #[\PHPUnit\Framework\Attributes\After]
+    public function cleanup_test_paths(): void {
+        foreach (array_reverse($this->pathstocleanup) as $path) {
+            $this->remove_path($path);
+        }
+        $this->pathstocleanup = [];
+        \core\component::reset();
+    }
+
+    /**
+     * Create a temporary theme in $CFG->themedir.
+     *
+     * @param string $name
+     * @param array $parents
+     * @return void
+     */
+    private function create_test_theme(string $name, array $parents = []): void {
+        global $CFG;
+
+        $quotedparents = array_map(fn(string $parent): string => "'{$parent}'", $parents);
+        $config = "<?php\n\$THEME->parents = [" . implode(', ', $quotedparents) . "];\n";
+        $this->create_file("{$CFG->themedir}/{$name}/config.php", $config);
+    }
+
+    /**
+     * Create a file and remember any newly-created directories for cleanup.
+     *
+     * @param string $path
+     * @param string $contents
+     * @return void
+     */
+    private function create_file(string $path, string $contents): void {
+        $directory = dirname($path);
+        if (!is_dir($directory)) {
+            mkdir($directory, 0777, true);
+            $this->pathstocleanup[] = $directory;
+        }
+
+        file_put_contents($path, $contents);
+        $this->pathstocleanup[] = $path;
+    }
+
+    /**
+     * Remove a test path if it still exists.
+     *
+     * @param string $path
+     * @return void
+     */
+    private function remove_path(string $path): void {
+        if (is_link($path) || is_file($path)) {
+            @unlink($path);
+            return;
+        }
+
+        if (!is_dir($path)) {
+            return;
+        }
+
+        $items = scandir($path);
+        if ($items === false) {
+            return;
+        }
+
+        foreach ($items as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+            $this->remove_path("{$path}/{$item}");
+        }
+
+        @rmdir($path);
     }
 }

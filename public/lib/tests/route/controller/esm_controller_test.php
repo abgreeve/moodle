@@ -102,6 +102,23 @@ final class esm_controller_test extends route_testcase {
         $this->assertStringContainsString('application/javascript', $response->getHeaderLine('Content-Type'));
     }
 
+
+    /**
+     * A valid component module also returns JavaScript when theme context is supplied.
+     */
+    public function test_serve_with_theme_component_module_returns_javascript(): void {
+        $response = $this->make_test_controller()->serve_with_theme(
+            new ServerRequest('GET', '/-1/boost/mod_test/index'),
+            new Response(),
+            -1,
+            'boost',
+            'mod_test/index',
+        );
+
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertStringContainsString('application/javascript', $response->getHeaderLine('Content-Type'));
+    }
+
     /**
      * An invalid revision (−1) results in a short-lived cache response with no ETag.
      */

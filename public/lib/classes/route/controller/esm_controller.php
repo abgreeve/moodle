@@ -16,6 +16,7 @@
 
 namespace core\route\controller;
 
+use core\router\parameters\path_themename;
 use core\router\schema\parameters\path_parameter;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -23,8 +24,9 @@ use Psr\Http\Message\ServerRequestInterface;
 /**
  * Controller for serving ES module files.
  *
- * Resolves all ESM requests under /esm/{revision}/{scriptpath} by delegating to the
- * import_map registry, which is the single source of truth for specifier → file mappings.
+ * Resolves all ESM requests under /esm/{revision}/{scriptpath} or
+ * /esm/{revision}/{themename}/{scriptpath} by delegating to the import_map registry,
+ * which is the single source of truth for specifier -> file mappings.
  *
  * @package    core
  * @copyright  2026 Andrew Lyons <andrew@nicols.co.uk>
@@ -42,6 +44,44 @@ class esm_controller {
         /** @var \core\clock The clock instance for managing time-related operations. */
         private \core\clock $clock,
     ) {
+    }
+
+    #[\core\router\route(
+        title: 'Serve Themed ESM Content',
+        path: '/esm/{revision:[0-9-]+}/{themename}/{scriptpath:.*}',
+        pathtypes: [
+            new path_parameter(
+                name: 'revision',
+                description: 'The revision number of the script to serve.',
+                type: \core\param::INT,
+            ),
+            new path_themename('themename'),
+            new path_parameter(
+                name: 'scriptpath',
+                description: 'The path to the script to serve.',
+                type: \core\param::ESM_PATH,
+            ),
+        ],
+        method: ['GET'],
+        abortafterconfig: true,
+    )]
+    /**
+     * Serve an ES module file using theme-aware resolution.
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param int $revision
+     * @param string $themename
+     * @param string $scriptpath
+     */
+    public function serve_with_theme(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        int $revision,
+        string $themename,
+        string $scriptpath,
+    ): ResponseInterface {
+        return $this->do_serve($request, $response, $revision, $scriptpath, $themename);
     }
 
     #[\core\router\route(
@@ -63,7 +103,9 @@ class esm_controller {
         abortafterconfig: true,
     )]
     /**
-     * Serve an ES module file by resolving the specifier via the import map.
+     * Serve an ES module file without explicit theme context.
+     *
+     * This preserves the legacy URL shape and resolution behaviour.
      *
      * @param ServerRequestInterface $request
      * @param ResponseInterface $response
@@ -76,6 +118,26 @@ class esm_controller {
         int $revision,
         string $scriptpath,
     ): ResponseInterface {
+        return $this->do_serve($request, $response, $revision, $scriptpath);
+    }
+
+    /**
+     * Serve an ES module file by resolving the specifier via the import map.
+     *
+     * @param ServerRequestInterface $request
+     * @param ResponseInterface $response
+     * @param int $revision
+     * @param string $scriptpath
+     * @param string|null $themename
+     * @return ResponseInterface
+     */
+    protected function do_serve(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        int $revision,
+        string $scriptpath,
+        ?string $themename = null,
+    ): ResponseInterface {
         // Normalise the revision: an outdated or invalid value disables long-term caching
         // so browsers always re-fetch rather than serving a stale file.
         if (!min_is_revision_valid_and_current($revision)) {
@@ -83,7 +145,7 @@ class esm_controller {
         }
 
         $importmap = \core\di::get(\core\output\requirements\import_map::class);
-        $fullpath = $importmap->get_path_for_script($revision, $scriptpath);
+        $fullpath = $importmap->get_path_for_script($revision, $scriptpath, $themename);
         if ($fullpath !== null && file_exists($fullpath)) {
             return $this->serve_script($request, $response, $revision, $fullpath, basename($fullpath));
         }

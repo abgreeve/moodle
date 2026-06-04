@@ -1049,9 +1049,10 @@ class page_requirements_manager {
         $importmap = \core\di::get(import_map::class);
         $importmap->set_default_loader(
             \core\router\util::get_path_for_callable(
-                [\core\route\controller\esm_controller::class, 'serve'],
+                [\core\route\controller\esm_controller::class, 'serve_with_theme'],
                 [
                     'revision' => $this->get_jsrev(),
+                    'themename' => $this->get_esm_theme_name(),
                     'scriptpath' => '',
                 ]
             ),
@@ -1078,9 +1079,10 @@ class page_requirements_manager {
      */
     public function react_mustache_autoinit(): string {
         $path = \core\router\util::get_path_for_callable(
-            [\core\route\controller\esm_controller::class, 'serve'],
+            [\core\route\controller\esm_controller::class, 'serve_with_theme'],
             [
                 'revision' => $this->get_jsrev(),
+                'themename' => $this->get_esm_theme_name(),
                 'scriptpath' => '@moodle/lms/core/react_autoinit',
             ]
         );
@@ -1093,6 +1095,21 @@ class page_requirements_manager {
             ],
         ) . "\n";
         return $scripthtml;
+    }
+
+    /**
+     * Get the theme name to include in generated ESM URLs.
+     *
+     * @return string
+     */
+    protected function get_esm_theme_name(): string {
+        global $PAGE;
+
+        if (!empty($PAGE?->theme?->name)) {
+            return $PAGE->theme->name;
+        }
+
+        return \theme_config::DEFAULT_THEME;
     }
 
     /**

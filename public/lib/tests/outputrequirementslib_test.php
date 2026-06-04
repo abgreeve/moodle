@@ -366,4 +366,23 @@ final class outputrequirementslib_test extends \advanced_testcase {
             ],
         ];
     }
+
+    /**
+     * The generated import map uses the active theme in the ESM loader URL.
+     */
+    public function test_get_import_map_includes_active_theme(): void {
+        global $PAGE;
+
+        $this->resetAfterTest();
+
+        $PAGE = new \moodle_page();
+        $PAGE->set_context(\context_system::instance());
+        $PAGE->set_url('/');
+
+        $html = $PAGE->requires->get_import_map();
+        $this->assertStringContainsString(
+            '/esm/' . $PAGE->requires->get_jsrev() . '/' . $PAGE->theme->name . '/',
+            $html,
+        );
+    }
 }

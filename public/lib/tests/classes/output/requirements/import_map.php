@@ -37,7 +37,7 @@ class import_map extends \core\output\requirements\import_map {
     }
 
     #[\Override]
-    public function get_path_for_script(int $revision, string $requestedpath): ?string {
+    public function get_path_for_script(int $revision, string $requestedpath, ?string $themename = null): ?string {
         return $this->fixture;
     }
 }

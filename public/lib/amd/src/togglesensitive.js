@@ -77,7 +77,17 @@ const renderSensitiveToggle = (sensitiveInput) => {
             sensitiveinput: sensitiveInput.outerHTML,
         }
     ).then((html) => {
-        sensitiveInput.outerHTML = html;
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = html.trim();
+        const wrapperElement = wrapper.firstElementChild;
+
+        // Insert the new wrapper in place of the original input, then swap the
+        // parsed clone of the input (inside the wrapper) for the original, live
+        // node. This preserves the original node's identity, so any external
+        // references to it (e.g. a JS framework's virtual DOM) remain valid.
+        sensitiveInput.replaceWith(wrapperElement);
+        document.getElementById(sensitiveInput.id)?.replaceWith(sensitiveInput);
+
         // Dispatch the event indicating the sensitive input has changed.
         notifyFieldStructureChanged(sensitiveInput.id);
         return;

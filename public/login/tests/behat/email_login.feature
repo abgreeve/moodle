@@ -1,4 +1,4 @@
-@core @javascript
+@core
 Feature: Login using email address
   Users should be able to access their site
   As a user

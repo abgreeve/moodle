@@ -1,4 +1,4 @@
-@auth @auth_email @javascript
+@auth @auth_email
 Feature: User must accept policy when logging in and signing up
   In order to record user agreement to use the site
   As a user

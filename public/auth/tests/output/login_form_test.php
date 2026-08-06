@@ -162,6 +162,23 @@ final class login_form_test extends \advanced_testcase {
     }
 
     /**
+     * The login_form renderable remains independently renderable as a React component
+     * placeholder. This is used by the OAuth login flow added in MDL-88472; the ordinary Moodle
+     * login page does not use it and continues to use \core_auth\output\login instead.
+     */
+    public function test_render_produces_react_component_placeholder(): void {
+        global $PAGE;
+
+        $this->resetAfterTest();
+
+        $loginform = new login_form(new url('/login/index.php'), []);
+        $html = $PAGE->get_renderer('core')->render($loginform);
+
+        $this->assertStringContainsString('data-react-component="@moodle/lms/core_auth/LoginForm"', $html);
+        $this->assertStringContainsString('data-react-props', $html);
+    }
+
+    /**
      * Data provider of all combinations of a boolean site setting and a boolean override.
      *
      * @return array

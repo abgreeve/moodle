@@ -8,7 +8,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
     Given the following config values are set as admin:
       | enablemyhome | 1 |
 
-  @javascript
   Scenario: Accept policy on sign up manage by plugin, no site policy
     Given the following config values are set as admin:
       | registerauth    | email |
@@ -25,7 +24,7 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | First name    | User1                 |
       | Last name     | L1                    |
     And I press "Create my new account"
-    And the page title should contain "Confirm your account"
+    And I should see "Confirm your account"
     And I should see "An email should have been sent to your address at user1@example.com"
     And I confirm email for "user1"
     And I should see "Thanks, User1 L1"
@@ -38,7 +37,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
     And I open my profile in edit mode
     And the field "First name" matches value "User1"
 
-  @javascript
   Scenario: Accept policy on sign up, only draft policy
     Given the following config values are set as admin:
       | registerauth    | email |
@@ -59,7 +57,7 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | First name    | User1                 |
       | Last name     | L1                    |
     And I press "Create my new account"
-    And the page title should contain "Confirm your account"
+    And I should see "Confirm your account"
     And I should see "An email should have been sent to your address at user1@example.com"
     And I confirm email for "user1"
     And I should see "Thanks, User1 L1"
@@ -72,7 +70,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
     And I open my profile in edit mode
     And the field "First name" matches value "User1"
 
-  @javascript
   Scenario: Accept policy on sign up, one policy
     Given the following config values are set as admin:
       | registerauth    | email |
@@ -85,7 +82,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | P1     | This site policy |          | full text3 | short text3 | draft    |
     And I am on homepage
     When I click on "Sign up" "link"
-    And I click on "Continue" "link"
     Then I should see "This site policy" in the "region-main" "region"
     And I should see "short text2"
     And I should see "full text2"
@@ -105,7 +101,7 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | First name    | User1                 |
       | Last name     | L1                    |
     And I press "Create my new account"
-    And the page title should contain "Confirm your account"
+    And I should see "Confirm your account"
     And I should see "An email should have been sent to your address at user1@example.com"
     And I confirm email for "user1"
     And I should see "Thanks, User1 L1"
@@ -121,7 +117,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
     And "Accepted" "text" should exist in the "This site policy" "table_row"
     And I log out
 
-  @javascript
   Scenario: Accept policy on sign up, multiple policies
     Given the following config values are set as admin:
       | registerauth    | email |
@@ -134,7 +129,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | This guests policy  | 0    |          | full text4 | short text4 | active   | guest    |
     And I am on homepage
     When I click on "Sign up" "link"
-    And I click on "Continue" "link"
     Then I should see "This site policy" in the "region-main" "region"
     And I should see "short text2"
     And I should see "full text2"
@@ -165,7 +159,7 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | First name    | User1                 |
       | Last name     | L1                    |
     And I press "Create my new account"
-    And the page title should contain "Confirm your account"
+    And I should see "Confirm your account"
     And I should see "An email should have been sent to your address at user1@example.com"
     And I confirm email for "user1"
     And I should see "Thanks, User1 L1"
@@ -183,7 +177,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
     And I should not see "This guests policy"
     And I log out
 
-  @javascript
   Scenario: Accept policy on sign up and age verification
     Given the following config values are set as admin:
       | registerauth    | email |
@@ -195,7 +188,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | This site policy |          | full text2 | short text2 | active   |
     And I am on homepage
     When I click on "Sign up" "link"
-    And I click on "Continue" "link"
     Then I should see "Age and location verification"
     And I set the field "What is your age?" to "16"
     And I set the field "In which country do you live?" to "DZ"
@@ -219,7 +211,7 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | First name    | User1                 |
       | Last name     | L1                    |
     And I press "Create my new account"
-    And the page title should contain "Confirm your account"
+    And I should see "Confirm your account"
     And I should see "An email should have been sent to your address at user1@example.com"
     And I confirm email for "user1"
     And I should see "Thanks, User1 L1"
@@ -235,7 +227,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
     And "Accepted" "text" should exist in the "This site policy" "table_row"
     And I log out
 
-  @javascript
   Scenario: Accept policy on sign up, do not accept all policies
     Given the following config values are set as admin:
       | registerauth    | email |
@@ -247,7 +238,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | This privacy policy | 1    |          | full text3 | short text3 | active   | loggedin |
     And I am on homepage
     And I click on "Sign up" "link"
-    And I click on "Continue" "link"
     And I should see "This site policy"
     And I press "Next"
     And I should see "This privacy policy"
@@ -488,7 +478,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
     When I follow "Continue"
     Then I should not see "If you continue browsing this website, you agree to our policies"
 
-  @javascript
   Scenario: Accept policy on sign up, after completing sign up attempt to create another account
     Given the following config values are set as admin:
       | registerauth    | email |
@@ -501,7 +490,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | This guests policy  | 0    |          | full text4 | short text4 | active   | guest    |
     And I am on homepage
     When I click on "Sign up" "link"
-    And I click on "Continue" "link"
     Then I should see "This site policy" in the "region-main" "region"
     And I should see "short text2"
     And I should see "full text2"
@@ -530,7 +518,7 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | First name    | User1                 |
       | Last name     | L1                    |
     When I press "Create my new account"
-    And the page title should contain "Confirm your account"
+    Then I should see "Confirm your account"
     And I should see "An email should have been sent to your address at user1@example.com"
     And I follow "Log in"
     When I click on "Sign up" "link"
@@ -616,7 +604,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
     And I should see "No permission to agree to the policies on behalf of this user."
     And I should see "Sorry, you do not have the required permission to agree to the following policies on behalf of User 1"
 
-  @javascript
   Scenario: Accept policy on sign up as a guest, one policy
     Given the following config values are set as admin:
       | registerauth    | email |
@@ -634,7 +621,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
     # Now sign up
     And I follow "Log in"
     When I click on "Sign up" "link"
-    And I click on "Continue" "link"
     Then I should see "This site policy"
     And I should see "short text2"
     And I should see "full text2"
@@ -654,7 +640,7 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | First name    | User1                 |
       | Last name     | L1                    |
     And I press "Create my new account"
-    And the page title should contain "Confirm your account"
+    And I should see "Confirm your account"
     And I should see "An email should have been sent to your address at user1@example.com"
     And I confirm email for "user1"
     And I should see "Thanks, User1 L1"
@@ -670,7 +656,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
     And "Accepted" "text" should exist in the "This site policy" "table_row"
     And I log out
 
-  @javascript
   Scenario: Accepting policies on sign up, multiple policies with different style of giving ageement.
     Given the following config values are set as admin:
       | registerauth      | email       |
@@ -684,7 +669,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | Terms of Service              | We teach, you learn       | Here goes content.  | 1               |
     And I am on homepage
     When I click on "Sign up" "link"
-    And I click on "Continue" "link"
     # The first policy with the agreement style "on its own page" must be accepted first.
     Then I should see "Digital maturity declaration" in the "region-main" "region"
     And I should see "You declare be old enough"
@@ -724,7 +708,7 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | First name    | User1                 |
       | Last name     | L1                    |
     And I press "Create my new account"
-    And the page title should contain "Confirm your account"
+    And I should see "Confirm your account"
     And I should see "An email should have been sent to your address at user1@example.com"
     And I confirm email for "user1"
     And I should see "Thanks, User1 L1"
@@ -835,7 +819,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
     And "Cookies policy" "table_row" should not exist
     And I log out
 
-  @javascript
   Scenario: Accepting policies on sign up, policies to be accepted on their own page.
     Given the following config values are set as admin:
       | registerauth      | email       |
@@ -849,7 +832,6 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | Terms of Service              | We teach, you learn       | Here goes content.  | 1               | guest     |
     And I am on homepage
     When I click on "Sign up" "link"
-    And I click on "Continue" "link"
     # All the policies to be displayed one by one with a button to accept each of them prior seeing the next.
     Then I should see "Digital maturity declaration" in the "region-main" "region"
     And I should see "You declare be old enough"
@@ -867,7 +849,7 @@ Feature: User must accept policy managed by this plugin when logging in and sign
       | First name    | User1                 |
       | Last name     | L1                    |
     And I press "Create my new account"
-    And the page title should contain "Confirm your account"
+    And I should see "Confirm your account"
     And I should see "An email should have been sent to your address at user1@example.com"
     And I confirm email for "user1"
     And I should see "Thanks, User1 L1"

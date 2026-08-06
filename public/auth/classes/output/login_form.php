@@ -26,9 +26,7 @@ use core\url;
  * @copyright  Andrew Lyons <andrew@nicols.co.uk>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class login_form implements
-    \core\output\react_component_renderable,
-    \core\output\renderable
+class login_form
 {
     use login_renderable_trait {
         get_react_component_props as shared_get_react_component_props;
@@ -57,12 +55,21 @@ class login_form implements
         $this->set_action_url($action);
     }
 
-    #[\Override]
+    /**
+     * Get the name of the React component to use for this renderable.
+     *
+     * @return string
+     */
     public function get_react_component_name(): string {
         return 'core_auth/LoginForm';
     }
 
-    #[\Override]
+    /**
+     * Get the props to pass to the React component for this renderable.
+     *
+     * @param renderer_base $renderer The renderer requesting the props
+     * @return \stdClass
+     */
     public function get_react_component_props(
         \core\output\renderer_base $output,
     ): \stdClass {

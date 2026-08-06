@@ -16,6 +16,7 @@
 
 namespace core_auth\output;
 
+use core\output\html_writer;
 use core\url;
 
 /**
@@ -162,17 +163,23 @@ final class login_form_test extends \advanced_testcase {
     }
 
     /**
-     * The login_form renderable remains independently renderable as a React component
-     * placeholder. This is used by the OAuth login flow added in MDL-88472; the ordinary Moodle
-     * login page does not use it and continues to use \core_auth\output\login instead.
+     * The login_form renderable is not itself renderable via renderer_base::render() (it is not
+     * a `renderable`, and there is no generic React-rendering support left in renderer_base).
+     * Callers instead build the React component placeholder directly from its name and props, as
+     * public/login/reactlogin.php does for the OAuth login flow added in MDL-88472; the ordinary
+     * Moodle login page does not use it and continues to use \core_auth\output\login instead.
      */
-    public function test_render_produces_react_component_placeholder(): void {
+    public function test_react_component_props_produce_placeholder(): void {
         global $PAGE;
 
         $this->resetAfterTest();
 
         $loginform = new login_form(new url('/login/index.php'), []);
-        $html = $PAGE->get_renderer('core')->render($loginform);
+        $renderer = $PAGE->get_renderer('core');
+        $html = html_writer::react_component(
+            '@moodle/lms/' . $loginform->get_react_component_name(),
+            $loginform->get_react_component_props($renderer),
+        );
 
         $this->assertStringContainsString('data-react-component="@moodle/lms/core_auth/LoginForm"', $html);
         $this->assertStringContainsString('data-react-props', $html);

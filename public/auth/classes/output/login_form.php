@@ -103,33 +103,6 @@ class login_form implements
     }
 
     /**
-     * Get an instance of the legacy login form.
-     *
-     * @since 5.3
-     * @deprecated since 5.3, use \core_auth\output\login_form instead.
-     * @return \core_auth\output\login
-     */
-    #[\core\attribute\deprecated(
-        self::class,
-        since: '5.3',
-        reason: 'The \\core_auth\\output\\login renderable has been replaced '
-            . 'with a new version to support a smoother migration to React',
-        mdl: 'MDL-89196',
-    )]
-    public function get_legacy_login_form(): \core_auth\output\login {
-        // This method is introduced and deprecated in the same release, so we can support a migration.
-        // We want to strongly encourage all theme designers with login form customisations to migrate to the new renderable,
-        // and to React.
-        \core\deprecation::emit_deprecation(__METHOD__);
-        $legacyform = new \core_auth\output\login($this->authsequence, $this->username);
-
-        $legacyform->set_error($this->rawerror, $this->errorcode);
-        $legacyform->set_info($this->info);
-
-        return $legacyform;
-    }
-
-    /**
      * Can the user toggle password visibility.
      *
      * @return bool

@@ -177,8 +177,6 @@ class login implements renderable, templatable {
     public function export_for_template(\core\output\renderer_base $output) {
         global $CFG, $SITE;
 
-        $formatter = \core\di::get(\core\formatting::class);
-
         $identityproviders = \auth_plugin_base::prepare_identity_providers_for_output($this->identityproviders, $output);
 
         $data = new stdClass();
@@ -216,10 +214,10 @@ class login implements renderable, templatable {
             $data->logourl = $logourl->out(false);
         }
 
-        $data->sitename = $formatter->format_string(
-            string: $SITE->fullname,
-            context: \core\context\course::instance(SITEID),
-            escape: false,
+        $data->sitename = \format_string(
+            $SITE->fullname,
+            true,
+            ['context' => \core\context\course::instance(SITEID), 'escape' => false]
         );
 
         $data->hasauthinstructions = !empty($CFG->auth_instructions);

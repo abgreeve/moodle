@@ -81,6 +81,8 @@ class login implements renderable, templatable {
     public $togglepassword;
     /** @var bool Toggle the password visibility icon for small screens only. */
     public $smallscreensonly;
+    /** @var bool Whether $instructions was auto-filled with the sign-up fallback message. */
+    private bool $instructionsfromsignupfallback = false;
 
     /**
      * Constructor.
@@ -89,13 +91,18 @@ class login implements renderable, templatable {
      * @param string $username The username to display.
      */
     public function __construct(array $authsequence, $username = '') {
-        global $CFG, $OUTPUT, $PAGE;
+        global $CFG, $PAGE;
 
         $this->username = $username;
 
         $languagedata = new \core\output\language_menu($PAGE);
 
-        $this->languagemenu = $languagedata->export_for_action_menu($OUTPUT);
+        // Fetch the renderer directly, rather than using the global $OUTPUT, since $OUTPUT may
+        // still be the bootstrap_renderer stub at this point (it only resolves to the real
+        // renderer the first time a method is *called on* it, and this constructor may run
+        // before that has happened, e.g. when building this renderable from a router-based
+        // page such as the OAuth2 authorisation flow).
+        $this->languagemenu = $languagedata->export_for_action_menu($PAGE->get_renderer('core'));
         $this->canloginasguest = $CFG->guestloginbutton && !isguestuser();
         $this->canloginbyemail = !empty($CFG->authloginviaemail);
         $this->cansignup = $CFG->registerauth == 'email' || !empty($CFG->registerauth);
@@ -117,6 +124,7 @@ class login implements renderable, templatable {
             $this->instructions = get_string('loginstepsnone');
         } else if ($CFG->registerauth == 'email' && empty($this->instructions)) {
             $this->instructions = get_string('logindonthaveaccount');
+            $this->instructionsfromsignupfallback = true;
         }
 
         if ($CFG->maintenance_enabled == true) {
@@ -166,6 +174,51 @@ class login implements renderable, templatable {
      */
     public function set_info(string $info): void {
         $this->info = $info;
+    }
+
+    /**
+     * Override whether guest login is offered on this login form instance.
+     *
+     * Site-wide guest login may be enabled, but a specific flow (for example, the
+     * OAuth2 authorisation login screen) may need to suppress it regardless.
+     *
+     * @param bool $canloginasguest Whether guest login should be offered.
+     */
+    public function set_can_login_as_guest(bool $canloginasguest): void {
+        $this->canloginasguest = $canloginasguest;
+    }
+
+    /**
+     * Override whether sign-up is offered on this login form instance.
+     *
+     * Site-wide registration may be open, but a specific flow (for example, the
+     * OAuth2 authorisation login screen) may need to suppress it regardless. If the
+     * "don't have an account? sign up" instructions text was auto-generated because
+     * sign-up is enabled site-wide, it is cleared here too, so the form doesn't point
+     * users at sign-up while also hiding the option to do it.
+     *
+     * @param bool $signupallowed Whether sign-up should be offered.
+     */
+    public function set_signup_allowed(bool $signupallowed): void {
+        $this->cansignup = $signupallowed;
+        if (!$signupallowed && $this->instructionsfromsignupfallback) {
+            $this->instructions = '';
+            $this->instructionsfromsignupfallback = false;
+        }
+    }
+
+    /**
+     * Override the form action URL for this login form instance.
+     *
+     * Some flows (for example, the OAuth2 authorisation login screen) need the
+     * credentials form to post back to a different endpoint than the standard
+     * login/index.php, so the flow can be resumed once the user has authenticated,
+     * rather than landing on the default post-login destination.
+     *
+     * @param moodle_url $loginurl The URL the login form should submit to.
+     */
+    public function set_login_url(moodle_url $loginurl): void {
+        $this->loginurl = $loginurl;
     }
 
     /**

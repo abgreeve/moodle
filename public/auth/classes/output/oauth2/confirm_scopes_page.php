@@ -100,8 +100,7 @@ class confirm_scopes_page extends oauth2_page {
             return (object) [
                 'identifier' => $scope->getIdentifier(),
                 'description' => $scope->get_description(),
-                'qualifiedName' => $scope->get_qualified_name(),
-                'humanName' => $scope->get_human_name(),
+                'summary' => $scope->get_summary(),
             ];
         };
 

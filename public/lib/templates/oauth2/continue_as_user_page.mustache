@@ -24,10 +24,9 @@
     * sitename - Name of site.,
     * logourl - Flag, logo url,
     * maintenance - Maintenance message,
-    * error - Any errors in the form?,
-    * info - Info notification to display,
     * languagemenu - Language menu HTML,
     * actionurl - The form action URL,
+    * authinstructions - Custom auth instructions for the left panel, if configured,
     * userinfo - Information about the user
       * username - The username of the user,
       * fullname - The full name of the user,
@@ -38,10 +37,9 @@
         "sitename": "My Moodle Site",
         "logourl": false,
         "maintenance": "For full access to this site, you need to login in as an admin.",
-        "error": "",
-        "info": "",
         "languagemenu": "Choose language",
         "actionurl": "http://localhost/stable_master/login/index.php",
+        "authinstructions": "",
         "userinfo": {
             "username": "johndoe",
             "fullname": "John Doe",
@@ -65,27 +63,12 @@
                     }{{/str}}</h2>
                     {{>core/oauth2/user}}
                     {{>core/local/login_form/maintenance}}
-                    {{>core/local/login_form/errorinfo}}
 
                     <p>{{#str}} oauth2:continueasuserinfo, core, {{userinfo.fullname}} {{/str}}</p>
                     {{>core/oauth2/continue/form}}
                     {{>core/local/login_form/languagemenu}}
-                    {{>core/local/login_form/cookiesnotice}}
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-{{#js}}
-    require(['core/pending'], function(Pending) {
-        const errorMessage = document.getElementById('loginerrormessage')?.textContent.trim();
-        if (errorMessage) {
-            const pendingJS = new Pending('login-move-focus');
-            setTimeout(function() {
-                document.getElementById('username')?.focus();
-                pendingJS.resolve();
-            }, 500);
-        }
-    });
-{{/js}}

@@ -214,11 +214,12 @@ class oauth2 {
             $frm->username = get_moodle_cookie();
         }
 
-        $loginform = new \core_auth\output\login_form(
-            $loginurl,
+        $loginform = new \core_auth\output\login(
             $authsequence,
             $frm->username,
         );
+
+        $loginform->set_login_url($loginurl);
 
         // Disable guest login and signup for OAuth2 login form.
         $loginform->set_can_login_as_guest(false);

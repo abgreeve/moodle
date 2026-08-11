@@ -171,7 +171,7 @@ class oauth2 {
         ServerRequestInterface $request,
         ResponseInterface $response,
     ): ResponseInterface {
-        global $SESSION;
+        global $SESSION, $PAGE;
 
         // If the user is already logged in, make this selectable.
         $loginurl = \core\router\util::get_path_for_callable([self::class, 'do_login']);
@@ -214,6 +214,7 @@ class oauth2 {
             $frm->username = get_moodle_cookie();
         }
 
+        $PAGE->set_context(\context_system::instance());
         $loginform = new \core_auth\output\login(
             $authsequence,
             $frm->username,

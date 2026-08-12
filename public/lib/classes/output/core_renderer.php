@@ -4736,6 +4736,7 @@ EOD;
      */
     public function render_login(\core_auth\output\login $form) {
         $context = $form->export_for_template($this);
+        $context->errorformatted = $this->error_text($context->error);
 
         return $this->render_from_template('core/loginform', $context);
     }

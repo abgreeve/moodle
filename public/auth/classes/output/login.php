@@ -184,7 +184,6 @@ class login implements renderable, templatable {
         $data->cansignup = $this->cansignup;
         $data->cookieshelpicon = $this->cookieshelpicon->export_for_template($output);
         $data->error = $this->error;
-        $data->errorformatted = $output->error_text($data->error);
         $data->errortitle = $this->errortitle;
         $data->info = $this->info;
         $data->forgotpasswordurl = $this->forgotpasswordurl->out(false);

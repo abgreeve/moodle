@@ -18,19 +18,26 @@
 {{!
     @template core/oauth2/continue_as_user_page
 
-    Moodle template for the login page.
+    Moodle template for the OAuth2 "continue as this user" confirmation page, shown when a user
+    is already logged in and reaching an OAuth2 authorization flow.
 
     Context variables required for this template:
     * sitename - Name of site.,
     * logourl - Flag, logo url,
     * maintenance - Maintenance message,
     * languagemenu - Language menu HTML,
-    * actionurl - The form action URL,
+    * actionurl - The URL to submit to in order to continue as the current user,
+    * logouturl - The URL to submit to in order to log out and change user,
+    * sesskey - The current session key,
     * authinstructions - Custom auth instructions for the left panel, if configured,
+    * client - The OAuth2 client requesting access
+      * name - The client's name,
+      * description - The client's description, as formatted HTML.
     * userinfo - Information about the user
       * username - The username of the user,
       * fullname - The full name of the user,
-      * email - The email of the user.
+      * email - The email of the user,
+      * userpicture - The rendered user picture HTML.
 
     Example context (json):
     {
@@ -38,12 +45,19 @@
         "logourl": false,
         "maintenance": "For full access to this site, you need to login in as an admin.",
         "languagemenu": "Choose language",
-        "actionurl": "http://localhost/stable_master/login/index.php",
+        "actionurl": "http://localhost/stable_master/oauth2/login",
+        "logouturl": "http://localhost/stable_master/oauth2/logout",
+        "sesskey": "abcdef1234",
         "authinstructions": "",
+        "client": {
+            "name": "Example client",
+            "description": "This application would like to view your course enrolments."
+        },
         "userinfo": {
             "username": "johndoe",
             "fullname": "John Doe",
-            "email": "johndoe@example.com"
+            "email": "johndoe@example.com",
+            "userpicture": "<img class=\"userpicture\" src=\"http://localhost/stable_master/pix/u/1/f1\" alt=\"Picture of John Doe\">"
         }
     }
 }}

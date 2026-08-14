@@ -17,10 +17,17 @@
 {{!
     @template core/oauth2/user
 
-    TODO describe template user
+    Displays the current user's picture, during an OAuth2 authorization flow.
+
+    Context variables required for this template:
+    * userinfo - Information about the current user
+      * userpicture - The rendered user picture HTML.
 
     Example context (json):
     {
+        "userinfo": {
+            "userpicture": "<img class=\"userpicture\" src=\"https://example.com/moodle/pix/u/1/f1\" alt=\"Picture of Jane Doe\">"
+        }
     }
 }}
 <div class="p-1 mt-2 mb-2 w-100 d-flex flex-row">

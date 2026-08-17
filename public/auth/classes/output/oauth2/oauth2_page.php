@@ -48,12 +48,27 @@ abstract class oauth2_page implements
         ];
     }
 
+    /**
+     * Get the display information for this page's client entity.
+     *
+     * @return \stdClass
+     */
     protected function get_client_info(): \stdClass {
+        return self::describe_client($this->client);
+    }
+
+    /**
+     * Build display information for an OAuth2 client.
+     *
+     * @param \League\OAuth2\Server\Entities\ClientEntityInterface $client
+     * @return \stdClass
+     */
+    public static function describe_client(\League\OAuth2\Server\Entities\ClientEntityInterface $client): \stdClass {
         return (object) [
-            'name' => $this->client->getName(),
-            'description' => format_text($this->client->get_description(), FORMAT_MOODLE),
-            'identifier' => $this->client->getIdentifier(),
-            'isconfidential' => $this->client->isConfidential(),
+            'name' => $client->getName(),
+            'description' => format_text($client->get_description(), FORMAT_MOODLE),
+            'identifier' => $client->getIdentifier(),
+            'isconfidential' => $client->isConfidential(),
         ];
     }
 }

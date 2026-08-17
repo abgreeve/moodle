@@ -90,14 +90,33 @@ final class oauth2_test extends \advanced_testcase {
     }
 
     /**
-     * Create a client entity fixture with the specified identifier.
+     * Create a client entity fixture with the specified identifier, name and description.
+     *
+     * Built via create_from_record() (rather than a bare new client_entity() with only its
+     * identifier set), so that a test exercising anything that reads the client's name or
+     * description (e.g. oauth2_page::describe_client(), used by the OAuth2 login screen and
+     * the other OAuth2 pages) does not fail on those typed properties being uninitialised.
      *
      * @param string $identifier
+     * @param string $name
+     * @param string $description
      */
-    protected function make_client_entity(string $identifier = 'client1'): client_entity {
-        $client = new client_entity();
-        $client->setIdentifier($identifier);
-        return $client;
+    protected function make_client_entity(
+        string $identifier = 'client1',
+        string $name = 'Example client',
+        string $description = 'This application would like to access your account.',
+    ): client_entity {
+        return client_entity::create_from_record(
+            (object) [
+                'clientidentifier' => $identifier,
+                'name' => $name,
+                'description' => $description,
+                'ownercontext' => \context_system::instance()->id,
+                'status' => client_entity::STATUS_ACTIVE,
+                'isconfidential' => 1,
+            ],
+            [],
+        );
     }
 
     /**
@@ -299,6 +318,74 @@ final class oauth2_test extends \advanced_testcase {
         );
 
         $this->assertInstanceOf(continue_as_user_page::class, $capturedcontent);
+    }
+
+    /**
+     * login() supplies the requesting client from the pending authorization request to the
+     * login renderable, so its identity can be shown before the user enters their credentials.
+     */
+    public function test_login_supplies_client_from_pending_request_to_login_form(): void {
+        global $PAGE;
+
+        $this->resetAfterTest();
+
+        $client = $this->make_client_entity();
+        $requestid = $this->store_auth_request_in_session($this->make_auth_request($client));
+
+        $clientrepository = $this->createStub(ClientRepositoryInterface::class);
+        $clientrepository->method('getClientEntity')->willReturn($client);
+
+        $route = $this->get_route_with_stubbed_rendering(clientrepository: $clientrepository);
+
+        $capturedcontent = null;
+        $route->method('render_page_from_renderable')
+            ->willReturnCallback(function ($content, ResponseInterface $response) use (&$capturedcontent): ResponseInterface {
+                $capturedcontent = $content;
+                return $response;
+            });
+
+        $route->login(
+            (new ServerRequest('GET', '/login'))->withQueryParams(['authrequestid' => $requestid]),
+            new Response(),
+        );
+
+        $this->assertInstanceOf(login::class, $capturedcontent);
+
+        $data = $capturedcontent->export_for_template($PAGE->get_renderer('core'));
+        $this->assertTrue($data->hasoauth2client);
+        $this->assertNotNull($data->client);
+        $this->assertSame('Example client', $data->client->name);
+        $this->assertSame('client1', $data->client->identifier);
+    }
+
+    /**
+     * login() does not set any OAuth2 client on the login renderable when there is no pending
+     * authorization request to take it from (e.g. no request id was supplied at all).
+     */
+    public function test_login_does_not_set_oauth2_client_when_no_pending_request(): void {
+        global $PAGE;
+
+        $this->resetAfterTest();
+
+        $route = $this->get_route_with_stubbed_rendering();
+
+        $capturedcontent = null;
+        $route->method('render_page_from_renderable')
+            ->willReturnCallback(function ($content, ResponseInterface $response) use (&$capturedcontent): ResponseInterface {
+                $capturedcontent = $content;
+                return $response;
+            });
+
+        $route->login(
+            new ServerRequest('GET', '/login'),
+            new Response(),
+        );
+
+        $this->assertInstanceOf(login::class, $capturedcontent);
+
+        $data = $capturedcontent->export_for_template($PAGE->get_renderer('core'));
+        $this->assertFalse($data->hasoauth2client);
+        $this->assertNull($data->client);
     }
 
     /**

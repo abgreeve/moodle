@@ -291,10 +291,10 @@ final class oauth2_test extends \advanced_testcase {
         $user = $this->getDataGenerator()->create_user();
         $this->setUser($user);
 
-        // login() is only ever reached, in production, via authorize()'s redirect, which always
-        // attaches "authrequestid" for a request already validated and stored in the session.
-        // Simulate that here, rather than hitting the unconfigured AuthorizationServer stub's
-        // validateAuthorizationRequest() fallback.
+        // The login() route is only ever reached, in production, via authorize()'s redirect,
+        // which always attaches "authrequestid" for a request already validated and stored in
+        // the session. Simulate that here, rather than hitting the unconfigured
+        // AuthorizationServer stub's validateAuthorizationRequest() fallback.
         $client = $this->make_client_entity();
         $authrequest = $this->make_auth_request($client);
         $authrequest->setUser($this->make_user_entity($user->id));
@@ -1292,7 +1292,12 @@ final class oauth2_test extends \advanced_testcase {
                 'username' => $submittedusername,
                 'password' => 'wrong',
             ]);
-        $response = $route->do_login($dologinrequest, new Response(), $userrepository, $this->make_granted_scopes_repository_stub());
+        $response = $route->do_login(
+            $dologinrequest,
+            new Response(),
+            $userrepository,
+            $this->make_granted_scopes_repository_stub(),
+        );
 
         $this->assertEquals(302, $response->getStatusCode());
         $location = $response->getHeaderLine('Location');
@@ -1755,7 +1760,7 @@ final class oauth2_test extends \advanced_testcase {
             new Response(),
         );
 
-        // login() must have stored something in wantsurl for this to be a meaningful test.
+        // The login() route must have stored something in wantsurl for this to be a meaningful test.
         $this->assertTrue(isset($SESSION->wantsurl));
 
         $this->submit_valid_login_and_approve($route, $requestid, approved: true);

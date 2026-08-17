@@ -771,9 +771,9 @@ class oauth2 {
     /**
      * Helper to render a page with header and footer.
      *
-     * @param string $title
      * @param renderable $content
      * @param ResponseInterface $response
+     * @param string|null $title
      * @return ResponseInterface
      */
     protected function render_page_from_renderable(

@@ -25,14 +25,14 @@ namespace core_auth\output\oauth2;
  */
 abstract class oauth2_page implements
     \core\output\named_templatable,
-    \core\output\renderable
-{
+    \core\output\renderable {
     /** @var \League\OAuth2\Server\Entities\ClientEntityInterface The client entity */
     protected \League\OAuth2\Server\Entities\ClientEntityInterface $client;
 
     /**
      * Get the user information for the currently logged in user.
      *
+     * @param \core\output\core_renderer $renderer
      * @return object
      */
     protected function get_user_info(\core\output\core_renderer $renderer): \stdClass {

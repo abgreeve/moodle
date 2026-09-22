@@ -46,6 +46,44 @@ class create_token extends \moodleform {
     protected const string SCOPE_LABEL = 'scopeslabel';
 
     /**
+     * HTML id of the fieldset wrapping the scope checkboxes.
+     *
+     * @var string
+     */
+    protected const string SCOPES_FIELDSET_ID = 'id_scopesfieldset';
+
+    /**
+     * Classes applied to the scopes fieldset when it carries a validation error.
+     *
+     * Bootstrap's own error styling (the Name field's red box) is a `.is-invalid` class, but that
+     * class only paints a border on `.form-control`/`.form-select` elements, not on a plain
+     * fieldset. These border utility classes are already compiled into Boost's CSS, so they give
+     * the fieldset the same kind of persistent, deliberate error box without a new stylesheet
+     * rule, and independent of any browser's own (and differently coloured) focus ring.
+     *
+     * @var string
+     */
+    protected const string SCOPES_FIELDSET_ERROR_CLASS = 'border border-danger rounded p-2 mb-2';
+
+    /**
+     * The "Scopes" label text, including its required-field marker.
+     *
+     * Shared by the static label row and the fieldset's legend, so both read the same thing.
+     *
+     * @var string
+     */
+    protected string $scopeslabel = '';
+
+    /**
+     * The element holding the scopes fieldset's opening tag and legend.
+     *
+     * Its text is rewritten in {@see display()} once the scopes error, if any, is known.
+     *
+     * @var \HTML_QuickForm_html|null
+     */
+    protected ?\HTML_QuickForm_html $scopesfieldsetopen = null;
+
+    /**
      * Map the available scopes to form element names, keyed by element name.
      *
      * @return string[] Scope identifiers keyed by element name.
@@ -88,6 +126,8 @@ class create_token extends \moodleform {
 
         $scopes = $manager->get_available_scopes();
 
+        $this->scopeslabel = get_string('pat_scopes') . ' ' . $OUTPUT->pix_icon('req', get_string('requiredelement', 'form'));
+
         // The hint carries the label, so "Scopes" sits in the label column like every other
         // field on this form and level with something to read. Not on the first checkbox: an
         // advcheckbox carrying a label renders its text in a described-by span rather than as
@@ -97,11 +137,19 @@ class create_token extends \moodleform {
         $mform->addElement(
             'static',
             self::SCOPE_LABEL,
-            get_string('pat_scopes') . ' ' . $OUTPUT->pix_icon('req', get_string('requiredelement', 'form')),
+            $this->scopeslabel,
             // What the scopes are for, rather than that one is required: the marker beside the
             // label says that already, and so does the error when none is ticked.
             $OUTPUT->notification(get_string('pat_scopesinfo'), 'info', false),
         );
+
+        // A real fieldset around the checkboxes, so their shared "select at least one" error
+        // describes the group as a unit rather than any single checkbox. Built from raw 'html'
+        // elements rather than mform's own grouping: a group renders its members with the
+        // "-inline" template, which would collapse the one-checkbox-per-row layout below onto a
+        // single line. Whether it is invalid is not known until the form has been validated, so
+        // the opening tag starts out plain and is rewritten in display() once that is known.
+        $this->scopesfieldsetopen = $mform->addElement('html', $this->get_scopes_fieldset_open(false));
 
         // A checkbox per scope, each its own form row: a form group would lay them out inline,
         // and a description too wide for the rest of the line drops beneath its own checkbox.
@@ -117,7 +165,66 @@ class create_token extends \moodleform {
             $mform->setType($elementname, PARAM_BOOL);
         }
 
+        $mform->addElement('html', html_writer::end_tag('fieldset'));
+
         $this->add_action_buttons(true, get_string('pat_create'));
+    }
+
+    /**
+     * Build the scopes fieldset's opening tag and its legend.
+     *
+     * @param bool $invalid Whether the scopes error is present, so the fieldset should be
+     *                       exposed as invalid and take focus once the page renders.
+     * @return string
+     */
+    protected function get_scopes_fieldset_open(bool $invalid): string {
+        $attributes = ['id' => self::SCOPES_FIELDSET_ID];
+
+        if ($invalid) {
+            // Mirrors what mform already does for a single invalid control such as Name:
+            // aria-invalid and aria-describedby point at the error, and the error-state class
+            // gives it the same kind of persistent visual box the Name field gets from
+            // is-invalid. tabindex makes the fieldset focusable at all; autofocus is left in as
+            // a harmless progressive-enhancement fallback, but {@see display()} is what actually
+            // moves focus here, since autofocus's content attribute is only specified to
+            // reliably do that on focusable form-associated elements (button, input, select,
+            // textarea), not a plain fieldset.
+            $attributes += [
+                'tabindex' => '-1',
+                'autofocus' => 'autofocus',
+                'aria-invalid' => 'true',
+                'aria-describedby' => 'id_error_' . self::SCOPE_LABEL,
+                'class' => self::SCOPES_FIELDSET_ERROR_CLASS,
+            ];
+        }
+
+        return html_writer::start_tag('fieldset', $attributes) .
+            html_writer::tag('legend', $this->scopeslabel, ['class' => 'visually-hidden']);
+    }
+
+    /**
+     * Print html form.
+     *
+     * Once the form has been through validation, the scopes error (if any) is known, so the
+     * fieldset opening tag added in {@see definition()} is rewritten here to carry it.
+     */
+    #[\Override]
+    public function display(): void {
+        if ($this->_form->getElementError(self::SCOPE_LABEL)) {
+            global $PAGE;
+
+            $this->scopesfieldsetopen->setText($this->get_scopes_fieldset_open(true));
+
+            // Force focus onto the fieldset explicitly rather than relying on the autofocus
+            // attribute alone: this runs once the whole page (including the fieldset itself) has
+            // loaded, so it works regardless of whether a given browser honours autofocus on a
+            // plain fieldset.
+            $PAGE->requires->js_init_code(
+                'document.getElementById(' . json_encode(self::SCOPES_FIELDSET_ID) . ').focus({preventScroll: true});',
+            );
+        }
+
+        parent::display();
     }
 
     /**
